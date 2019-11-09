@@ -41,6 +41,17 @@ def bq(elem, doc):
     if elem.classes == ['bq']:
         return pf.BlockQuote(*elem.content)
 
+def wg21(elem, doc):
+    """
+    Turn wg21 pseudo-class into a link
+    """
+    if not isinstance(elem, pf.Span):
+        return None
+
+    if elem.classes == ['wg21']:
+        target = elem.content[0].text;
+        return pf.Link(pf.Str('[{}]'.format(target)), url='https://wg21.link/{}'.format(target))
+
 def cpp2language(elem, doc):
     """
     Change all the cpp to language-cpp for prism
@@ -52,4 +63,4 @@ def cpp2language(elem, doc):
     return elem
 
 if __name__ == '__main__':
-    pf.run_filters([code_cpp, h1hr, bq])
+    pf.run_filters([code_cpp, h1hr, bq, wg21])
