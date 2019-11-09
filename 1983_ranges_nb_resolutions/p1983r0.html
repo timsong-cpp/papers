@@ -530,7 +530,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <table style="border:none;float:right">
   <tr>
     <td>Document #: </td>
-    <td>D1983R0</td>
+    <td>P1983R0</td>
   </tr>
   <tr>
     <td>Date: </td>
@@ -716,7 +716,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <span id="cb8-2"><a href="#cb8-2"></a><span class="va">+ template&lt;<span class="diffins">class</span> I&gt;</span></span>
 <span id="cb8-3"><a href="#cb8-3"></a>    concept <em>has-arrow</em> =                           // <em>exposition only</em></span>
 <span id="cb8-4"><a href="#cb8-4"></a><span class="st">-     is_pointer_v&lt;I&gt; || requires(I i) { i.operator-&gt;(); };</span></span>
-<span id="cb8-5"><a href="#cb8-5"></a><span class="va">+     <span class="diffins">input_iterator&lt;I&gt; &amp;&amp; (</span> is_pointer_v&lt;I&gt; || requires(I i) { i.operator-&gt;(); } <span class="diffins">)</span>;</span></span></code></pre></div>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="va">+     <span class="diffins">input_iterator&lt;I&gt; &amp;&amp; (</span>is_pointer_v&lt;I&gt; || requires(I i) { i.operator-&gt;(); }<span class="diffins">)</span>;</span></span></code></pre></div>
 </div>
 </blockquote>
 <h1 id="references" style="border-bottom:1px solid #cccccc"><span class="header-section-number">3</span> References<a href="#references" class="self-link"></a></h1>

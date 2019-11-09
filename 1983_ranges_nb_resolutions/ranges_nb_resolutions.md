@@ -1,6 +1,6 @@
 ---
 title: Wording for GB301, US296, US292, US291, and US283 
-document: D1983R0
+document: P1983R0
 date: today
 audience:
   - LWG
@@ -208,6 +208,6 @@ Edit [range.utility.helpers]{.wg21} as indicated:
 + template<@[class]{.diffins}@ I>
     concept @_has-arrow_@ =                           // @_exposition only_@
 -     is_pointer_v<I> || requires(I i) { i.operator->(); };
-+     @[input_iterator<I> && (]{.diffins}@ is_pointer_v<I> || requires(I i) { i.operator->(); } @[)]{.diffins}@;
++     @[input_iterator<I> && (]{.diffins}@is_pointer_v<I> || requires(I i) { i.operator->(); }@[)]{.diffins}@;
 ```
 :::
