@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2019-11-11" />
+  <meta name="dcterms.date" content="2019-11-13" />
   <title>Casting convertible_to&lt;bool&gt; considered harmful</title>
   <style>
       code{white-space: pre-wrap;}
@@ -534,7 +534,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
   </tr>
   <tr>
     <td>Date: </td>
-    <td>2019-11-11</td>
+    <td>2019-11-13</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project: </td>
@@ -592,7 +592,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 </thead>
 <tbody>
 <tr class="odd">
-<td><div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1"></a><span class="dt">bool</span> r <span class="op">=</span> x <span class="op">!=</span> y;                     </span>
+<td><div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1"></a><span class="dt">bool</span> r <span class="op">=</span> x <span class="op">!=</span> y;</span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="dt">bool</span> f<span class="op">()</span> <span class="op">{</span> <span class="co">/* ... */</span> <span class="cf">return</span> a <span class="op">&lt;</span> b; <span class="op">}</span></span></code></pre></div></td>
 <td><div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">static_cast</span><span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;(</span>x <span class="op">==</span> y<span class="op">)</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="dt">bool</span><span class="op">(</span>c <span class="op">&gt;</span> d<span class="op">)</span></span></code></pre></div></td>
@@ -643,9 +643,9 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <p>The keenly-eyed reader may have noticed that the examples in the above table are the same as those in section 2.2 “Nonuniformity of application” of <span class="citation" data-cites="P1934R0">[<a href="#ref-P1934R0" role="doc-biblioref">P1934R0</a>]</span>, only modified to be correct.</p>
 <p>In other words, P1934R0 fails to solve the motivating example it presented for this problem: a cast is still sometimes required, sometimes not. While it is certainly an improvement over <code class="sourceCode cpp">boolean</code> - the demarcation of the two “sometimes” is cleaner and easier to reason about - the problem remains.</p>
 <h2 id="contradiction-with-lwgs-preferred-direction-for-lwg2114"><span class="header-section-number">3.2</span> Contradiction with LWG’s preferred direction for <span class="citation" data-cites="LWG2114">[<a href="#ref-LWG2114" role="doc-biblioref">LWG2114</a>]</span><a href="#contradiction-with-lwgs-preferred-direction-for-lwg2114" class="self-link"></a></h2>
-<p>Since C++98, the current library specification has been filled with requirements for something to be “convertible to <code class="sourceCode cpp"><span class="dt">bool</span></code>” requirements (see, e.g., what is now called <em>Cpp17LessThanComparable</em>) and “contextually convertible to <code class="sourceCode cpp"><span class="dt">bool</span></code>” has been added to the mix since C++11 (see, e.g., <em>Cpp17NullablePointer</em>).</p>
+<p>Since C++98, the current library specification has been filled with requirements for something to be “convertible to <code class="sourceCode cpp"><span class="dt">bool</span></code>” requirements (see, e.g., what is now called <em>Cpp17LessThanComparable</em> <a href="https://wg21.link/utility.arg.requirements">[utility.arg.requirements]</a>) and “contextually convertible to <code class="sourceCode cpp"><span class="dt">bool</span></code>” has been added to the mix since C++11 (see, e.g., <em>Cpp17NullablePointer</em> <a href="https://wg21.link/nullablepointer.requirements">[nullablepointer.requirements]</a>).</p>
 <p>However, these requirements date from a time where library specification has been quite imprecise; as Casey Carter put it during the LEWG discussion of an early draft of this paper, what was meant was more like “it converts to <code class="sourceCode cpp"><span class="dt">bool</span></code> when the library wants it to convert to <code class="sourceCode cpp"><span class="dt">bool</span></code>”.</p>
-<p>An library issue, <span class="citation" data-cites="LWG2114">[<a href="#ref-LWG2114" role="doc-biblioref">LWG2114</a>]</span>, was opened in 2011 to address the formulation of these requirements; in 2012, STL explained in the issue that implementations want to do things well beyond just converting them to <code class="sourceCode cpp"><span class="dt">bool</span></code>; the example given from the Dinkumware Standard Library implementaton then were:</p>
+<p>A library issue, <span class="citation" data-cites="LWG2114">[<a href="#ref-LWG2114" role="doc-biblioref">LWG2114</a>]</span>, was opened in 2011 to address the formulation of these requirements; in 2012, STL explained in the issue that implementations want to do things well beyond just converting them to <code class="sourceCode cpp"><span class="dt">bool</span></code>; the example given from the Dinkumware Standard Library implementation then were:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1"></a><span class="cf">if</span> <span class="op">(</span>pred<span class="op">(</span>args<span class="op">))</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="cf">if</span> <span class="op">(!</span>pred<span class="op">(</span>args<span class="op">))</span></span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="cf">if</span> <span class="op">(</span>cond <span class="op">&amp;&amp;</span> pred<span class="op">(</span>args<span class="op">))</span></span>
@@ -657,8 +657,8 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <p><span class="citation" data-cites="P1934R0">[<a href="#ref-P1934R0" role="doc-biblioref">P1934R0</a>]</span> claims that <code class="sourceCode cpp">convertible_to<span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span></code> “is quite close to the ‘old’ notion of what a predicate should yield”. As seen from the history above, this is simply not the case in practice. None of the three major implementations in fact accept everything “convertible to <code class="sourceCode cpp"><span class="dt">bool</span></code>”; they all make use of logical operations on the result and expect them to work. It takes five minutes to find examples in their current code base:</p>
 <table>
 <colgroup>
-<col style="width: 50%"></col>
-<col style="width: 50%"></col>
+<col style="width: 16%"></col>
+<col style="width: 83%"></col>
 </colgroup>
 <thead>
 <tr class="header">
@@ -685,13 +685,14 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 </tr>
 </tbody>
 </table>
+<p>It’s also worth noting that two of the three examples above depend on the built-in operator <code class="sourceCode cpp"><span class="op">&amp;&amp;</span></code>’s short-circuiting behavior.</p>
 <p>In other words, while “convertible to <code class="sourceCode cpp"><span class="dt">bool</span></code>” or “contextually convertible to <code class="sourceCode cpp"><span class="dt">bool</span></code>” might have been the requirement <em>on paper</em>, it has never been the reality.</p>
 <h2 id="unreasonable-burden-for-implementers-and-users"><span class="header-section-number">3.4</span> Unreasonable burden for implementers and users<a href="#unreasonable-burden-for-implementers-and-users" class="self-link"></a></h2>
 <p>The benefit conferred by the choice of <code class="sourceCode cpp">convertible_to<span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span></code> is that it enables certain highly questionable types to be returned from predicates and comparisons - overloading <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> and <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">||</span></code> is universally recommended against due to such overloads not having the built-in operator’s short-circuit semantics. But the costs imposed are substantial enough to be unreasonable when measured against the minimal benefit it confers:</p>
 <ul>
 <li>Implementations, as well as generic code authors using standard library concepts, must now perform <code class="sourceCode cpp"><span class="dt">bool</span></code> casts for correctness. The fact that these casts are only <em>sometimes</em> required compounds the problem.</li>
-<li>It’s unclear how many will actually do so, given the unnatural verbosity of these casts, and the lack of these questionable types in the wild. In LWG discussion, at least one major implementation stated that they have never received a user complaint for not supporting such types, even as they added support for overloaded address-of and comma operators. The lack of such types in the wild also makes it easy to overlook the need for casting and difficult to test.</li>
-<li>It is very common for authors of concrete iterators in partcular to just specify the iterator concept (or named requirement) supported. The standard itself does so for the iterators of containers, as well as things like <code class="sourceCode cpp">filesystem<span class="op">::</span>directory_iterator</code>. Without further changes in the library specification, <em>users</em> would be required to cast the result of comparing two <code class="sourceCode cpp">vector<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;::</span>iterator</code> to <code class="sourceCode cpp"><span class="dt">bool</span></code>, which is obviously untenable. Similarly, authors of concrete iterators will need to revise their documentation to assure their users that casting is not required. While this might not be a major burden, the fact that doing so is necessary at all should give us pause.</li>
+<li>It’s unclear how many will actually do so, given the unnatural verbosity of these casts, and the lack of these questionable types in the wild. In LWG discussion, at least one major implementation stated that they have never received a user complaint for not supporting such types, even as they added support for overloaded address-of and comma operators. The lack of such types in the wild also makes it easy to overlook the need for casting and difficult to test for missing casts.</li>
+<li>It is very common for authors of concrete iterators in particular to just specify the iterator concept (or named requirement) supported. The standard itself does so for the iterators of containers, as well as things like <code class="sourceCode cpp">filesystem<span class="op">::</span>directory_iterator</code>. Without further changes in the library specification, <em>users</em> would be required to cast the result of comparing two <code class="sourceCode cpp">vector<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;::</span>iterator</code> to <code class="sourceCode cpp"><span class="dt">bool</span></code>, which is obviously untenable. Similarly, authors of concrete iterators will need to revise their documentation to assure their users that casting is not required. While this might not be a major burden, the fact that doing so is necessary at all should give us pause.</li>
 </ul>
 <h1 id="proposal-require-the-logical-operators-to-just-work" style="border-bottom:1px solid #cccccc"><span class="header-section-number">4</span> Proposal: require the logical operators to “just work”<a href="#proposal-require-the-logical-operators-to-just-work" class="self-link"></a></h1>
 <p>Instead of <code class="sourceCode cpp">convertible_to<span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span></code>, we propose to replace <code class="sourceCode cpp">boolean</code> with an exposition-only concept <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> as follows:</p>
@@ -705,15 +706,15 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <li><code class="sourceCode cpp"><span class="op">&amp;&amp;</span></code> and <code class="sourceCode cpp"><span class="op">||</span></code> must have their built-in meaning.</li>
 </ul>
 <p>This is the same set of operations required to be supported by the current proposed resolution of <span class="citation" data-cites="LWG2114">[<a href="#ref-LWG2114" role="doc-biblioref">LWG2114</a>]</span>; casting to <code class="sourceCode cpp"><span class="dt">bool</span></code> will not be necessary for these operations.</p>
-<p>The primary difficulty that has plagued previous attempts at expressing the requirement as to <code class="sourceCode cpp"><span class="op">&amp;&amp;</span></code> and <code class="sourceCode cpp"><span class="op">||</span></code> is that it seems to require universal quantification: for a <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> type, we must require that <code class="sourceCode cpp"><span class="op">&amp;&amp;</span></code> and <code class="sourceCode cpp"><span class="op">||</span></code> can be used with <em>every</em> <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> type. This is impossible to express in concepts, and exceedingly difficult at best to formulate even in prose, as the drafting history of <span class="citation" data-cites="LWG2114">[<a href="#ref-LWG2114" role="doc-biblioref">LWG2114</a>]</span> attests. Moreover, this requirement makes it difficult to answer even simple questions like “is <code class="sourceCode cpp"><span class="dt">bool</span></code> <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em>?” If there’s a <code class="sourceCode cpp">Evil</code> type that works with itself but no other type, is <code class="sourceCode cpp">Evil</code> the broken one, or is it everything else? How can you tell?</p>
+<p>The primary difficulty that has plagued previous attempts at expressing the requirement as to <code class="sourceCode cpp"><span class="op">&amp;&amp;</span></code> and <code class="sourceCode cpp"><span class="op">||</span></code> is that it seems to require universal quantification: for a <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> type, we must require that <code class="sourceCode cpp"><span class="op">&amp;&amp;</span></code> and <code class="sourceCode cpp"><span class="op">||</span></code> can be used with <em>every</em> <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> type. This is impossible to express in concepts, and exceedingly difficult at best to formulate even in prose, as the drafting history of <span class="citation" data-cites="LWG2114">[<a href="#ref-LWG2114" role="doc-biblioref">LWG2114</a>]</span> attests. Moreover, stating the requirement in this manner makes it difficult to answer even simple questions like “is <code class="sourceCode cpp"><span class="dt">bool</span></code> <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em>?” If there’s a <code class="sourceCode cpp">Evil</code> type that works with itself but no other type, is <code class="sourceCode cpp">Evil</code> the broken one, or is it everything else? How can you tell?</p>
 <p>To address this difficulty and allow the type to be analyzed in isolation, we propose to strengthen the requirement: the type must not introduce a potentially viable <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> or <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">||</span></code> candidate into the overload set. This is a requirement that can be answered easily: given a type, we know its member functions and its associated namespaces and classes (if any). We therefore know the result of class member lookup and argument-dependent lookup for the names <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> and <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">||</span></code>. If there is no member with these names, and ADL also does not find an overload that can possibly be viable, then we know that using this type in an expression cannot possibly bring in viable <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> and <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">||</span></code> overloads, and so using <code class="sourceCode cpp"><span class="op">&amp;&amp;</span></code> or <code class="sourceCode cpp"><span class="op">||</span></code> with two such types will always resolve to the built-in operator.</p>
-<p>While this is a stronger requirement than what is strictly necessary, it allows analysis based on a single type (possibly by a static analyzer), and still admits a wide set of models including well-defined class and enumeration types.</p>
+<p>While this is a stronger requirement than what is strictly necessary, it allows analysis based on a single type (possibly by a static analyzer), and still admits a wide set of models including well-behaved class and enumeration types. There is some subtlety here (the wording needs to be carefully crafted to ensure that <code class="sourceCode cpp">std<span class="op">::</span>valarray</code>’s <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> and <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">||</span></code> do not disqualify <code class="sourceCode cpp">std<span class="op">::</span>true_type</code>, for example), but the rule to teach is simple: just don’t overload the conditional operators, and your type will be fine. In this respect, it’s not unlike the conditional operator: the rules take up some 1.5 pages of dense standardese in <a href="https://wg21.link/expr.cond">[expr.cond]</a>, but the gist of what it does can be explained in a single sentence.</p>
 <h1 id="alternative-direction-limit-the-set-of-permitted-types-to-a-known-set-of-well-behaved-types-not-proposed" style="border-bottom:1px solid #cccccc"><span class="header-section-number">5</span> Alternative direction: limit the set of permitted types to a known set of well-behaved types (not proposed)<a href="#alternative-direction-limit-the-set-of-permitted-types-to-a-known-set-of-well-behaved-types-not-proposed" class="self-link"></a></h1>
 <p>Alternative suggestions have been made to limit these expression to a small set of permitted types that we know to be well-behaved. Various options have been proposed in this direction.</p>
 <table>
 <colgroup>
-<col style="width: 50%"></col>
-<col style="width: 50%"></col>
+<col style="width: 44%"></col>
+<col style="width: 55%"></col>
 </colgroup>
 <thead>
 <tr class="header">
@@ -721,7 +722,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <strong>Option</strong>
 </div></th>
 <th><div style="text-align:center">
-<strong>Permitted result type of a comparsion of predicate</strong>
+<strong>Permitted result type of a comparison of predicate</strong>
 </div></th>
 </tr>
 </thead>
@@ -732,23 +733,23 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 </tr>
 <tr class="even">
 <td><code class="sourceCode cpp">decays_to<span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span></code></td>
-<td>anything that decays to <code class="sourceCode cpp"><span class="dt">bool</span></code>, thus allowing <code class="sourceCode cpp"><span class="kw">const</span> <span class="dt">bool</span><span class="op">&amp;</span></code></td>
+<td>Anything that decays to <code class="sourceCode cpp"><span class="dt">bool</span></code>, thus allowing, e.g., <code class="sourceCode cpp"><span class="kw">const</span> <span class="dt">bool</span><span class="op">&amp;</span></code> (important for when a pointer to data member is used as an invocable predicate)</td>
 </tr>
 <tr class="odd">
 <td><code class="sourceCode cpp">decays_to<span class="op">&lt;</span>integral<span class="op">&gt;</span></code></td>
-<td>anything that decays to an integral type, such as <code class="sourceCode cpp"><span class="dt">bool</span></code>, <code class="sourceCode cpp"><span class="dt">int</span></code>, or <code class="sourceCode cpp"><span class="kw">const</span> <span class="dt">int</span><span class="op">&amp;</span></code>. This allows things like Windows <code class="sourceCode cpp">BOOL</code> and C functions like <code class="sourceCode cpp">isupper</code> that returns an <code class="sourceCode cpp"><span class="dt">int</span></code>.</td>
+<td>Anything that decays to an integral type, such as <code class="sourceCode cpp"><span class="dt">bool</span></code>, <code class="sourceCode cpp"><span class="dt">int</span></code>, or <code class="sourceCode cpp"><span class="kw">const</span> <span class="dt">int</span><span class="op">&amp;</span></code>. This allows things like Windows <code class="sourceCode cpp">BOOL</code> and C functions like <code class="sourceCode cpp">isupper</code> that returns an <code class="sourceCode cpp"><span class="dt">int</span></code>.</td>
 </tr>
 <tr class="even">
 <td><code class="sourceCode cpp">decays_to<span class="op">&lt;</span>integral <span class="kw">or</span> pointer <span class="kw">or</span> pointer<span class="op">-</span>to<span class="op">-</span>member<span class="op">&gt;</span></code></td>
-<td>anything that decays to an integral/pointer/pointer to member type. This enables returning possibly-null pointers from predicates without having to convert them to <code class="sourceCode cpp"><span class="dt">bool</span></code> first.</td>
+<td>Anything that decays to an integral/pointer/pointer to member type. This enables returning possibly-null pointers from predicates without having to convert them to <code class="sourceCode cpp"><span class="dt">bool</span></code> first.</td>
 </tr>
 <tr class="odd">
-<td><code class="sourceCode cpp">decays_to<span class="op">&lt;</span>integral<span class="op">&gt;</span></code>, <code class="sourceCode cpp">true_type</code>, <code class="sourceCode cpp">false_type</code></td>
+<td><code class="sourceCode cpp">decays_to<span class="op">&lt;</span>integral <span class="kw">or</span> true_type <span class="kw">or</span> false_type<span class="op">&gt;</span></code></td>
 <td>This accepts two known-good class types for which support have been requested.</td>
 </tr>
 </tbody>
 </table>
-<p>By necessity, they are all significantly more limiting than the <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> approach: class types and enumeration types cannot be supported generally; even supporting a select set requires giving up support for pointers and pointers to member. This paper does not propose this approach, but mentions it for completenesss.</p>
+<p>By necessity, they are all significantly more limiting than the <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> approach: class types and enumeration types cannot be supported generally; even supporting a select set requires giving up support for pointers and pointers to member. This paper does not propose this approach, but mentions it for completeness.</p>
 <h1 id="references" style="border-bottom:1px solid #cccccc"><span class="header-section-number">6</span> References<a href="#references" class="self-link"></a></h1>
 
 <div id="refs" role="doc-bibliography">

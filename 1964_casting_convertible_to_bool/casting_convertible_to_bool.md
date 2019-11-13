@@ -20,7 +20,8 @@ imposes an unreasonable burden on implementers and users alike,
 and should be reconsidered.
 
 # Revision history
-- R0: Initial revision for the post-Belfast mailing. An early draft of this paper was written and presented to LEWG during the Belfast meeting and attached to the LEWG wiki; this version has been substantially revised from that draft.
+- R0: Initial revision for the post-Belfast mailing. An early draft of this paper was written and presented to LEWG
+  during the Belfast meeting and attached to the LEWG wiki; this version has been substantially revised from that draft.
 
 # Problem statement
 [@P1934R0] proposes removing the `boolean` concept and replacing its uses with `convertible_to<bool>` instead.
@@ -31,7 +32,7 @@ explicitly, or contextually:
 :::tonytable
 ## Implicit
 ```c++
-bool r = x != y;                     
+bool r = x != y;
 bool f() { /* ... */ return a < b; }
 ```
 ## Explicit
@@ -83,7 +84,7 @@ bool equal(I1 first1, S1 last1, I2 first2, S2 last2) {
 There are a multitude of problems with this proposed replacement.
 
 ## Nonuniformity of application remains
-The keenly-eyed reader may have noticed that the examples in the above table are the same as those in 
+The keenly-eyed reader may have noticed that the examples in the above table are the same as those in
 section 2.2 "Nonuniformity of application" of [@P1934R0], only modified to be correct.
 
 In other words, P1934R0 fails to solve the motivating example it presented for this problem:
@@ -93,16 +94,18 @@ about - the problem remains.
 
 ## Contradiction with LWG's preferred direction for [@LWG2114]
 Since C++98, the current library specification has been filled with requirements for something to be
-"convertible to `bool`" requirements (see, e.g., what is now called _Cpp17LessThanComparable_) and 
-"contextually convertible to `bool`" has been added to the mix since C++11 (see, e.g., _Cpp17NullablePointer_).
+"convertible to `bool`" requirements (see, e.g., what is now called _Cpp17LessThanComparable_
+[utility.arg.requirements]{.wg21}) and
+"contextually convertible to `bool`" has been added to the mix since C++11 (see, e.g., _Cpp17NullablePointer_
+[nullablepointer.requirements]{.wg21}).
 
 However, these requirements date from a time where library specification has been quite imprecise;
 as Casey Carter put it during the LEWG discussion of an early draft of this paper, what was meant
 was more like "it converts to `bool` when the library wants it to convert to `bool`".
 
-An library issue, [@LWG2114], was opened in 2011 to address the formulation of these requirements;
+A library issue, [@LWG2114], was opened in 2011 to address the formulation of these requirements;
 in 2012, STL explained in the issue that implementations want to do things well beyond just converting them to `bool`;
-the example given from the Dinkumware Standard Library implementaton then were:
+the example given from the Dinkumware Standard Library implementation then were:
 
 ```c++
 if (pred(args))
@@ -130,10 +133,12 @@ everything "convertible to `bool`"; they all make use of logical operations on t
 five minutes to find examples in their current code base:
 
 |Implementation | Example |
-|-----|-----|
-| MSVC| `while (_UFirst1 != _ULast1 && _UFirst2 != _ULast2 && _Pred(*_UFirst1, *_UFirst2))` |
+|-|-----|
+| MSVC | `while (_UFirst1 != _ULast1 && _UFirst2 != _ULast2 && _Pred(*_UFirst1, *_UFirst2))` |
 | libstdc++ | `while (__first != __last && !__pred(__first))` |
 | libc++ | `for (; __first1 != __last1 && __first2 != __last2; ++__first1, (void) ++__first2)` |
+
+It's also worth noting that two of the three examples above depend on the built-in operator `&&`'s short-circuiting behavior.
 
 In other words, while "convertible to `bool`" or "contextually convertible to `bool`" might have been the requirement
 _on paper_, it has never been the reality.
@@ -141,17 +146,17 @@ _on paper_, it has never been the reality.
 ## Unreasonable burden for implementers and users
 The benefit conferred by the choice of `convertible_to<bool>` is that it enables certain highly questionable types
 to be returned from predicates and comparisons - overloading `operator&&` and `operator||` is universally recommended
-against due to such overloads not having the built-in operator's short-circuit semantics. But the costs imposed are 
+against due to such overloads not having the built-in operator's short-circuit semantics. But the costs imposed are
 substantial enough to be unreasonable when measured against the minimal benefit it confers:
 
 - Implementations, as well as generic code authors using standard library concepts, must now perform `bool` casts
-  for correctness. The fact that these casts are only _sometimes_ required compounds the problem. 
+  for correctness. The fact that these casts are only _sometimes_ required compounds the problem.
 - It's unclear how many will actually do so, given the unnatural verbosity of these casts, and the lack of these
-  questionable types in the wild. In LWG discussion, at least one major implementation stated that they have 
+  questionable types in the wild. In LWG discussion, at least one major implementation stated that they have
   never received a user complaint for not supporting such types, even as they added support for overloaded address-of
   and comma operators. The lack of such types in the wild also makes it easy to overlook the need for casting and
-  difficult to test.
-- It is very common for authors of concrete iterators in partcular to just specify the iterator concept (or named requirement)
+  difficult to test for missing casts.
+- It is very common for authors of concrete iterators in particular to just specify the iterator concept (or named requirement)
   supported. The standard itself does so for the iterators of containers, as well as things like `filesystem::directory_iterator`.
   Without further changes in the library specification, _users_ would be required to cast the result of comparing two
   `vector<int>::iterator` to `bool`, which is obviously untenable. Similarly, authors of concrete iterators will need to
@@ -171,7 +176,7 @@ concept @_boolean-testable_@ = convertible_to<T, bool> && requires (const remove
 ```
 and further add the semantic requirement that all logical operators "just work":
 
- - `!` can be overloaded but must have the usual semantics; 
+ - `!` can be overloaded but must have the usual semantics;
  - `&&` and `||` must have their built-in meaning.
 
 This is the same set of operations required to be supported by the current proposed resolution of [@LWG2114];
@@ -187,27 +192,31 @@ type that works with itself but no other type, is `Evil` the broken one, or is i
 To address this difficulty and allow the type to be analyzed in isolation, we propose to strengthen the requirement: the type must
 not introduce a potentially viable `operator&&` or `operator||` candidate into the overload set. This is a requirement that can be
 answered easily: given a type, we know its member functions and its associated namespaces and classes (if any).
-We therefore know the result of class member lookup and argument-dependent lookup for the names `operator&&` and `operator||`. 
+We therefore know the result of class member lookup and argument-dependent lookup for the names `operator&&` and `operator||`.
 If there is no member with these names, and ADL also does not find an overload that can possibly be viable, then we know that
-using this type in an expression cannot possibly bring in viable `operator&&` and `operator||` overloads, 
+using this type in an expression cannot possibly bring in viable `operator&&` and `operator||` overloads,
 and so using `&&` or `||` with two such types will always resolve to the built-in operator.
 
 While this is a stronger requirement than what is strictly necessary, it allows analysis based on a single type (possibly
-by a static analyzer), and still admits a wide set of models including well-defined class and enumeration types.
+by a static analyzer), and still admits a wide set of models including well-behaved class and enumeration types.
+There is some subtlety here (the wording needs to be carefully crafted to ensure that `std::valarray`'s
+`operator&&` and `operator||` do not disqualify `std::true_type`, for example), but the rule to teach is simple: just don't overload the
+conditional operators, and your type will be fine. In this respect, it's not unlike the conditional operator: the rules take
+up some 1.5 pages of dense standardese in [expr.cond]{.wg21}, but the gist of what it does can be explained in a single sentence.
 
 # Alternative direction: limit the set of permitted types to a known set of well-behaved types (not proposed)
 Alternative suggestions have been made to limit these expression to a small set of permitted types that we know
 to be well-behaved. Various options have been proposed in this direction.
 
-| Option | Permitted result type of a comparsion of predicate |
-| --- | --- |
+| Option | Permitted result type of a comparison of predicate |
+| ---- | ----- |
 | `same_as<bool>` | `bool`, only. `const bool&` is not allowed. |
-| `decays_to<bool>` | anything that decays to `bool`, thus allowing `const bool&`|
-| `decays_to<integral>` | anything that decays to an integral type, such as `bool`, `int`, or `const int&`. This allows things like Windows `BOOL` and C functions like `isupper` that returns an `int`. |
-| `decays_to<integral or pointer or pointer-to-member>` | anything that decays to an integral/pointer/pointer to member type. This enables returning possibly-null pointers from predicates without having to convert them to `bool` first. |
-| `decays_to<integral>`, `true_type`, `false_type` | This accepts two known-good class types for which support have been requested. |
+| `decays_to<bool>` | Anything that decays to `bool`, thus allowing, e.g., `const bool&` (important for when a pointer to data member is used as an invocable predicate)|
+| `decays_to<integral>` | Anything that decays to an integral type, such as `bool`, `int`, or `const int&`. This allows things like Windows `BOOL` and C functions like `isupper` that returns an `int`. |
+| `decays_to<integral or pointer or pointer-to-member>` | Anything that decays to an integral/pointer/pointer to member type. This enables returning possibly-null pointers from predicates without having to convert them to `bool` first. |
+| `decays_to<integral or true_type or false_type>` | This accepts two known-good class types for which support have been requested. |
 
 By necessity, they are all significantly more limiting than the _`boolean-testable`_ approach:
 class types and enumeration types cannot be supported generally; even supporting a select set
 requires giving up support for pointers and pointers to member. This paper does not propose
-this approach, but mentions it for completenesss.
+this approach, but mentions it for completeness.
