@@ -96,9 +96,9 @@ about - the problem remains.
 ## Contradiction with LWG's preferred direction for [@LWG2114]
 Since C++98, the current library specification has been filled with requirements for something to be
 "convertible to `bool`" requirements (see, e.g., what is now called _Cpp17LessThanComparable_
-[utility.arg.requirements]{.wg21}) and
+[utility.arg.requirements]{.sref}) and
 "contextually convertible to `bool`" has been added to the mix since C++11 (see, e.g., _Cpp17NullablePointer_
-[nullablepointer.requirements]{.wg21}).
+[nullablepointer.requirements]{.sref}).
 
 However, these requirements date from a time where library specification has been quite imprecise;
 as Casey Carter put it during the LEWG discussion of an early draft of this paper, what was meant

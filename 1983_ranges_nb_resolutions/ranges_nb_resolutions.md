@@ -20,7 +20,7 @@ This wording is relative to [@N4835].
 
 ## [GB301](https://github.com/cplusplus/nbballot/issues/297) Add `filter_view::pred()` accessor
 
-Edit [range.filter.view]{.wg21}, class template `filter_view` synopsis, as indicated:
+Edit [range.filter.view]{.sref}, class template `filter_view` synopsis, as indicated:
 
 ::: bq
 
@@ -49,7 +49,7 @@ Edit [range.filter.view]{.wg21}, class template `filter_view` synopsis, as indic
 ```
 :::
 
-In [range.filter.view]{.wg21}, insert the following after p3:
+In [range.filter.view]{.sref}, insert the following after p3:
 
 ::: add
 
@@ -65,7 +65,7 @@ In [range.filter.view]{.wg21}, insert the following after p3:
 [LWG was not convinced that the constructor was wrong, but nonetheless agreed to
  change this for consistency with the rest of the Clause.]{.draftnote}
 
-Edit [range.split.outer]{.wg21}, class template `split_view::outer_iterator` synopsis, as indicated:
+Edit [range.split.outer]{.sref}, class template `split_view::outer_iterator` synopsis, as indicated:
 
 ::: bq
 
@@ -107,7 +107,7 @@ Edit [range.split.outer]{.wg21}, class template `split_view::outer_iterator` syn
 ```
 :::
 
-Edit [range.split.outer]{.wg21} before p4 as indicated:
+Edit [range.split.outer]{.sref} before p4 as indicated:
 
 :::bq
 
@@ -123,7 +123,7 @@ Edit [range.split.outer]{.wg21} before p4 as indicated:
 
 ## [US292](https://github.com/cplusplus/nbballot/issues/288) Incorrect constructor for `join_view::iterator`
 
-Edit [range.join.iterator]{.wg21},  class template `join_­view​::​iterator` synopsis, as indicated:
+Edit [range.join.iterator]{.sref},  class template `join_­view​::​iterator` synopsis, as indicated:
 
 :::bq
 ```diff
@@ -150,7 +150,7 @@ Edit [range.join.iterator]{.wg21},  class template `join_­view​::​iterator`
 ```
 :::
 
-Edit [range.join.iterator]{.wg21} before p7 as indicated:
+Edit [range.join.iterator]{.sref} before p7 as indicated:
 
 :::bq
 ```diff
@@ -163,7 +163,7 @@ Edit [range.join.iterator]{.wg21} before p7 as indicated:
 
 ## [US291](https://github.com/cplusplus/nbballot/issues/287) `join_view::begin` requires mutable data
 
-Edit [range.join.view]{.wg21} as indicated:
+Edit [range.join.view]{.sref} as indicated:
 
 ::: bq
 
@@ -200,7 +200,7 @@ Edit [range.join.view]{.wg21} as indicated:
 
 ## [US283](https://github.com/cplusplus/nbballot/issues/279) Specification of _`has-arrow`_ concept is ill-formed
 
-Edit [range.utility.helpers]{.wg21} as indicated:
+Edit [range.utility.helpers]{.sref} as indicated:
 
 :::bq
 ```diff

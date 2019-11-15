@@ -15,7 +15,6 @@ PANDOC = pandoc $< $(MPARK_DATA)/references.md \
    --filter $(THIS_DIR)/pandoc.py \
    --highlight-style $(MPARK_DATA)/syntax/wg21.theme \
    --metadata datadir:$(MPARK_DATA) \
-   --metadata annexf:$(THIS_DIR)annex-f \
    --metadata-file $(MPARK_DATA)/metadata.yaml \
    --syntax-definition $(MPARK_DATA)/syntax/isocpp.xml \
    --template $(MPARK_DATA)/template/wg21 \
