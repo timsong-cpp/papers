@@ -41,6 +41,8 @@ def bq(elem, doc):
     if elem.classes == ['bq']:
         return pf.BlockQuote(*elem.content)
 
+stable_name_map = {}
+
 def wg21(elem, doc):
     """
     Turn wg21 pseudo-class into a link
@@ -48,9 +50,20 @@ def wg21(elem, doc):
     if not isinstance(elem, pf.Span):
         return None
 
+    global stable_name_map
+    if not stable_name_map:
+        annexf_path = doc.get_metadata('annexf')
+        with open(annexf_path, 'r') as f:
+            lines = f.readlines()
+            stable_name_map = dict(map(lambda s: s.split(), lines))
+
     if elem.classes == ['wg21']:
-        target = elem.content[0].text;
-        return pf.Link(pf.Str('[{}]'.format(target)), url='https://wg21.link/{}'.format(target))
+        target = pf.stringify(elem)
+        targetlink = pf.Link(pf.Str('[{}]'.format(target)), url='https://wg21.link/{}'.format(target))
+        if target in stable_name_map:
+            return pf.Span(pf.Str(stable_name_map[target]), pf.Space(), targetlink)
+        else:
+            return targetlink
 
 def cpp2language(elem, doc):
     """
