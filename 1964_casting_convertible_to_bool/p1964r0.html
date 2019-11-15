@@ -530,7 +530,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <table style="border:none;float:right">
   <tr>
     <td>Document #: </td>
-    <td>D1964R0</td>
+    <td>P1964R0</td>
   </tr>
   <tr>
     <td>Date: </td>
@@ -572,7 +572,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <p><span class="citation" data-cites="P1934R0">[<a href="#ref-P1934R0" role="doc-biblioref">P1934R0</a>]</span> proposes removing the <code class="sourceCode cpp">boolean</code> concept and replacing its uses with <code class="sourceCode cpp">convertible_to<span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span></code> instead. The proposed replacement fails to completely fix the problems with <code class="sourceCode cpp">boolean</code> identified by the paper, contradicts LWG’s preferred direction for <span class="citation" data-cites="LWG2114">[<a href="#ref-LWG2114" role="doc-biblioref">LWG2114</a>]</span>, conflicts with existing practice, imposes an unreasonable burden on implementers and users alike, and should be reconsidered.</p>
 <h1 id="revision-history" style="border-bottom:1px solid #cccccc"><span class="header-section-number">2</span> Revision history<a href="#revision-history" class="self-link"></a></h1>
 <ul>
-<li>R0: Initial revision for the post-Belfast mailing. An early draft of this paper was written and presented to LEWG during the Belfast meeting and attached to the LEWG wiki; this version has been substantially revised from that draft.</li>
+<li>R0: Initial revision for the post-Belfast mailing. An early draft of this paper was written during the Belfast meeting, attached to the LEWG wiki, and subsequently presented to LEWG; this version has been substantially revised from that draft to better follow the actual presentation.</li>
 </ul>
 <h1 id="problem-statement" style="border-bottom:1px solid #cccccc"><span class="header-section-number">3</span> Problem statement<a href="#problem-statement" class="self-link"></a></h1>
 <p><span class="citation" data-cites="P1934R0">[<a href="#ref-P1934R0" role="doc-biblioref">P1934R0</a>]</span> proposes removing the <code class="sourceCode cpp">boolean</code> concept and replacing its uses with <code class="sourceCode cpp">convertible_to<span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span></code> instead. As <code class="sourceCode cpp">boolean</code> is currently used in the comparison concepts and the <code class="sourceCode cpp">predicate</code> concept, this change requires generic code performing comparisons and invoking predicates to convert the result to <code class="sourceCode cpp"><span class="dt">bool</span></code>. This can be done implicitly, explicitly, or contextually:</p>

@@ -1,6 +1,6 @@
 ---
 title: Casting `convertible_to<bool>` considered harmful
-document: D1964R0
+document: P1964R0
 date: today
 audience:
   - LEWG
@@ -20,8 +20,9 @@ imposes an unreasonable burden on implementers and users alike,
 and should be reconsidered.
 
 # Revision history
-- R0: Initial revision for the post-Belfast mailing. An early draft of this paper was written and presented to LEWG
-  during the Belfast meeting and attached to the LEWG wiki; this version has been substantially revised from that draft.
+- R0: Initial revision for the post-Belfast mailing. An early draft of this paper was written during the Belfast meeting,
+  attached to the LEWG wiki, and subsequently presented to LEWG; this version has been substantially revised from that draft
+  to better follow the actual presentation.
 
 # Problem statement
 [@P1934R0] proposes removing the `boolean` concept and replacing its uses with `convertible_to<bool>` instead.
