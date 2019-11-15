@@ -1,5 +1,5 @@
 ---
-title: Wording for GB301, US296, US292, US291, and US283 
+title: Wording for GB301, US296, US292, US291, and US283
 document: P1983R0
 date: today
 audience:
@@ -56,13 +56,13 @@ In [range.filter.view]{.wg21}, insert the following after p3:
 > ```c++
 > constexpr const Pred& pred() const;
 > ```
-> 
+>
 > [?]{.pnum} _Effects_: Equivalent to: `return *pred_;`
 :::
 
 ## [US296](https://github.com/cplusplus/nbballot/issues/292) Converting constructor for `split_view::outer_iterator` is slightly wrong
 
-[LWG was not convinced that the constructor was wrong, but nonetheless agreed to 
+[LWG was not convinced that the constructor was wrong, but nonetheless agreed to
  change this for consistency with the rest of the Clause.]{.draftnote}
 
 Edit [range.split.outer]{.wg21}, class template `split_view::outer_iterator` synopsis, as indicated:
@@ -74,7 +74,7 @@ Edit [range.split.outer]{.wg21}, class template `split_view::outer_iterator` syn
    template<class V, class Pattern>
    template<bool Const>
    struct split_view<V, Pattern>::outer_iterator {
-  
+
    @_[...]_@
 
      outer_iterator() = default;
@@ -150,14 +150,14 @@ Edit [range.join.iterator]{.wg21},  class template `join_­view​::​iterator`
 ```
 :::
 
-Edit [range.join.iterator]{.wg21} before p6 as indicated:
+Edit [range.join.iterator]{.wg21} before p7 as indicated:
 
 :::bq
 ```diff
 -    constexpr iterator(Parent& parent, iterator_t<@[V]{.diffdel}@> outer)
 +    constexpr iterator(Parent& parent, iterator_t<@[Base]{.diffins}@> outer)@[;]{.diffins}@
 ```
-[6]{.pnum} _Effects_: Initializes `outer_­` with `outer` and `parent_­` with `addressof(parent)`; then calls `satisfy()`.
+[7]{.pnum} _Effects_: Initializes `outer_­` with `outer` and `parent_­` with `addressof(parent)`; then calls `satisfy()`.
 
 :::
 
@@ -182,7 +182,7 @@ Edit [range.join.view]{.wg21} as indicated:
      @_[...]_@
 
      constexpr auto begin() {
-+      constexpr bool use_const = @_simple-view_@<V> && 
++      constexpr bool use_const = @_simple-view_@<V> &&
 +        is_reference_v<range_reference_t<V>>;
 -      return iterator<@[_simple-view_<V>]{.diffdel}@>{*this, ranges::begin(base_)};
 +      return iterator<@[use_const]{.diffins}@>{*this, ranges::begin(base_)};

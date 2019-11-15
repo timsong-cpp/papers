@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2019-11-09" />
+  <meta name="dcterms.date" content="2019-11-15" />
   <title>Wording for GB301, US296, US292, US291, and US283</title>
   <style>
       code{white-space: pre-wrap;}
@@ -534,7 +534,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
   </tr>
   <tr>
     <td>Date: </td>
-    <td>2019-11-09</td>
+    <td>2019-11-15</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project: </td>
@@ -557,7 +557,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <h1 id="wording" style="border-bottom:1px solid #cccccc"><span class="header-section-number">2</span> Wording<a href="#wording" class="self-link"></a></h1>
 <p>This wording is relative to <span class="citation" data-cites="N4835">[<a href="#ref-N4835" role="doc-biblioref">N4835</a>]</span>.</p>
 <h2 id="gb301-add-filter_viewpred-accessor"><span class="header-section-number">2.1</span> <a href="https://github.com/cplusplus/nbballot/issues/297">GB301</a> Add <code class="sourceCode cpp">filter_view<span class="op">::</span>pred<span class="op">()</span></code> accessor<a href="#gb301-add-filter_viewpred-accessor" class="self-link"></a></h2>
-<p>Edit <a href="https://wg21.link/range.filter.view">[range.filter.view]</a>, class template <code class="sourceCode cpp">filter_view</code> synopsis, as indicated:</p>
+<p>Edit <span>24.7.4.2 <a href="https://wg21.link/range.filter.view">[range.filter.view]</a></span>, class template <code class="sourceCode cpp">filter_view</code> synopsis, as indicated:</p>
 <blockquote>
 <div>
 <div class="sourceCode" id="cb1"><pre class="sourceCode diff"><code class="sourceCode diff"><span id="cb1-1"><a href="#cb1-1"></a> namespace std::ranges {</span>
@@ -583,7 +583,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <span id="cb1-21"><a href="#cb1-21"></a> }</span></code></pre></div>
 </div>
 </blockquote>
-<p>In <a href="https://wg21.link/range.filter.view">[range.filter.view]</a>, insert the following after p3:</p>
+<p>In <span>24.7.4.2 <a href="https://wg21.link/range.filter.view">[range.filter.view]</a></span>, insert the following after p3:</p>
 <div class="add" style="color: #006e28">
 
 <blockquote>
@@ -594,14 +594,14 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 </div>
 <h2 id="us296-converting-constructor-for-split_viewouter_iterator-is-slightly-wrong"><span class="header-section-number">2.2</span> <a href="https://github.com/cplusplus/nbballot/issues/292">US296</a> Converting constructor for <code class="sourceCode cpp">split_view<span class="op">::</span>outer_iterator</code> is slightly wrong<a href="#us296-converting-constructor-for-split_viewouter_iterator-is-slightly-wrong" class="self-link"></a></h2>
 <p><span class="draftnote" style="color: #0000ff">[ Drafting note: LWG was not convinced that the constructor was wrong, but nonetheless agreed to change this for consistency with the rest of the Clause. ]</span></p>
-<p>Edit <a href="https://wg21.link/range.split.outer">[range.split.outer]</a>, class template <code class="sourceCode cpp">split_view<span class="op">::</span>outer_iterator</code> synopsis, as indicated:</p>
+<p>Edit <span>24.7.11.3 <a href="https://wg21.link/range.split.outer">[range.split.outer]</a></span>, class template <code class="sourceCode cpp">split_view<span class="op">::</span>outer_iterator</code> synopsis, as indicated:</p>
 <blockquote>
 <div>
 <div class="sourceCode" id="cb3"><pre class="sourceCode diff"><code class="sourceCode diff"><span id="cb3-1"><a href="#cb3-1"></a> namespace std::ranges {</span>
 <span id="cb3-2"><a href="#cb3-2"></a>   template&lt;class V, class Pattern&gt;</span>
 <span id="cb3-3"><a href="#cb3-3"></a>   template&lt;bool Const&gt;</span>
 <span id="cb3-4"><a href="#cb3-4"></a>   struct split_view&lt;V, Pattern&gt;::outer_iterator {</span>
-<span id="cb3-5"><a href="#cb3-5"></a>  </span>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
 <span id="cb3-6"><a href="#cb3-6"></a>   <em>[…]</em></span>
 <span id="cb3-7"><a href="#cb3-7"></a></span>
 <span id="cb3-8"><a href="#cb3-8"></a>     outer_iterator() = default;</span>
@@ -633,7 +633,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <span id="cb3-34"><a href="#cb3-34"></a> }</span></code></pre></div>
 </div>
 </blockquote>
-<p>Edit <a href="https://wg21.link/range.split.outer">[range.split.outer]</a> before p4 as indicated:</p>
+<p>Edit <span>24.7.11.3 <a href="https://wg21.link/range.split.outer">[range.split.outer]</a></span> before p4 as indicated:</p>
 <blockquote>
 <div>
 <div class="sourceCode" id="cb4"><pre class="sourceCode diff"><code class="sourceCode diff"><span id="cb4-1"><a href="#cb4-1"></a> constexpr outer_iterator(outer_iterator&lt;!Const&gt; i)</span>
@@ -643,7 +643,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <p><span class="marginalizedparent"><a class="marginalized">4</a></span> <em>Effects:</em> Initializes <code class="sourceCode cpp">parent_</code>­ with <code class="sourceCode cpp">i<span class="op">.</span>parent_</code>­ and <code class="sourceCode cpp">current_</code>­ with <code class="sourceCode cpp">std​<span class="op">::</span>​move<span class="op">(</span>i<span class="op">.</span>current_­<span class="op">)</span></code>.</p>
 </blockquote>
 <h2 id="us292-incorrect-constructor-for-join_viewiterator"><span class="header-section-number">2.3</span> <a href="https://github.com/cplusplus/nbballot/issues/288">US292</a> Incorrect constructor for <code class="sourceCode cpp">join_view<span class="op">::</span>iterator</code><a href="#us292-incorrect-constructor-for-join_viewiterator" class="self-link"></a></h2>
-<p>Edit <a href="https://wg21.link/range.join.iterator">[range.join.iterator]</a>, class template <code class="sourceCode cpp">join_­view​<span class="op">::</span>​iterator</code> synopsis, as indicated:</p>
+<p>Edit <span>24.7.10.3 <a href="https://wg21.link/range.join.iterator">[range.join.iterator]</a></span>, class template <code class="sourceCode cpp">join_­view​<span class="op">::</span>​iterator</code> synopsis, as indicated:</p>
 <blockquote>
 <div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode diff"><code class="sourceCode diff"><span id="cb5-1"><a href="#cb5-1"></a> namespace std::ranges {</span>
@@ -668,16 +668,16 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <span id="cb5-20"><a href="#cb5-20"></a> }</span></code></pre></div>
 </div>
 </blockquote>
-<p>Edit <a href="https://wg21.link/range.join.iterator">[range.join.iterator]</a> before p6 as indicated:</p>
+<p>Edit <span>24.7.10.3 <a href="https://wg21.link/range.join.iterator">[range.join.iterator]</a></span> before p7 as indicated:</p>
 <blockquote>
 <div>
 <div class="sourceCode" id="cb6"><pre class="sourceCode diff"><code class="sourceCode diff"><span id="cb6-1"><a href="#cb6-1"></a><span class="st">-    constexpr iterator(Parent&amp; parent, iterator_t&lt;<span class="diffdel">V</span>&gt; outer)</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="va">+    constexpr iterator(Parent&amp; parent, iterator_t&lt;<span class="diffins">Base</span>&gt; outer)<span class="diffins">;</span></span></span></code></pre></div>
 </div>
-<p><span class="marginalizedparent"><a class="marginalized">6</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp">outer_­</code> with <code class="sourceCode cpp">outer</code> and <code class="sourceCode cpp">parent_­</code> with <code class="sourceCode cpp">addressof<span class="op">(</span>parent<span class="op">)</span></code>; then calls <code class="sourceCode cpp">satisfy<span class="op">()</span></code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized">7</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp">outer_­</code> with <code class="sourceCode cpp">outer</code> and <code class="sourceCode cpp">parent_­</code> with <code class="sourceCode cpp">addressof<span class="op">(</span>parent<span class="op">)</span></code>; then calls <code class="sourceCode cpp">satisfy<span class="op">()</span></code>.</p>
 </blockquote>
 <h2 id="us291-join_viewbegin-requires-mutable-data"><span class="header-section-number">2.4</span> <a href="https://github.com/cplusplus/nbballot/issues/287">US291</a> <code class="sourceCode cpp">join_view<span class="op">::</span>begin</code> requires mutable data<a href="#us291-join_viewbegin-requires-mutable-data" class="self-link"></a></h2>
-<p>Edit <a href="https://wg21.link/range.join.view">[range.join.view]</a> as indicated:</p>
+<p>Edit <span>24.7.10.2 <a href="https://wg21.link/range.join.view">[range.join.view]</a></span> as indicated:</p>
 <blockquote>
 <div>
 <div class="sourceCode" id="cb7"><pre class="sourceCode diff"><code class="sourceCode diff"><span id="cb7-1"><a href="#cb7-1"></a> namespace std::ranges {</span>
@@ -694,7 +694,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <span id="cb7-12"><a href="#cb7-12"></a>     <em>[…]</em></span>
 <span id="cb7-13"><a href="#cb7-13"></a></span>
 <span id="cb7-14"><a href="#cb7-14"></a>     constexpr auto begin() {</span>
-<span id="cb7-15"><a href="#cb7-15"></a><span class="va">+      constexpr bool use_const = <em>simple-view</em>&lt;V&gt; &amp;&amp; </span></span>
+<span id="cb7-15"><a href="#cb7-15"></a><span class="va">+      constexpr bool use_const = <em>simple-view</em>&lt;V&gt; &amp;&amp;</span></span>
 <span id="cb7-16"><a href="#cb7-16"></a><span class="va">+        is_reference_v&lt;range_reference_t&lt;V&gt;&gt;;</span></span>
 <span id="cb7-17"><a href="#cb7-17"></a><span class="st">-      return iterator&lt;<span class="diffdel"><em>simple-view</em>&lt;V&gt;</span>&gt;{*this, ranges::begin(base_)};</span></span>
 <span id="cb7-18"><a href="#cb7-18"></a><span class="va">+      return iterator&lt;<span class="diffins">use_const</span>&gt;{*this, ranges::begin(base_)};</span></span>
@@ -709,7 +709,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 </div>
 </blockquote>
 <h2 id="us283-specification-of-has-arrow-concept-is-ill-formed"><span class="header-section-number">2.5</span> <a href="https://github.com/cplusplus/nbballot/issues/279">US283</a> Specification of <em><code class="sourceCode cpp">has<span class="op">-</span>arrow</code></em> concept is ill-formed<a href="#us283-specification-of-has-arrow-concept-is-ill-formed" class="self-link"></a></h2>
-<p>Edit <a href="https://wg21.link/range.utility.helpers">[range.utility.helpers]</a> as indicated:</p>
+<p>Edit <span>24.5.1 <a href="https://wg21.link/range.utility.helpers">[range.utility.helpers]</a></span> as indicated:</p>
 <blockquote>
 <div>
 <div class="sourceCode" id="cb8"><pre class="sourceCode diff"><code class="sourceCode diff"><span id="cb8-1"><a href="#cb8-1"></a><span class="st">- template&lt;<span class="diffdel">input_iterator</span> I&gt;</span></span>
