@@ -117,9 +117,8 @@ if (cond && !pred(args))
 All but the first would have required explicit `bool` casts if "convertible to `bool`" were the sole requirement.
 
 LWG's direction for LWG2114 has consistently been to require the logical operators to work correctly for these types.
-However, formulation of correct wording has proven difficult, for much of the same reasons that have plagued `boolean`,
-and since this was seen as a defect in wording and required no implementation changes, it justifiably received a lower
-priority.
+However, formulation of correct wording has proven difficult, and since this was seen as a defect in wording and required
+no implementation changes, it justifiably received a lower priority.
 
 [@P1934R0] contradicts this longstanding direction. If the former is adopted, then either we need to require implementations
 to litter `bool` casts everywhere through their existing code, or introduce an odd inconsistency in how the algorithms handle
@@ -152,7 +151,7 @@ substantial enough to be unreasonable when measured against the minimal benefit 
 - Implementations, as well as generic code authors using standard library concepts, must now perform `bool` casts
   for correctness. The fact that these casts are only _sometimes_ required compounds the problem.
 - It's unclear how many will actually do so, given the unnatural verbosity of these casts, and the lack of these
-  questionable types in the wild. In LWG discussion, at least one major implementation stated that they have
+  questionable types in the wild. In LWG discussion, a major implementation stated that they have
   never received a user complaint for not supporting such types, even as they added support for overloaded address-of
   and comma operators. The lack of such types in the wild also makes it easy to overlook the need for casting and
   difficult to test for missing casts.
@@ -166,12 +165,12 @@ substantial enough to be unreasonable when measured against the minimal benefit 
 # Proposal: require the logical operators to "just work"
 
 Instead of `convertible_to<bool>`, we propose to replace `boolean` with an exposition-only concept
-_`boolean-testable`_ as follows:
+_`boolean-testable`_:
 
 ```c++
 template<class T>
-concept @_boolean-testable_@ = convertible_to<T, bool> && requires (const remove_cvref_t<T>& t) {
-    { !t } -> convertible_to<bool>;
+concept @_boolean-testable_@ = convertible_to<T, bool> && requires (T&& t) {
+    { !std::forward<T>(t) } -> convertible_to<bool>;
 };
 ```
 and further add the semantic requirement that all logical operators "just work":
@@ -200,9 +199,8 @@ and so using `&&` or `||` with two such types will always resolve to the built-i
 While this is a stronger requirement than what is strictly necessary, it allows analysis based on a single type (possibly
 by a static analyzer), and still admits a wide set of models including well-behaved class and enumeration types.
 There is some subtlety here (the wording needs to be carefully crafted to ensure that `std::valarray`'s
-`operator&&` and `operator||` do not disqualify `std::true_type`, for example), but the rule to teach is simple: just don't overload the
-conditional operators, and your type will be fine. In this respect, it's not unlike the conditional operator: the rules take
-up some 1.5 pages of dense standardese in [expr.cond]{.wg21}, but the gist of what it does can be explained in a single sentence.
+`operator&&` and `operator||` do not disqualify `std::true_type`, for example), but the rule to teach is simple:
+just don't overload the conditional operators, and your type will be fine.
 
 # Alternative direction: limit the set of permitted types to a known set of well-behaved types (not proposed)
 Alternative suggestions have been made to limit these expression to a small set of permitted types that we know
