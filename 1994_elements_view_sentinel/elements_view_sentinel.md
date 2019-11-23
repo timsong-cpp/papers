@@ -19,19 +19,51 @@ toc: false
 # Discussion
 
 `elements_view` is effectively a specialized version of `transform_view`; the latter has a custom `sentinel` type,
-and so should `elements_view`. More generally, if a range adaptor has a custom iterator, it should probably also have a custom sentinel.
+and so should `elements_view`.
+
+More generally, if a range adaptor has a custom iterator, it should probably also have a custom sentinel.
 The rationale is that the underlying range's sentinel could encode a generic predicate that is equally meaningful
 for the adapted range, leading to an ambiguity.
 
-For example, consider a sentinel that checks whether the second element is zero (i.e., `i == s` is `std::get<1>(*i) == 0`)
-and a range of `pair<pair<int, int>, int>` using this sentinel that is then adapted by `views::keys`:
-does the comparison with the sentinel check the second element of the original range,
-or the second element of the adapted range?
+For example, consider:
 
-A custom sentinel is needed to avoid this ambiguity.
+```c++
+
+struct S { // sentinel that checks if the second element is zero
+  friend bool operator==(input_iterator auto const& i, S) requires /* ... */
+  { return get<1>(*i) == 0; }
+};
+
+void algo(input_range auto&& r) requires /* ... */ {
+  for (auto&& something : subrange{ranges::begin(r), S{}})
+  {
+    /* do something */
+  }
+}
+
+using P = pair<pair<char, int>, long>;
+vector<P> something = /* ... */;
+
+subrange r{something.begin(), S{}};
+
+algo(r | view::keys);                 // checks the long, effectively iterating over r completely
+algo(r | view::transform(&P::first)); // checks the int and stops at the first zero
+```
+
+`algo` is trying to use the sentinel `S` to stop at the first element `e` for which `get<1>(e)` is zero,
+and it works correctly for all ranges of `pair<char, int>` ... except things like `r | view::keys`. In the
+latter case, `ranges::begin(r | view::keys) == S{}` calls `elements_view::iterator`'s `operator==`
+instead, which compares the _underlying range's_ iterator against the sentinel. In the above example,
+this means that we check the `long` instead of the `int`, and effectively iterate over the entire range.
+
+A custom sentinel is needed to avoid this problem. `elements_view` is the only adaptor in the current WP
+that has a custom iterator but not a custom sentinel.
 
 # Wording
 This wording is relative to [@N4835].
+
+[These changes, including the overload set for `end`, match the specification of `transform_view`.
+This seems appropriate since `elements_view` is just a special kind of transform.]{.draftnote}
 
 Edit [range.elements.view]{.sref}, class template `elements_view` synopsis, as indicated:
 
@@ -42,8 +74,8 @@ Edit [range.elements.view]{.sref}, class template `elements_view` synopsis, as i
     @_[...]_@
 
    template<input_range R, size_t N>
-     requires view<R> && has-tuple-element<range_value_t<R>, N> &&
-       has-tuple-element<remove_reference_t<range_reference_t<R>>, N>
+     requires view<R> && @_has-tuple-element_@<range_value_t<R>, N> &&
+       @_has-tuple-element_@<remove_reference_t<range_reference_t<R>>, N>
    class elements_view : public view_interface<elements_view<R, N>> {
    public:
      @_[...]_@
@@ -71,9 +103,9 @@ Edit [range.elements.view]{.sref}, class template `elements_view` synopsis, as i
      @_[...]_@
 
    private:
-     template<bool> struct iterator;                     // exposition only
-+    template<bool> struct sentinel;                     // exposition only
-     R base_ = R();                                      // exposition only
+     template<bool> struct iterator;                     // @_exposition only_@
++    template<bool> struct sentinel;                     // @_exposition only_@
+     R base_ = R();                                      // @_exposition only_@
    };
  }
 ```
@@ -87,7 +119,7 @@ Edit [range.elements.iterator]{.sref}, class template `elements_view<R, N>::iter
  namespace std::ranges {
    template<class R, size_t N>
    template<bool Const>
-   class elements_view<R, N>::iterator { // exposition only
+   class elements_view<R, N>::iterator { // @_exposition only_@
    @_[...]_@
 
    public:
