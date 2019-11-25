@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2019-11-23" />
+  <meta name="dcterms.date" content="2019-11-25" />
   <title>elements_view needs its own sentinel</title>
   <style>
       code{white-space: pre-wrap;}
@@ -530,11 +530,11 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <table style="border:none;float:right">
   <tr>
     <td>Document #: </td>
-    <td>D1994R0</td>
+    <td>P1994R0</td>
   </tr>
   <tr>
     <td>Date: </td>
-    <td>2019-11-23</td>
+    <td>2019-11-25</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project: </td>
@@ -553,9 +553,9 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 
 </header>
 <div style="clear:both">
-<h1 id="abstract" style="border-bottom:1px solid #cccccc"><span class="header-section-number">1</span> Abstract<a href="#abstract" class="self-link"></a></h1>
+<h1 data-number="1" style="border-bottom:1px solid #cccccc" id="abstract"><span class="header-section-number">1</span> Abstract<a href="#abstract" class="self-link"></a></h1>
 <p><code class="sourceCode cpp">elements_view</code> needs its own <code class="sourceCode cpp">sentinel</code> type.</p>
-<h1 id="discussion" style="border-bottom:1px solid #cccccc"><span class="header-section-number">2</span> Discussion<a href="#discussion" class="self-link"></a></h1>
+<h1 data-number="2" style="border-bottom:1px solid #cccccc" id="discussion"><span class="header-section-number">2</span> Discussion<a href="#discussion" class="self-link"></a></h1>
 <p><code class="sourceCode cpp">elements_view</code> is effectively a specialized version of <code class="sourceCode cpp">transform_view</code>; the latter has a custom <code class="sourceCode cpp">sentinel</code> type, and so should <code class="sourceCode cpp">elements_view</code>.</p>
 <p>More generally, if a range adaptor has a custom iterator, it should probably also have a custom sentinel. The rationale is that the underlying range’s sentinel could encode a generic predicate that is equally meaningful for the adapted range, leading to an ambiguity.</p>
 <p>For example, consider:</p>
@@ -581,7 +581,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <span id="cb1-20"><a href="#cb1-20"></a>algo<span class="op">(</span>r <span class="op">|</span> view<span class="op">::</span>transform<span class="op">(&amp;</span>P<span class="op">::</span>first<span class="op">))</span>; <span class="co">// checks the int and stops at the first zero</span></span></code></pre></div>
 <p><code class="sourceCode cpp">algo</code> is trying to use the sentinel <code class="sourceCode cpp">S</code> to stop at the first element <code class="sourceCode cpp">e</code> for which <code class="sourceCode cpp">get<span class="op">&lt;</span><span class="dv">1</span><span class="op">&gt;(</span>e<span class="op">)</span></code> is zero, and it works correctly for all ranges of <code class="sourceCode cpp">pair<span class="op">&lt;</span><span class="dt">char</span>, <span class="dt">int</span><span class="op">&gt;</span></code> … except things like <code class="sourceCode cpp">r <span class="op">|</span> view<span class="op">::</span>keys</code>. In the latter case, <code class="sourceCode cpp">ranges<span class="op">::</span>begin<span class="op">(</span>r <span class="op">|</span> view<span class="op">::</span>keys<span class="op">)</span> <span class="op">==</span> S<span class="op">{}</span></code> calls <code class="sourceCode cpp">elements_view<span class="op">::</span>iterator</code>’s <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">==</span></code> instead, which compares the <em>underlying range’s</em> iterator against the sentinel. In the above example, this means that we check the <code class="sourceCode cpp"><span class="dt">long</span></code> instead of the <code class="sourceCode cpp"><span class="dt">int</span></code>, and effectively iterate over the entire range.</p>
 <p>A custom sentinel is needed to avoid this problem. <code class="sourceCode cpp">elements_view</code> is the only adaptor in the current WP that has a custom iterator but not a custom sentinel.</p>
-<h1 id="wording" style="border-bottom:1px solid #cccccc"><span class="header-section-number">3</span> Wording<a href="#wording" class="self-link"></a></h1>
+<h1 data-number="3" style="border-bottom:1px solid #cccccc" id="wording"><span class="header-section-number">3</span> Wording<a href="#wording" class="self-link"></a></h1>
 <p>This wording is relative to <span class="citation" data-cites="N4835">[<a href="#ref-N4835" role="doc-biblioref">N4835</a>]</span>.</p>
 <p><span class="draftnote" style="color: #01796F">[ Drafting note: These changes, including the overload set for <code class="sourceCode cpp">end</code>, match the specification of <code class="sourceCode cpp">transform_view</code>. This seems appropriate since <code class="sourceCode cpp">elements_view</code> is just a special kind of transform. ]</span></p>
 <p>Edit <span>24.7.16.2 <a href="https://wg21.link/range.elements.view">[range.elements.view]</a></span>, class template <code class="sourceCode cpp">elements_view</code> synopsis, as indicated:</p>
@@ -682,7 +682,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <p>Add a new subclause after <span>24.7.16.3 <a href="https://wg21.link/range.elements.iterator">[range.elements.iterator]</a></span>:</p>
 <div class="add" style="color: #006e28">
 
-<h4 id="class-template-elements_viewsentinel-ranges.element.sentinel" class="unnumbered">?.?.?.? Class template <code class="sourceCode cpp">elements_view<span class="op">::</span>sentinel</code> [ranges.element.sentinel]<a href="#class-template-elements_viewsentinel-ranges.element.sentinel" class="self-link"></a></h4>
+<h4 class="unnumbered" data-number id="class-template-elements_viewsentinel-ranges.element.sentinel">?.?.?.? Class template <code class="sourceCode cpp">elements_view<span class="op">::</span>sentinel</code> [ranges.element.sentinel]<a href="#class-template-elements_viewsentinel-ranges.element.sentinel" class="self-link"></a></h4>
 <div class="sourceCode" id="cb7"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> R, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
 <span id="cb7-3"><a href="#cb7-3"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
@@ -734,9 +734,8 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 </blockquote>
 
 </div>
-<h1 id="references" style="border-bottom:1px solid #cccccc"><span class="header-section-number">4</span> References<a href="#references" class="self-link"></a></h1>
-
-<div id="refs" role="doc-bibliography">
+<h1 data-number="4" style="border-bottom:1px solid #cccccc" id="references"><span class="header-section-number">4</span> References<a href="#references" class="self-link"></a></h1>
+<div id="refs" class="references" role="doc-bibliography">
 <div id="ref-N4835">
 <p>[N4835] Richard Smith. 2019. Working Draft, Standard for Programming Language C++. <br />
 <a href="https://wg21.link/n4835">https://wg21.link/n4835</a></p>

@@ -1,6 +1,6 @@
 ---
 title: "`elements_view` needs its own `sentinel`"
-document: D1994R0
+document: P1994R0
 date: today
 audience:
   - LWG
