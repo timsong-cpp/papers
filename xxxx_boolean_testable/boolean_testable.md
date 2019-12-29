@@ -88,7 +88,7 @@ Replace [concept.boolean]{.sref} with the following:
 
 ::: add
 
-### 18.5.2 Boolean testability {-}
+### 18.5.2 Boolean testability [concept.booleantestable] {-}
 
 [1]{.pnum} The exposition-only _`boolean-testable`_ concept specifies the requirements on expressions that are convertible
 to `bool` and for which the logical operators ([expr.log.and]{.sref}, [expr.log.or]{.sref}, [expr.unary.op]{.sref})
@@ -189,12 +189,10 @@ above example, given
 [5]{.pnum} A _disqualifying declaration_ is
 
 - [5.1]{.pnum} a (non-template) function declaration that contains at least one disqualifying parameter; or
-- [5.2]{.pnum} a function template declaration where
-  - [5.2.1]{.pnum} the declaration is at namespace scope and contains at least one key parameter, and at least one key
-    parameter is disqualifying; or
-  - [5.2.2]{.pnum} the declaration contains at least one disqualifying parameter, and it either
-    - [5.2.2.1]{.pnum} contains no key parameter, or
-    - [5.2.2.2]{.pnum} declares a function template that is not visible in its namespace ([namespace.memdef]{.sref}).
+- [5.2]{.pnum} a function template declaration that contains at least one disqualifying parameter, where
+  - [5.2.1]{.pnum} at least one disqualifying parameter is a key parameter; or
+  - [5.2.2]{.pnum} the declaration contains no key parameters; or
+  - [5.2.3]{.pnum} the declaration declares a function template that is not visible in its namespace ([namespace.memdef]{.sref}).
 
 :::draftnote-blue
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2019-12-28" />
+  <meta name="dcterms.date" content="2019-12-29" />
   <title>Wording for boolean-testable</title>
   <style>
       code{white-space: pre-wrap;}
@@ -534,7 +534,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
   </tr>
   <tr>
     <td>Date: </td>
-    <td>2019-12-28</td>
+    <td>2019-12-29</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project: </td>
@@ -618,7 +618,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <p>Replace <span>18.5.2 <a href="https://wg21.link/concept.boolean">[concept.boolean]</a></span> with the following:</p>
 <div class="add" style="color: #006e28">
 
-<h3 class="unnumbered" data-number id="boolean-testability">18.5.2 Boolean testability<a href="#boolean-testability" class="self-link"></a></h3>
+<h3 class="unnumbered" data-number id="boolean-testability-concept.booleantestable">18.5.2 Boolean testability [concept.booleantestable]<a href="#boolean-testability-concept.booleantestable" class="self-link"></a></h3>
 <p><span class="marginalizedparent"><a class="marginalized">1</a></span> The exposition-only <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> concept specifies the requirements on expressions that are convertible to <code class="sourceCode cpp"><span class="dt">bool</span></code> and for which the logical operators (<span>7.6.14 <a href="https://wg21.link/expr.log.and">[expr.log.and]</a></span>, <span>7.6.15 <a href="https://wg21.link/expr.log.or">[expr.log.or]</a></span>, <span>7.6.2.1 <a href="https://wg21.link/expr.unary.op">[expr.unary.op]</a></span>) have the conventional semantics.</p>
 <blockquote>
 <div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
@@ -640,16 +640,16 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 </ul>
 <div class="draftnote-blue" style="color: #0000ff">
 <p>[ Drafting note: Non-deduced contexts must be disqualifying because they can contain an arbitrary type transformation. Consider:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1"></a> <span class="kw">namespace</span> Z <span class="op">{</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a>   <span class="kw">enum</span> X <span class="op">{}</span>;</span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1"></a> <span class="kw">namespace</span> NS1 <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>   <span class="kw">enum</span> A <span class="op">{}</span>;</span>
 <span id="cb4-3"><a href="#cb4-3"></a></span>
 <span id="cb4-4"><a href="#cb4-4"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span><span class="op">&gt;</span></span>
-<span id="cb4-5"><a href="#cb4-5"></a>   <span class="kw">struct</span> trait <span class="op">{</span> <span class="kw">using</span> type <span class="op">=</span> X; <span class="op">}</span>;</span>
+<span id="cb4-5"><a href="#cb4-5"></a>   <span class="kw">struct</span> trait <span class="op">{</span> <span class="kw">using</span> type <span class="op">=</span> A; <span class="op">}</span>;</span>
 <span id="cb4-6"><a href="#cb4-6"></a></span>
 <span id="cb4-7"><a href="#cb4-7"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
 <span id="cb4-8"><a href="#cb4-8"></a>   <span class="dt">void</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span>T<span class="op">*</span>, <span class="kw">typename</span> trait<span class="op">&lt;</span>T<span class="op">&gt;::</span>type<span class="op">)</span>;</span>
 <span id="cb4-9"><a href="#cb4-9"></a> <span class="op">}</span></span></code></pre></div>
-<p><code class="sourceCode cpp"><span class="op">(</span><span class="dt">int</span><span class="op">*)</span><span class="kw">nullptr</span> <span class="op">&amp;&amp;</span> Z<span class="op">::</span>X<span class="op">()</span></code> will use the <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> overload, and therefore we must disqualify <code class="sourceCode cpp">Z<span class="op">::</span>X</code>. ]</p>
+<p><code class="sourceCode cpp"><span class="op">(</span><span class="dt">int</span><span class="op">*)</span><span class="kw">nullptr</span> <span class="op">&amp;&amp;</span> NS1<span class="op">::</span>A<span class="op">()</span></code> will use the <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> overload, and therefore we must disqualify <code class="sourceCode cpp">NS1<span class="op">::</span>A</code>. ]</p>
 </div>
 <p><span class="marginalizedparent"><a class="marginalized">4</a></span> A <em>key parameter</em> of a function template <code class="sourceCode cpp">D</code> is a function parameter of type <em><code class="sourceCode cpp">cv</code></em> <code class="sourceCode cpp">X</code> or reference thereto, where <code class="sourceCode cpp">X</code> names a specialization of a class template that is a member of the same namespace as <code class="sourceCode cpp">D</code>, and <code class="sourceCode cpp">X</code> contains at least one template parameter that participates in template argument deduction.</p>
 <div class="example">
@@ -677,28 +677,29 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 </div>
 <p><span class="marginalizedparent"><a class="marginalized">5</a></span> A <em>disqualifying declaration</em> is</p>
 <ul>
-<li><span class="marginalizedparent"><a class="marginalized">(5.1)</a></span> a (non-template) function declaration that contains at least one disqualifying parameter;</li>
-<li><span class="marginalizedparent"><a class="marginalized">(5.2)</a></span> a function template declaration where either
+<li><span class="marginalizedparent"><a class="marginalized">(5.1)</a></span> a (non-template) function declaration that contains at least one disqualifying parameter; or</li>
+<li><span class="marginalizedparent"><a class="marginalized">(5.2)</a></span> a function template declaration that contains at least one disqualifying parameter, where
 <ul>
-<li><span class="marginalizedparent"><a class="marginalized">(5.2.1)</a></span> the declaration is at namespace scope and contains at least one key parameter, and at least one key parameter is disqualifying; or</li>
-<li><span class="marginalizedparent"><a class="marginalized">(5.2.2)</a></span> the declaration declares an function template that is not visible in its namespace (<span>9.8.1.2 <a href="https://wg21.link/namespace.memdef">[namespace.memdef]</a></span>), or contains no key parameter, and at least one function parameter is disqualifying.</li>
+<li><span class="marginalizedparent"><a class="marginalized">(5.2.1)</a></span> at least one disqualifying parameter is a key parameter; or</li>
+<li><span class="marginalizedparent"><a class="marginalized">(5.2.2)</a></span> the declaration contains no key parameters; or</li>
+<li><span class="marginalizedparent"><a class="marginalized">(5.2.3)</a></span> the declaration declares a function template that is not visible in its namespace (<span>9.8.1.2 <a href="https://wg21.link/namespace.memdef">[namespace.memdef]</a></span>).</li>
 </ul></li>
 </ul>
 <div class="draftnote-blue" style="color: #0000ff">
 <p>[ Drafting note: We cannot only look at the key parameter(s) if the function template is a hidden friend, because it may be a hidden friend of the wrong class.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1"></a> <span class="kw">namespace</span> Z <span class="op">{</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
-<span id="cb7-3"><a href="#cb7-3"></a>   <span class="kw">struct</span> X <span class="op">{</span></span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1"></a> <span class="kw">namespace</span> NS2 <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span><span class="op">&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>   <span class="kw">struct</span> A <span class="op">{</span></span>
 <span id="cb7-4"><a href="#cb7-4"></a>     <span class="kw">operator</span> <span class="dt">bool</span><span class="op">()</span>;</span>
 <span id="cb7-5"><a href="#cb7-5"></a>   <span class="op">}</span>;</span>
 <span id="cb7-6"><a href="#cb7-6"></a></span>
-<span id="cb7-7"><a href="#cb7-7"></a>   <span class="kw">struct</span> Y <span class="op">{</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a>   <span class="kw">struct</span> B <span class="op">{</span></span>
 <span id="cb7-8"><a href="#cb7-8"></a>     <span class="kw">operator</span> <span class="dt">bool</span><span class="op">()</span>;</span>
 <span id="cb7-9"><a href="#cb7-9"></a>     <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
-<span id="cb7-10"><a href="#cb7-10"></a>     <span class="kw">friend</span> <span class="dt">void</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span>X<span class="op">&lt;</span>T<span class="op">&gt;</span>, Y<span class="op">)</span>;</span>
+<span id="cb7-10"><a href="#cb7-10"></a>     <span class="kw">friend</span> <span class="dt">void</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span>A<span class="op">&lt;</span>T<span class="op">&gt;</span>, B<span class="op">)</span>;</span>
 <span id="cb7-11"><a href="#cb7-11"></a>   <span class="op">}</span>;</span>
 <span id="cb7-12"><a href="#cb7-12"></a> <span class="op">}</span></span></code></pre></div>
-<p><code class="sourceCode cpp">Z<span class="op">::</span>X<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;()</span> <span class="op">&amp;&amp;</span> Z<span class="op">::</span>Y<span class="op">()</span></code> will use the <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> overload, but ADL for <code class="sourceCode cpp">Z<span class="op">::</span>X<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;()</span></code> alone will not find the hidden friend overload, so that overload must disqualify <code class="sourceCode cpp">Y</code>. ]</p>
+<p><code class="sourceCode cpp">NS2<span class="op">::</span>A<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;()</span> <span class="op">&amp;&amp;</span> NS2<span class="op">::</span>B<span class="op">()</span></code> will use the <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> overload, but ADL for <code class="sourceCode cpp">NS2<span class="op">::</span>A<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;()</span></code> alone will not find the hidden friend overload, so that overload must disqualify <code class="sourceCode cpp">NS2<span class="op">::</span>B</code>. ]</p>
 </div>
 <p><span class="marginalizedparent"><a class="marginalized">6</a></span> <span class="note"><span>[ <em>Note:</em> </span>The intention is to ensure that given two types <code class="sourceCode cpp">T1</code> and <code class="sourceCode cpp">T2</code> that both model <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable<span class="op">-</span>impl</code></em>, the <code class="sourceCode cpp"><span class="op">&amp;&amp;</span></code> and <code class="sourceCode cpp"><span class="op">||</span></code> operators within the expressions <code class="sourceCode cpp">declval<span class="op">&lt;</span>T1<span class="op">&gt;()</span> <span class="op">&amp;&amp;</span> declval<span class="op">&lt;</span>T2<span class="op">&gt;()</span></code> and <code class="sourceCode cpp">declval<span class="op">&lt;</span>T1<span class="op">&gt;()</span> <span class="op">||</span> declval<span class="op">&lt;</span>T2<span class="op">&gt;()</span></code> resolve to the corresponding built-in operators.<span> — <em>end note</em> ]</span></span></p>
 <blockquote>
