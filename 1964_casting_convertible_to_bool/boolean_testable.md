@@ -1,22 +1,25 @@
 ---
 title: Wording for _`boolean-testable`_
-document: DxxxxRX
+document: D1964R1
 date: today
 audience:
   - LWG
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
-toc: false
+toc: true
 ---
 
 # Introduction
 
 This paper provides wording for replacing `boolean` with the _`boolean-testable`_ exposition-only concept, as proposed
-in [@P1964R0].
+in [@P1964R0]. For detailed motivation and discussion, see that paper.
 
 # LEWG Belfast vote
 
+An early draft of [@P1964R0] was presented to LEWG on Friday afternoon in Belfast. The following polls were taken:
+
+::: bq
 Introduce an exposition-only concept `$NAME` as a replacement for the existing use of the `boolean` concept.
 
  - subsume `convertible_to`
@@ -37,14 +40,18 @@ Tim and Casey will update P1964 with wording for the above design. We forward th
 
 Unanimous consent
 
+:::
 
 # Drafting notes
 
-Yes, this is a lot of words to specify what is basically "don't be dumb".
+Yes, this is a lot of words to specify what is basically "don't be dumb". Defining "dumb" with sufficient precision
+turns out to be complicated.
 
-The basic requirement is that a _`boolean-testable`_ type must not contribute any potentially viable `operator&&` or
-`operator||` overload to the overload set. If so, then any two _`boolean-testable`_ types can be freely used with these
-operators, because there are no viable user-defined overloads and therefore they must have their built-in meaning.
+The basic requirement is that a _`boolean-testable`_ type must not contribute any potentially
+viable `operator&&` or `operator||` overload to the overload set. If so, then any two _`boolean-testable`_ types can be
+freely used with these operators, because there are no viable user-defined overloads and therefore they must have their
+built-in meaning.
+
 There are three cases to consider:
 
 1. Members. These are relatively straightforward: no `operator&&` or `operator||`, period.
@@ -53,8 +60,34 @@ There are three cases to consider:
 3. Non-member function templates. These are the hardest because we don't know the parameter types at all and must
    therefore resort to template argument deduction.
 
-There is an additional wrinkle in the third case: as mentioned in [@P1964R0], the wording needs to avoid avoid catching
-overloads like `std::valarray`'s `operator&&` on unsuspecting types in `namespace std`. That is, we want declarations like
+There are some wrinkles for this third case.
+
+### Non-deduced contexts {-}
+
+Consider the following example:
+
+```c++
+ namespace X {
+   enum A {};
+
+   template<class>
+   struct trait { using type = A; };
+
+   template<class T>
+   void operator&&(T*, typename trait<T>::type);
+ }
+
+```
+
+This `operator&&` will be picked up in an expression like `(int*) nullptr && X::A()`. Since `int*` should model
+_`boolean-testable`_ (and certainly isn't responsible for this operator), we must make `X::A` not model
+_`boolean-testable`_. In other words, a non-deduced context, which can encode an arbitrary type transformation,
+must be considered to match everything.
+
+### `std::valarray` {-}
+
+As mentioned in [@P1964R0], the wording needs to avoid catching overloads like `std::valarray`'s `operator&&` on
+unsuspecting types in `namespace std`. That is, we want declarations like
 
 ```c++
 template<class T>
@@ -68,21 +101,88 @@ template<class T>
 valarray<bool> operator&&(const valarray<T>&, const T&);
 ```
 
-to disqualify `std::valarray`, but not `std::true_type`.
+to disqualify specializations of `std::valarray` (or any derived class that might have added a conversion to `bool`),
+but not `std::true_type`.
 
-The approach taken in the wording below is to only consider "key parameters" where possible. A "key parameter"
-is a function parameter whose type is (reference to) a class template specialization that is a member of the same
-namespace as the function template. In the examples above, only the first parameter is "key".
+The distinguishing characteristics of these overloads are
 
-If a namespace-scope function template declaration `D` has at least one key parameter, then we can limit our inspection
-to those parameters, because for template argument deduction to succeed on a key parameter, the type of supplied argument
-must be a specialization of that class template or derived therefrom. Such an argument is necessarily associated with
-the namespace containing `D`, and therefore we can safely blame it for `D`, and not consider anything else that might
-also accidentally bring the declaration in.
+1. They are part of the interface of some class template (e.g., `std::valarray`);
+2. They have a function parameter whose (uncvref'd) type is a specialization of that class template;
+3. They are a member of the same namespace as that class template (so that they can be found by ADL)
+
+For these overloads, we can safely only consider the parameter(s) satisfying #2 above (called _key parameters_ in the
+wording below). <span style="color:darkblue">This is because for template argument deduction to succeed on such a parameter,
+the type of the provided argument must be either a specialization of that class template or derived from it.</span>
+<span style="color:darkgreen">If so, then _that argument_ must necessarily also bring this function template into the
+overload set.</span>
+As long as the wording excludes such arguments, then, there is no need to worry about other types that may happen to belong
+in the same namespace.
+
+I have color-coded the two steps in this reasoning because there are corner cases involving each, which I'll now discuss.
+
+#### Non-deduced contexts, again {-}
+
+Consider this example:
+
+```c++
+namespace Y {
+  template<class>
+  struct C {};
+
+  template<class T>
+  void operator&&(C<T> x, T y);
+
+  template<class T>
+  void operator||(C<std::decay_t<T>> x, T y);
+
+  enum A {};
+}
+
+struct B { template<class T> operator T(); };
+```
+
+We don't want the `operator&&` declaration to disqualify `Y::A`; however the expression `::B() || Y::A()` will use the
+`Y::operator||` overload, and therefore `Y::A` cannot be _`boolean-testable`_, even though its declaration might be
+superficially similar. The key difference here is that `C<std::decay_t<T>>` doesn't contain anything that participates
+in template argument deduction, and therefore no longer requires the argument to have any relation to `C`, contrary to
+the <span style="color:darkblue">first sentence of the reasoning above</span>.
+
+To qualify as a _key parameter_, then, the type must contain at least one template parameter that participates in
+template argument deduction.
+
+#### Hidden friends{-}
+
+Hidden friends strike at the <span style="color:darkgreen">second sentence of the reasoning above</span>. Consider:
+
+```c++
+namespace Z {
+  template<class>
+  struct A {
+    operator bool();
+  };
+
+  struct B {
+    operator bool();
+    template<class T>
+    friend void operator&&(A<T>, B);
+  };
+}
+```
+
+`Z::A<int>() && Z::B()` will use the `operator&&` overload, but ADL for `Z::A<int>()` alone will not even find the hidden
+friend overload (indeed, the author of `Z::A` might have nothing to do with it). So we must disqualify `Z::B` instead.
+
+The problem here is that the hidden friend can be a friend of the wrong class. That means that the
+<span style="color:darkgreen">second sentence of the reasoning above</span> no longer applies, because we are no longer
+guaranteed that the argument related to `A` will bring the overload in.
+
+The wording below excludes hidden friends from the _key parameter_ special case: hidden friends disqualify a type from
+modeling _`boolean-testable`_ if template argument deduction for either parameter succeeds. Note that the concern
+motivating this special case doesn't apply to hidden friends: if they are the hidden friend of the "right" class template,
+then ADL for other types in the namespace will not even find them, so they will not accidentally disqualify anything.
 
 # Wording
-This wording is relative to [@N4842]. Drafting notes in blue ([like this]{.draftnote-blue}) are explanations of the wording
-for reviewers and not part of the wording.
+This wording is relative to [@N4842].
 
 Replace [concept.boolean]{.sref} with the following:
 
@@ -120,28 +220,6 @@ concept @_boolean-testable-impl_@ = convertible_to<T, bool>;  // @_exposition on
   - [3.2.2]{.pnum} template argument deduction using the rules for deducing template arguments in a function call
     ([temp.deduct.call]{.sref}) and the type of `e` as the argument type succeeds.
 
-:::draftnote-blue
-
-Non-deduced contexts must be disqualifying because they can contain an arbitrary type transformation. Consider:
-
-```c++
- namespace NS1 {
-   enum A {};
-
-   template<class>
-   struct trait { using type = A; };
-
-   template<class T>
-   void operator&&(T*, typename trait<T>::type);
- }
-
-```
-
-`(int*)nullptr && NS1::A()` will use the `operator&&` overload, and therefore we must disqualify `NS1::A`.
-
-:::
-
-
 [4]{.pnum} A _key parameter_ of a function template `D` is a function parameter of type _`cv`_ `X` or reference thereto,
 where `X` names a specialization of a class template that is a member of the same namespace as `D`, and `X` contains at
 least one template parameter that participates in template argument deduction.
@@ -168,24 +246,6 @@ no key parameters.
 
 :::
 
-:::draftnote-blue
-
-It's important that `X` contains at least one parameter that participates in template argument deduction; if not, then
-we cannot guarantee that a deduction failure will result for any type that is not derived from the class template. In the
-above example, given
-
-```c++
- namespace Z {
-   enum X {};
- }
-
-  struct Y { template<class T> operator T(); };
-```
-
-`Y() || Z::X()` will use the `operator||` overload, so that overload must disqualify `Z::X`.
-
-:::
-
 [5]{.pnum} A _disqualifying declaration_ is
 
 - [5.1]{.pnum} a (non-template) function declaration that contains at least one disqualifying parameter; or
@@ -194,32 +254,7 @@ above example, given
   - [5.2.2]{.pnum} the declaration contains no key parameters; or
   - [5.2.3]{.pnum} the declaration declares a function template that is not visible in its namespace ([namespace.memdef]{.sref}).
 
-:::draftnote-blue
-
-We cannot only look at the key parameter(s) if the function template is a hidden friend, because it may be a hidden
-friend of the wrong class.
-
-```c++
- namespace NS2 {
-   template<class>
-   struct A {
-     operator bool();
-   };
-
-   struct B {
-     operator bool();
-     template<class T>
-     friend void operator&&(A<T>, B);
-   };
- }
-```
-
-`NS2::A<int>() && NS2::B()` will use the `operator&&` overload, but ADL for `NS2::A<int>()` alone will not find the hidden
-friend overload, so that overload must disqualify `NS2::B`.
-
-:::
-
-[6]{.pnum} [The intention is to ensure that given two types `T1` and `T2` that both model _`boolean-testable-impl`_,
+[6]{.pnum} [The intention is to ensure that given two types `T1` and `T2` that each model _`boolean-testable-impl`_,
 the `&&` and `||` operators within the expressions `declval<T1>() && declval<T2>()` and `declval<T1>() || declval<T2>()`
 resolve to the corresponding built-in operators.]{.note}
 

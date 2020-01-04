@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2019-12-29" />
+  <meta name="dcterms.date" content="2020-01-11" />
   <title>Wording for boolean-testable</title>
   <style>
       code{white-space: pre-wrap;}
@@ -530,11 +530,11 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <table style="border:none;float:right">
   <tr>
     <td>Document #: </td>
-    <td>DxxxxRX</td>
+    <td>D1964R1</td>
   </tr>
   <tr>
     <td>Date: </td>
-    <td>2019-12-29</td>
+    <td>2020-01-11</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project: </td>
@@ -552,9 +552,21 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 
 </header>
 <div style="clear:both">
+<div id="TOC" role="doc-toc">
+<h1 id="toctitle">Contents</h1>
+<ul>
+<li><a href="#introduction"><span class="toc-section-number">1</span> Introduction<span></span></a></li>
+<li><a href="#lewg-belfast-vote"><span class="toc-section-number">2</span> LEWG Belfast vote<span></span></a></li>
+<li><a href="#drafting-notes"><span class="toc-section-number">3</span> Drafting notes<span></span></a></li>
+<li><a href="#wording"><span class="toc-section-number">4</span> Wording<span></span></a></li>
+<li><a href="#references"><span class="toc-section-number">5</span> References<span></span></a></li>
+</ul>
+</div>
 <h1 data-number="1" style="border-bottom:1px solid #cccccc" id="introduction"><span class="header-section-number">1</span> Introduction<a href="#introduction" class="self-link"></a></h1>
-<p>This paper provides wording for replacing <code class="sourceCode cpp">boolean</code> with the <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> exposition-only concept, as proposed in <span class="citation" data-cites="P1964R0">[<a href="#ref-P1964R0" role="doc-biblioref">P1964R0</a>]</span>.</p>
+<p>This paper provides wording for replacing <code class="sourceCode cpp">boolean</code> with the <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> exposition-only concept, as proposed in <span class="citation" data-cites="P1964R0">[<a href="#ref-P1964R0" role="doc-biblioref">P1964R0</a>]</span>. For detailed motivation and discussion, see that paper.</p>
 <h1 data-number="2" style="border-bottom:1px solid #cccccc" id="lewg-belfast-vote"><span class="header-section-number">2</span> LEWG Belfast vote<a href="#lewg-belfast-vote" class="self-link"></a></h1>
+<p>An early draft of <span class="citation" data-cites="P1964R0">[<a href="#ref-P1964R0" role="doc-biblioref">P1964R0</a>]</span> was presented to LEWG on Friday afternoon in Belfast. The following polls were taken:</p>
+<blockquote>
 <p>Introduce an exposition-only concept <code class="sourceCode cpp"><span class="er">$</span>NAME</code> as a replacement for the existing use of the <code class="sourceCode cpp">boolean</code> concept.</p>
 <ul>
 <li>subsume <code class="sourceCode cpp">convertible_to</code></li>
@@ -596,33 +608,90 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <p>Unanimous consent</p>
 <p>Tim and Casey will update P1964 with wording for the above design. We forward that paper to LWG for C++20.</p>
 <p>Unanimous consent</p>
+</blockquote>
 <h1 data-number="3" style="border-bottom:1px solid #cccccc" id="drafting-notes"><span class="header-section-number">3</span> Drafting notes<a href="#drafting-notes" class="self-link"></a></h1>
-<p>Yes, this is a lot of words to specify what is basically “don’t be dumb”.</p>
-<p>The basic requirement is that a <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> type must not contribute any potentially viable <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> or <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">||</span></code> overload to the overload set. If so, then any two <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> types can be freely used with these operators, because there are no viable user-defined overloads and therefore they must have their built-in meaning. There are three cases to consider:</p>
+<p>Yes, this is a lot of words to specify what is basically “don’t be dumb”. Defining “dumb” with sufficient precision turns out to be complicated.</p>
+<p>The basic requirement is that a <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> type must not contribute any potentially viable <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> or <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">||</span></code> overload to the overload set. If so, then any two <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> types can be freely used with these operators, because there are no viable user-defined overloads and therefore they must have their built-in meaning.</p>
+<p>There are three cases to consider:</p>
 <ol type="1">
 <li>Members. These are relatively straightforward: no <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> or <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">||</span></code>, period.</li>
 <li>Non-member functions. These are also simple: we know the concrete types, so they are either potentially viable (an implicit conversion sequence exists from the source expression to one of the parameter types) or they are not.</li>
 <li>Non-member function templates. These are the hardest because we don’t know the parameter types at all and must therefore resort to template argument deduction.</li>
 </ol>
-<p>There is an additional wrinkle in the third case: as mentioned in <span class="citation" data-cites="P1964R0">[<a href="#ref-P1964R0" role="doc-biblioref">P1964R0</a>]</span>, the wording needs to avoid avoid catching overloads like <code class="sourceCode cpp">std<span class="op">::</span>valarray</code>’s <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> on unsuspecting types in <code class="sourceCode cpp"><span class="kw">namespace</span> std</code>. That is, we want declarations like</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a>valarray<span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span><span class="kw">const</span> valarray<span class="op">&lt;</span>T<span class="op">&gt;&amp;</span>, <span class="kw">const</span> <span class="kw">typename</span> valarray<span class="op">&lt;</span>T<span class="op">&gt;::</span>value_type<span class="op">&amp;)</span>;</span></code></pre></div>
-<p>and its pre-<span class="citation" data-cites="LWG3074">[<a href="#ref-LWG3074" role="doc-biblioref">LWG3074</a>]</span> form</p>
+<p>There are some wrinkles for this third case.</p>
+<h3 class="unnumbered" data-number id="non-deduced-contexts">Non-deduced contexts<a href="#non-deduced-contexts" class="self-link"></a></h3>
+<p>Consider the following example:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1"></a> <span class="kw">namespace</span> X <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>   <span class="kw">enum</span> A <span class="op">{}</span>;</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span><span class="op">&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>   <span class="kw">struct</span> trait <span class="op">{</span> <span class="kw">using</span> type <span class="op">=</span> A; <span class="op">}</span>;</span>
+<span id="cb1-6"><a href="#cb1-6"></a></span>
+<span id="cb1-7"><a href="#cb1-7"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>   <span class="dt">void</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span>T<span class="op">*</span>, <span class="kw">typename</span> trait<span class="op">&lt;</span>T<span class="op">&gt;::</span>type<span class="op">)</span>;</span>
+<span id="cb1-9"><a href="#cb1-9"></a> <span class="op">}</span></span></code></pre></div>
+<p>This <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> will be picked up in an expression like <code class="sourceCode cpp"><span class="op">(</span><span class="dt">int</span><span class="op">*)</span> <span class="kw">nullptr</span> <span class="op">&amp;&amp;</span> X<span class="op">::</span>A<span class="op">()</span></code>. Since <code class="sourceCode cpp"><span class="dt">int</span><span class="op">*</span></code> should model <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> (and certainly isn’t responsible for this operator), we must make <code class="sourceCode cpp">X<span class="op">::</span>A</code> not model <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em>. In other words, a non-deduced context, which can encode an arbitrary type transformation, must be considered to match everything.</p>
+<h3 class="unnumbered" data-number id="stdvalarray"><code class="sourceCode cpp">std<span class="op">::</span>valarray</code><a href="#stdvalarray" class="self-link"></a></h3>
+<p>As mentioned in <span class="citation" data-cites="P1964R0">[<a href="#ref-P1964R0" role="doc-biblioref">P1964R0</a>]</span>, the wording needs to avoid catching overloads like <code class="sourceCode cpp">std<span class="op">::</span>valarray</code>’s <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> on unsuspecting types in <code class="sourceCode cpp"><span class="kw">namespace</span> std</code>. That is, we want declarations like</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a>valarray<span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span><span class="kw">const</span> valarray<span class="op">&lt;</span>T<span class="op">&gt;&amp;</span>, <span class="kw">const</span> T<span class="op">&amp;)</span>;</span></code></pre></div>
-<p>to disqualify <code class="sourceCode cpp">std<span class="op">::</span>valarray</code>, but not <code class="sourceCode cpp">std<span class="op">::</span>true_type</code>.</p>
-<p>The approach taken in the wording below is to only consider “key parameters” where possible. A “key parameter” is a function parameter whose type is (reference to) a class template specialization that is a member of the same namespace as the function template. In the examples above, only the first parameter is “key”.</p>
-<p>If a namespace-scope function template declaration <code class="sourceCode cpp">D</code> has at least one key parameter, then we can limit our inspection to those parameters, because for template argument deduction to succeed on a key parameter, the type of supplied argument must be a specialization of that class template or derived therefrom. Such an argument is necessarily associated with the namespace containing <code class="sourceCode cpp">D</code>, and therefore we can safely blame it for <code class="sourceCode cpp">D</code>, and not consider anything else that might also accidentally bring the declaration in.</p>
+<span id="cb2-2"><a href="#cb2-2"></a>valarray<span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span><span class="kw">const</span> valarray<span class="op">&lt;</span>T<span class="op">&gt;&amp;</span>, <span class="kw">const</span> <span class="kw">typename</span> valarray<span class="op">&lt;</span>T<span class="op">&gt;::</span>value_type<span class="op">&amp;)</span>;</span></code></pre></div>
+<p>and its pre-<span class="citation" data-cites="LWG3074">[<a href="#ref-LWG3074" role="doc-biblioref">LWG3074</a>]</span> form</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>valarray<span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span><span class="kw">const</span> valarray<span class="op">&lt;</span>T<span class="op">&gt;&amp;</span>, <span class="kw">const</span> T<span class="op">&amp;)</span>;</span></code></pre></div>
+<p>to disqualify specializations of <code class="sourceCode cpp">std<span class="op">::</span>valarray</code> (or any derived class that might have added a conversion to <code class="sourceCode cpp"><span class="dt">bool</span></code>), but not <code class="sourceCode cpp">std<span class="op">::</span>true_type</code>.</p>
+<p>The distinguishing characteristics of these overloads are</p>
+<ol type="1">
+<li>They are part of the interface of some class template (e.g., <code class="sourceCode cpp">std<span class="op">::</span>valarray</code>);</li>
+<li>They have a function parameter whose (uncvref’d) type is a specialization of that class template;</li>
+<li>They are a member of the same namespace as that class template (so that they can be found by ADL)</li>
+</ol>
+<p>For these overloads, we can safely only consider the parameter(s) satisfying #2 above (called <em>key parameters</em> in the wording below). <span style="color:darkblue">This is because for template argument deduction to succeed on such a parameter, the type of the provided argument must be either a specialization of that class template or derived from it.</span> <span style="color:darkgreen">If so, then <em>that argument</em> must necessarily also bring this function template into the overload set.</span> As long as the wording excludes such arguments, then, there is no need to worry about other types that may happen to belong in the same namespace.</p>
+<p>I have color-coded the two steps in this reasoning because there are corner cases involving each, which I’ll now discuss.</p>
+<h4 class="unnumbered" data-number id="non-deduced-contexts-again">Non-deduced contexts, again<a href="#non-deduced-contexts-again" class="self-link"></a></h4>
+<p>Consider this example:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">namespace</span> Y <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span><span class="op">&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="kw">struct</span> C <span class="op">{}</span>;</span>
+<span id="cb4-4"><a href="#cb4-4"></a></span>
+<span id="cb4-5"><a href="#cb4-5"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>  <span class="dt">void</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span>C<span class="op">&lt;</span>T<span class="op">&gt;</span> x, T y<span class="op">)</span>;</span>
+<span id="cb4-7"><a href="#cb4-7"></a></span>
+<span id="cb4-8"><a href="#cb4-8"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>  <span class="dt">void</span> <span class="kw">operator</span><span class="op">||(</span>C<span class="op">&lt;</span>std<span class="op">::</span>decay_t<span class="op">&lt;</span>T<span class="op">&gt;&gt;</span> x, T y<span class="op">)</span>;</span>
+<span id="cb4-10"><a href="#cb4-10"></a></span>
+<span id="cb4-11"><a href="#cb4-11"></a>  <span class="kw">enum</span> A <span class="op">{}</span>;</span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="op">}</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="kw">struct</span> B <span class="op">{</span> <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span> <span class="kw">operator</span> T<span class="op">()</span>; <span class="op">}</span>;</span></code></pre></div>
+<p>We don’t want the <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> declaration to disqualify <code class="sourceCode cpp">Y<span class="op">::</span>A</code>; however the expression <code class="sourceCode cpp"><span class="op">::</span>B<span class="op">()</span> <span class="op">||</span> Y<span class="op">::</span>A<span class="op">()</span></code> will use the <code class="sourceCode cpp">Y<span class="op">::</span><span class="kw">operator</span><span class="op">||</span></code> overload, and therefore <code class="sourceCode cpp">Y<span class="op">::</span>A</code> cannot be <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em>, even though its declaration might be superficially similar. The key difference here is that <code class="sourceCode cpp">C<span class="op">&lt;</span>std<span class="op">::</span>decay_t<span class="op">&lt;</span>T<span class="op">&gt;&gt;</span></code> doesn’t contain anything that participates in template argument deduction, and therefore no longer requires the argument to have any relation to <code class="sourceCode cpp">C</code>, contrary to the <span style="color:darkblue">first sentence of the reasoning above</span>.</p>
+<p>To qualify as a <em>key parameter</em>, then, the type must contain at least one template parameter that participates in template argument deduction.</p>
+<h4 class="unnumbered" data-number id="hidden-friends">Hidden friends<a href="#hidden-friends" class="self-link"></a></h4>
+<p>Hidden friends strike at the <span style="color:darkgreen">second sentence of the reasoning above</span>. Consider:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">namespace</span> Z <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span><span class="op">&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>  <span class="kw">struct</span> A <span class="op">{</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>    <span class="kw">operator</span> <span class="dt">bool</span><span class="op">()</span>;</span>
+<span id="cb5-5"><a href="#cb5-5"></a>  <span class="op">}</span>;</span>
+<span id="cb5-6"><a href="#cb5-6"></a></span>
+<span id="cb5-7"><a href="#cb5-7"></a>  <span class="kw">struct</span> B <span class="op">{</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a>    <span class="kw">operator</span> <span class="dt">bool</span><span class="op">()</span>;</span>
+<span id="cb5-9"><a href="#cb5-9"></a>    <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a>    <span class="kw">friend</span> <span class="dt">void</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span>A<span class="op">&lt;</span>T<span class="op">&gt;</span>, B<span class="op">)</span>;</span>
+<span id="cb5-11"><a href="#cb5-11"></a>  <span class="op">}</span>;</span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="op">}</span></span></code></pre></div>
+<p><code class="sourceCode cpp">Z<span class="op">::</span>A<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;()</span> <span class="op">&amp;&amp;</span> Z<span class="op">::</span>B<span class="op">()</span></code> will use the <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> overload, but ADL for <code class="sourceCode cpp">Z<span class="op">::</span>A<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;()</span></code> alone will not even find the hidden friend overload (indeed, the author of <code class="sourceCode cpp">Z<span class="op">::</span>A</code> might have nothing to do with it). So we must disqualify <code class="sourceCode cpp">Z<span class="op">::</span>B</code> instead.</p>
+<p>The problem here is that the hidden friend can be a friend of the wrong class. That means that the <span style="color:darkgreen">second sentence of the reasoning above</span> no longer applies, because we are no longer guaranteed that the argument related to <code class="sourceCode cpp">A</code> will bring the overload in.</p>
+<p>The wording below excludes hidden friends from the <em>key parameter</em> special case: hidden friends disqualify a type from modeling <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> if template argument deduction for either parameter succeeds. Note that the concern motivating this special case doesn’t apply to hidden friends: if they are the hidden friend of the “right” class template, then ADL for other types in the namespace will not even find them, so they will not accidentally disqualify anything.</p>
 <h1 data-number="4" style="border-bottom:1px solid #cccccc" id="wording"><span class="header-section-number">4</span> Wording<a href="#wording" class="self-link"></a></h1>
-<p>This wording is relative to <span class="citation" data-cites="N4842">[<a href="#ref-N4842" role="doc-biblioref">N4842</a>]</span>. Drafting notes in blue (<span class="draftnote-blue" style="color: #0000ff">[ Drafting note: like this ]</span>) are explanations of the wording for reviewers and not part of the wording.</p>
+<p>This wording is relative to <span class="citation" data-cites="N4842">[<a href="#ref-N4842" role="doc-biblioref">N4842</a>]</span>.</p>
 <p>Replace <span>18.5.2 <a href="https://wg21.link/concept.boolean">[concept.boolean]</a></span> with the following:</p>
 <div class="add" style="color: #006e28">
 
 <h3 class="unnumbered" data-number id="boolean-testability-concept.booleantestable">18.5.2 Boolean testability [concept.booleantestable]<a href="#boolean-testability-concept.booleantestable" class="self-link"></a></h3>
 <p><span class="marginalizedparent"><a class="marginalized">1</a></span> The exposition-only <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable</code></em> concept specifies the requirements on expressions that are convertible to <code class="sourceCode cpp"><span class="dt">bool</span></code> and for which the logical operators (<span>7.6.14 <a href="https://wg21.link/expr.log.and">[expr.log.and]</a></span>, <span>7.6.15 <a href="https://wg21.link/expr.log.or">[expr.log.or]</a></span>, <span>7.6.2.1 <a href="https://wg21.link/expr.unary.op">[expr.unary.op]</a></span>) have the conventional semantics.</p>
 <blockquote>
-<div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">concept</span> <em>boolean-testable-impl</em> <span class="op">=</span> convertible_to<span class="op">&lt;</span>T, <span class="dt">bool</span><span class="op">&gt;</span>;  <span class="co">// <em>exposition only</em></span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="kw">concept</span> <em>boolean-testable-impl</em> <span class="op">=</span> convertible_to<span class="op">&lt;</span>T, <span class="dt">bool</span><span class="op">&gt;</span>;  <span class="co">// <em>exposition only</em></span></span></code></pre></div>
 </blockquote>
 <p><span class="marginalizedparent"><a class="marginalized">2</a></span> Let <code class="sourceCode cpp">e</code> be an expression such that <code class="sourceCode cpp"><span class="kw">decltype</span><span class="op">((</span>e<span class="op">))</span></code> is <code class="sourceCode cpp">T</code>. <code class="sourceCode cpp">T</code> models <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable<span class="op">-</span>impl</code></em> only if:</p>
 <ul>
@@ -638,42 +707,20 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <li><span class="marginalizedparent"><a class="marginalized">(3.2.2)</a></span> template argument deduction using the rules for deducing template arguments in a function call (<span>13.10.2.1 <a href="https://wg21.link/temp.deduct.call">[temp.deduct.call]</a></span>) and the type of <code class="sourceCode cpp">e</code> as the argument type succeeds.</li>
 </ul></li>
 </ul>
-<div class="draftnote-blue" style="color: #0000ff">
-<p>[ Drafting note: Non-deduced contexts must be disqualifying because they can contain an arbitrary type transformation. Consider:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1"></a> <span class="kw">namespace</span> NS1 <span class="op">{</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a>   <span class="kw">enum</span> A <span class="op">{}</span>;</span>
-<span id="cb4-3"><a href="#cb4-3"></a></span>
-<span id="cb4-4"><a href="#cb4-4"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span><span class="op">&gt;</span></span>
-<span id="cb4-5"><a href="#cb4-5"></a>   <span class="kw">struct</span> trait <span class="op">{</span> <span class="kw">using</span> type <span class="op">=</span> A; <span class="op">}</span>;</span>
-<span id="cb4-6"><a href="#cb4-6"></a></span>
-<span id="cb4-7"><a href="#cb4-7"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
-<span id="cb4-8"><a href="#cb4-8"></a>   <span class="dt">void</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span>T<span class="op">*</span>, <span class="kw">typename</span> trait<span class="op">&lt;</span>T<span class="op">&gt;::</span>type<span class="op">)</span>;</span>
-<span id="cb4-9"><a href="#cb4-9"></a> <span class="op">}</span></span></code></pre></div>
-<p><code class="sourceCode cpp"><span class="op">(</span><span class="dt">int</span><span class="op">*)</span><span class="kw">nullptr</span> <span class="op">&amp;&amp;</span> NS1<span class="op">::</span>A<span class="op">()</span></code> will use the <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> overload, and therefore we must disqualify <code class="sourceCode cpp">NS1<span class="op">::</span>A</code>. ]</p>
-</div>
 <p><span class="marginalizedparent"><a class="marginalized">4</a></span> A <em>key parameter</em> of a function template <code class="sourceCode cpp">D</code> is a function parameter of type <em><code class="sourceCode cpp">cv</code></em> <code class="sourceCode cpp">X</code> or reference thereto, where <code class="sourceCode cpp">X</code> names a specialization of a class template that is a member of the same namespace as <code class="sourceCode cpp">D</code>, and <code class="sourceCode cpp">X</code> contains at least one template parameter that participates in template argument deduction.</p>
 <div class="example">
 <p><span>[ <em>Example:</em> </span>In</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1"></a> <span class="kw">namespace</span> Z <span class="op">{</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span><span class="op">&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3"></a>   <span class="kw">struct</span> C <span class="op">{}</span>;</span>
-<span id="cb5-4"><a href="#cb5-4"></a></span>
-<span id="cb5-5"><a href="#cb5-5"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
-<span id="cb5-6"><a href="#cb5-6"></a>   <span class="dt">void</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span>C<span class="op">&lt;</span>T<span class="op">&gt;</span> x, T y<span class="op">)</span>;</span>
-<span id="cb5-7"><a href="#cb5-7"></a></span>
-<span id="cb5-8"><a href="#cb5-8"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
-<span id="cb5-9"><a href="#cb5-9"></a>   <span class="dt">void</span> <span class="kw">operator</span><span class="op">||(</span>C<span class="op">&lt;</span>type_identity_t<span class="op">&lt;</span>T<span class="op">&gt;&gt;</span> x, T y<span class="op">)</span>;</span>
-<span id="cb5-10"><a href="#cb5-10"></a> <span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1"></a> <span class="kw">namespace</span> Z <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span><span class="op">&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>   <span class="kw">struct</span> C <span class="op">{}</span>;</span>
+<span id="cb7-4"><a href="#cb7-4"></a></span>
+<span id="cb7-5"><a href="#cb7-5"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a>   <span class="dt">void</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span>C<span class="op">&lt;</span>T<span class="op">&gt;</span> x, T y<span class="op">)</span>;</span>
+<span id="cb7-7"><a href="#cb7-7"></a></span>
+<span id="cb7-8"><a href="#cb7-8"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a>   <span class="dt">void</span> <span class="kw">operator</span><span class="op">||(</span>C<span class="op">&lt;</span>type_identity_t<span class="op">&lt;</span>T<span class="op">&gt;&gt;</span> x, T y<span class="op">)</span>;</span>
+<span id="cb7-10"><a href="#cb7-10"></a> <span class="op">}</span></span></code></pre></div>
 <p>the declaration of <code class="sourceCode cpp">Z<span class="op">::</span><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> contains one key parameter, <code class="sourceCode cpp">C<span class="op">&lt;</span>T<span class="op">&gt;</span> x</code>, and the declaration of <code class="sourceCode cpp">Z<span class="op">::</span><span class="kw">operator</span><span class="op">||</span></code> contains no key parameters.<span> — <em>end example</em> ]</span></p>
-</div>
-<div class="draftnote-blue" style="color: #0000ff">
-<p>[ Drafting note: It’s important that <code class="sourceCode cpp">X</code> contains at least one parameter that participates in template argument deduction; if not, then we cannot guarantee that a deduction failure will result for any type that is not derived from the class template. In the above example, given</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1"></a> <span class="kw">namespace</span> Z <span class="op">{</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a>   <span class="kw">enum</span> X <span class="op">{}</span>;</span>
-<span id="cb6-3"><a href="#cb6-3"></a> <span class="op">}</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a></span>
-<span id="cb6-5"><a href="#cb6-5"></a>  <span class="kw">struct</span> Y <span class="op">{</span> <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span> <span class="kw">operator</span> T<span class="op">()</span>; <span class="op">}</span>;</span></code></pre></div>
-<p><code class="sourceCode cpp">Y<span class="op">()</span> <span class="op">||</span> Z<span class="op">::</span>X<span class="op">()</span></code> will use the <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">||</span></code> overload, so that overload must disqualify <code class="sourceCode cpp">Z<span class="op">::</span>X</code>. ]</p>
 </div>
 <p><span class="marginalizedparent"><a class="marginalized">5</a></span> A <em>disqualifying declaration</em> is</p>
 <ul>
@@ -685,23 +732,7 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <li><span class="marginalizedparent"><a class="marginalized">(5.2.3)</a></span> the declaration declares a function template that is not visible in its namespace (<span>9.8.1.2 <a href="https://wg21.link/namespace.memdef">[namespace.memdef]</a></span>).</li>
 </ul></li>
 </ul>
-<div class="draftnote-blue" style="color: #0000ff">
-<p>[ Drafting note: We cannot only look at the key parameter(s) if the function template is a hidden friend, because it may be a hidden friend of the wrong class.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1"></a> <span class="kw">namespace</span> NS2 <span class="op">{</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a>   <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span><span class="op">&gt;</span></span>
-<span id="cb7-3"><a href="#cb7-3"></a>   <span class="kw">struct</span> A <span class="op">{</span></span>
-<span id="cb7-4"><a href="#cb7-4"></a>     <span class="kw">operator</span> <span class="dt">bool</span><span class="op">()</span>;</span>
-<span id="cb7-5"><a href="#cb7-5"></a>   <span class="op">}</span>;</span>
-<span id="cb7-6"><a href="#cb7-6"></a></span>
-<span id="cb7-7"><a href="#cb7-7"></a>   <span class="kw">struct</span> B <span class="op">{</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a>     <span class="kw">operator</span> <span class="dt">bool</span><span class="op">()</span>;</span>
-<span id="cb7-9"><a href="#cb7-9"></a>     <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
-<span id="cb7-10"><a href="#cb7-10"></a>     <span class="kw">friend</span> <span class="dt">void</span> <span class="kw">operator</span><span class="op">&amp;&amp;(</span>A<span class="op">&lt;</span>T<span class="op">&gt;</span>, B<span class="op">)</span>;</span>
-<span id="cb7-11"><a href="#cb7-11"></a>   <span class="op">}</span>;</span>
-<span id="cb7-12"><a href="#cb7-12"></a> <span class="op">}</span></span></code></pre></div>
-<p><code class="sourceCode cpp">NS2<span class="op">::</span>A<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;()</span> <span class="op">&amp;&amp;</span> NS2<span class="op">::</span>B<span class="op">()</span></code> will use the <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">&amp;&amp;</span></code> overload, but ADL for <code class="sourceCode cpp">NS2<span class="op">::</span>A<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;()</span></code> alone will not find the hidden friend overload, so that overload must disqualify <code class="sourceCode cpp">NS2<span class="op">::</span>B</code>. ]</p>
-</div>
-<p><span class="marginalizedparent"><a class="marginalized">6</a></span> <span class="note"><span>[ <em>Note:</em> </span>The intention is to ensure that given two types <code class="sourceCode cpp">T1</code> and <code class="sourceCode cpp">T2</code> that both model <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable<span class="op">-</span>impl</code></em>, the <code class="sourceCode cpp"><span class="op">&amp;&amp;</span></code> and <code class="sourceCode cpp"><span class="op">||</span></code> operators within the expressions <code class="sourceCode cpp">declval<span class="op">&lt;</span>T1<span class="op">&gt;()</span> <span class="op">&amp;&amp;</span> declval<span class="op">&lt;</span>T2<span class="op">&gt;()</span></code> and <code class="sourceCode cpp">declval<span class="op">&lt;</span>T1<span class="op">&gt;()</span> <span class="op">||</span> declval<span class="op">&lt;</span>T2<span class="op">&gt;()</span></code> resolve to the corresponding built-in operators.<span> — <em>end note</em> ]</span></span></p>
+<p><span class="marginalizedparent"><a class="marginalized">6</a></span> <span class="note"><span>[ <em>Note:</em> </span>The intention is to ensure that given two types <code class="sourceCode cpp">T1</code> and <code class="sourceCode cpp">T2</code> that each model <em><code class="sourceCode cpp">boolean<span class="op">-</span>testable<span class="op">-</span>impl</code></em>, the <code class="sourceCode cpp"><span class="op">&amp;&amp;</span></code> and <code class="sourceCode cpp"><span class="op">||</span></code> operators within the expressions <code class="sourceCode cpp">declval<span class="op">&lt;</span>T1<span class="op">&gt;()</span> <span class="op">&amp;&amp;</span> declval<span class="op">&lt;</span>T2<span class="op">&gt;()</span></code> and <code class="sourceCode cpp">declval<span class="op">&lt;</span>T1<span class="op">&gt;()</span> <span class="op">||</span> declval<span class="op">&lt;</span>T2<span class="op">&gt;()</span></code> resolve to the corresponding built-in operators.<span> — <em>end note</em> ]</span></span></p>
 <blockquote>
 <div class="sourceCode" id="cb8"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="kw">concept</span> <em>boolean-testable</em> <span class="op">=</span>                             <span class="co">// <em>exposition only</em></span></span>
