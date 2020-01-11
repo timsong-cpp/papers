@@ -1,6 +1,6 @@
 ---
 title: Wording for _`boolean-testable`_
-document: D1964R1
+document: P1964R1
 date: today
 audience:
   - LWG
