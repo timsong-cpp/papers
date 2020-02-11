@@ -1,6 +1,6 @@
 ---
 title: Make "implicit expression variations" more explicit (Wording for US185)
-document: D2102R0
+document: P2102R0
 date: today
 audience:
   - LWG
@@ -75,7 +75,7 @@ complete non-array object type.]{.diffins}
 +    indirectly_writable<Out, const iter_value_t<In>&&> &&
      copyable<iter_value_t<In>> &&
      constructible_from<iter_value_t<In>, iter_reference_t<In>> &&
-     assignable_from<iter_value_t<In>&, iter_reference_t<In>>;```
+     assignable_from<iter_value_t<In>&, iter_reference_t<In>>;
 
 ```
 

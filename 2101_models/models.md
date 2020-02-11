@@ -1,6 +1,6 @@
 ---
 title: "\"Models\" subsumes \"satisfies\" (Wording for US298 and US300)"
-document: D2101R0
+document: P2101R0
 date: today
 audience:
   - LWG
@@ -23,10 +23,10 @@ Add the following paragraphs to [res.on.requirements]{.sref} before p1:
 
 ::: add
 
-[1]{.pnum} A set of template arguments `Ts` is said to _model_ a concept `C` if `Ts` satisfies `C`
+[1]{.pnum} A sequence `Args` of template arguments is said to _model_ a concept `C` if `Args` satisfies `C`
 ([temp.constr.decl]{.sref}) and meets all semantic requirements (if any) given in the specification of `C`.
 
-[2]{.pnum} If the validity or meaning of a program depends on whether a set of template arguments models
+[2]{.pnum} If the validity or meaning of a program depends on whether a sequence of template arguments models
 a concept, and the concept is satisfied but not modeled, the program is ill-formed, no diagnostic required.
 
 :::

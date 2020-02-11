@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2020-02-10" />
-  <title>Make “implicit expression variations” more explicit (Wording for US185)</title>
+  <meta name="dcterms.date" content="2020-02-11" />
+  <title>“Models” subsumes “satisfies” (Wording for US298 and US300)</title>
   <style>
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
@@ -525,16 +525,16 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 <body>
 <div class="wrapper">
 <header id="title-block-header">
-<h1 class="title" style="text-align:center">Make “implicit expression variations” more explicit (Wording for US185)</h1>
+<h1 class="title" style="text-align:center">“Models” subsumes “satisfies” (Wording for US298 and US300)</h1>
 
 <table style="border:none;float:right">
   <tr>
     <td>Document #: </td>
-    <td>D2102R0</td>
+    <td>P2101R0</td>
   </tr>
   <tr>
     <td>Date: </td>
-    <td>2020-02-10</td>
+    <td>2020-02-11</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project: </td>
@@ -554,63 +554,21 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 </header>
 <div style="clear:both">
 <h1 id="introduction" style="border-bottom:1px solid #cccccc"><span class="header-section-number">1</span> Introduction<a href="#introduction" class="self-link"></a></h1>
-<p>This paper provides wording to resolve NB comment <a href="https://github.com/cplusplus/nbballot/issues/183">US185</a>.</p>
+<p>This paper provides wording to resolve NB comments <a href="https://github.com/cplusplus/nbballot/issues/294">US298</a> and <a href="https://github.com/cplusplus/nbballot/issues/296">US300</a>. It also resolves <span class="citation" data-cites="LWG3345">[<a href="#ref-LWG3345" role="doc-biblioref">LWG3345</a>]</span>.</p>
 <h1 id="wording" style="border-bottom:1px solid #cccccc"><span class="header-section-number">2</span> Wording<a href="#wording" class="self-link"></a></h1>
 <p>This wording is relative to <span class="citation" data-cites="N4849">[<a href="#ref-N4849" role="doc-biblioref">N4849</a>]</span>.</p>
-<ol type="1">
-<li>Edit <span>18.2 <a href="https://wg21.link/concepts.equality">[concepts.equality]</a></span>p1 as indicated to define “operand”:</li>
-</ol>
-<blockquote>
-<p>An expression is <em>equality-preserving</em> if, given equal inputs, the expression results in equal outputs. The inputs to an expression are the set of the expression’s operands. The output of an expression is the expression’s result and all operands modified by the expression. <span class="diffins">For the purposes of this subclause, the <em>operands</em> of an expression are the largest subexpressions that include only:</span></p>
+<p>Add the following paragraphs to <span>16.5.4.12 <a href="https://wg21.link/res.on.requirements">[res.on.requirements]</a></span> before p1:</p>
 <div class="add" style="color: #006e28">
-
-<ul>
-<li><span class="marginalizedparent"><a class="marginalized">(1.1)</a></span> an <em>id-expression</em> (<span>7.5.4 <a href="https://wg21.link/expr.prim.id">[expr.prim.id]</a></span>), and</li>
-<li><span class="marginalizedparent"><a class="marginalized">(1.2)</a></span> invocations of the library function templates <code class="sourceCode cpp">std<span class="op">::</span>move</code>, <code class="sourceCode cpp">std<span class="op">::</span>forward</code>, and <code class="sourceCode cpp">std<span class="op">::</span>declval</code> (<span>20.2.4 <a href="https://wg21.link/forward">[forward]</a></span>, <span>20.2.6 <a href="https://wg21.link/declval">[declval]</a></span>)</li>
-</ul>
-<div class="example">
-<p><span>[ <em>Example:</em> </span>The operands of the expression <code class="sourceCode cpp">a <span class="op">=</span> std<span class="op">::</span>move<span class="op">(</span>b<span class="op">)</span></code> are <code class="sourceCode cpp">a</code> and <code class="sourceCode cpp">std<span class="op">::</span>move<span class="op">(</span>b<span class="op">)</span></code>.<span> — <em>end example</em> ]</span></p>
+<p><span class="marginalizedparent"><a class="marginalized">1</a></span> A sequence <code class="sourceCode cpp">Args</code> of template arguments is said to <em>model</em> a concept <code class="sourceCode cpp">C</code> if <code class="sourceCode cpp">Args</code> satisfies <code class="sourceCode cpp">C</code> (<span>13.5.2 <a href="https://wg21.link/temp.constr.decl">[temp.constr.decl]</a></span>) and meets all semantic requirements (if any) given in the specification of <code class="sourceCode cpp">C</code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized">2</a></span> If the validity or meaning of a program depends on whether a sequence of template arguments models a concept, and the concept is satisfied but not modeled, the program is ill-formed, no diagnostic required.</p>
 </div>
-
-</div>
-</blockquote>
-<ol start="2" type="1">
-<li>Edit <span>18.2 <a href="https://wg21.link/concepts.equality">[concepts.equality]</a></span> p5 to clarify how the cv-qualification and value categories of operands are determined:</li>
-</ol>
-<blockquote>
-<p>An expression that may alter the value of one or more of its inputs in a manner observable to equality-preserving expressions is said to modify those inputs. This document uses a notational convention to specify which expressions declared in a requires-expression modify which inputs: except where otherwise specified, an expression operand that is a non-constant lvalue or rvalue may be modified. Operands that are constant lvalues or rvalues are required to not be modified. <span class="diffins">For the purposes of this subclause, the cv-qualification and value category of each operand is determined by assuming that each template type parameter denotes a cv-unqualified complete non-array object type.</span></p>
-</blockquote>
-<ol start="3" type="1">
-<li>Edit <span>18.6 <a href="https://wg21.link/concepts.object">[concepts.object]</a></span> to explicitly require additional variations on <code class="sourceCode cpp">assignable_from</code> for <code class="sourceCode cpp">copyable</code>:</li>
-</ol>
-<blockquote>
-<div>
-<div class="sourceCode" id="cb1"><pre class="sourceCode diff"><code class="sourceCode diff"><span id="cb1-1"><a href="#cb1-1"></a> template&lt;class T&gt;</span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="st">-  concept copyable = copy_constructible&lt;T&gt; &amp;&amp; movable&lt;T&gt; &amp;&amp; assignable_from&lt;T&amp;, const T&amp;&gt;;</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="va">+  concept copyable = copy_constructible&lt;T&gt; &amp;&amp; movable&lt;T&gt; &amp;&amp; <span class="diffins">assignable_from&lt;T&amp;, T&amp;&gt; &amp;&amp;</span></span></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="va">+                     assignable_from&lt;T&amp;, const T&amp;&gt; <span class="diffins">&amp;&amp; assignable_from&lt;T&amp;, const T&gt;</span>;</span></span></code></pre></div>
-</div>
-</blockquote>
-<ol start="4" type="1">
-<li>Edit <span>23.3.7.3 <a href="https://wg21.link/alg.req.ind.copy">[alg.req.ind.copy]</a></span> to explicit require additional variations on <code class="sourceCode cpp">indirectly_writable</code> for <code class="sourceCode cpp">indirectly_copyable_storable</code>:</li>
-</ol>
-<blockquote>
-<div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode diff"><code class="sourceCode diff"><span id="cb2-1"><a href="#cb2-1"></a> template&lt;class In, class Out&gt;</span>
-<span id="cb2-2"><a href="#cb2-2"></a>   concept indirectly_copyable_storable =</span>
-<span id="cb2-3"><a href="#cb2-3"></a>     indirectly_copyable&lt;In, Out&gt; &amp;&amp;</span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="va">+    indirectly_writable&lt;Out, iter_value_t&lt;In&gt;&amp;&gt; &amp;&amp;</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a>     indirectly_writable&lt;Out, const iter_value_t&lt;In&gt;&amp;&gt; &amp;&amp;</span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="va">+    indirectly_writable&lt;Out, iter_value_t&lt;In&gt;&amp;&amp;&gt; &amp;&amp;</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a><span class="va">+    indirectly_writable&lt;Out, const iter_value_t&lt;In&gt;&amp;&amp;&gt; &amp;&amp;</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a>     copyable&lt;iter_value_t&lt;In&gt;&gt; &amp;&amp;</span>
-<span id="cb2-9"><a href="#cb2-9"></a>     constructible_from&lt;iter_value_t&lt;In&gt;, iter_reference_t&lt;In&gt;&gt; &amp;&amp;</span>
-<span id="cb2-10"><a href="#cb2-10"></a>     assignable_from&lt;iter_value_t&lt;In&gt;&amp;, iter_reference_t&lt;In&gt;&gt;;```</span></code></pre></div>
-</div>
-</blockquote>
 <h1 id="references" style="border-bottom:1px solid #cccccc"><span class="header-section-number">3</span> References<a href="#references" class="self-link"></a></h1>
 
 <div id="refs" role="doc-bibliography">
+<div id="ref-LWG3345">
+<p>[LWG3345] Daniel Krügler. Incorrect usages of “models” versus “satisfies”. <br />
+<a href="https://wg21.link/lwg3345">https://wg21.link/lwg3345</a></p>
+</div>
 <div id="ref-N4849">
 <p>[N4849] Richard Smith. 2020. Working Draft, Standard for Programming Language C++. <br />
 <a href="https://wg21.link/n4849">https://wg21.link/n4849</a></p>
