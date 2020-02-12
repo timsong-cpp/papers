@@ -1,6 +1,6 @@
 ---
 title: Wording for _`boolean-testable`_
-document: P1964R1
+document: P1964R2
 date: today
 audience:
   - LWG
@@ -14,6 +14,11 @@ toc: true
 
 This paper provides wording for replacing `boolean` with the _`boolean-testable`_ exposition-only concept, as proposed
 in [@P1964R0]. For detailed motivation and discussion, see that paper.
+
+# Revision history
+
+- R2: Incorporated LWG feedback in Prague.
+- R1: Initial draft of wording.
 
 # LEWG Belfast vote
 
@@ -264,7 +269,7 @@ resolve to the corresponding built-in operators.]{.note}
 template<class T>
 concept @_boolean-testable_@ =                             // @_exposition only_@
     @_boolean-testable-impl_@<T> && requires (T&& t) {
-        { !std::forward<T>(t) } -> @_boolean-testable-impl_@
+        { !std::forward<T>(t) } -> @_boolean-testable-impl_@;
     };
 ```
 
@@ -376,3 +381,6 @@ Edit [alg.count]{.sref} p1 as indicated:
 - [1.4]{.pnum} [`bool(`]{.diffins}`invoke(pred, invoke(proj, *i))`[`)`]{.diffins} [`!= false`]{.diffdel} for the overloads
   with both parameters `proj` and `pred`.
 :::
+
+Update the value of `__cpp_lib_concepts` in [version.syn]{.sref}, header `<version>` synopsis, to reflect the date of
+approval of this proposal.
