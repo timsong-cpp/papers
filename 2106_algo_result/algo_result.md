@@ -1,6 +1,6 @@
 ---
 title: Alternative wording for GB315 and GB316
-document: D2106R0
+document: P2106R0
 date: today
 audience:
   - LWG
@@ -12,7 +12,7 @@ toc: false
 
 # Introduction
 
-This paper provides alternative wording for NB comments [GB315](https://github.com/cplusplus/nbballot/issues/311) and [GB316](https://github.com/cplusplus/nbballot/issues/312).
+This paper provides alternative wording for NB comments [GB315](https://github.com/cplusplus/nbballot/issues/311) and [GB316](https://github.com/cplusplus/nbballot/issues/312), based on LEWG's direction in Prague.
 
 # Wording
 This wording is relative to [@N4849].
@@ -23,12 +23,38 @@ Edit [algorithm.syn]{.sref} as indicated:
  #include <initializer_list>
 
  namespace std {
+
++  namespace ranges {
++
++    // [algorithms.results], algorithm result types
++    template<class I, class F>
++    struct in_fun_result;
++
++    template<class I1, class I2>
++    struct in_in_result;
++
++    template<class I, class O>
++    struct in_out_result;
++
++    template<class I1, class I2, class O>
++    struct in_in_out_result;
++
++    template<class I, class O1, class O2>
++    struct in_out_out_result;
++
++    template<class T>
++    struct min_max_result;
++
++    template<class I>
++    struct in_found_result;
++  }
++
    @_[...]_@
 
    namespace ranges {
      template<class I, class F>
++    using for_each_result = in_fun_result<I, F>;
 -    struct for_each_result {
-+    struct for_each_result;
 -      [[no_unique_address]] I in;
 -      [[no_unique_address]] F fun;
 -
@@ -59,8 +85,8 @@ Edit [algorithm.syn]{.sref} as indicated:
 
    namespace ranges {
      template<class I1, class I2>
++    using mismatch_result = in_in_result<I1, I2>;
 -    struct mismatch_result {
-+    struct mismatch_result;
 -      [[no_unique_address]] I1 in1;
 -      [[no_unique_address]] I2 in2;
 -
@@ -95,8 +121,8 @@ Edit [algorithm.syn]{.sref} as indicated:
 
    namespace ranges {
      template<class I, class O>
++    using copy_result = in_out_result<I, O>;
 -    struct copy_result {
-+    struct copy_result;
 -      [[no_unique_address]] I in;
 -      [[no_unique_address]] O out;
 -
@@ -128,7 +154,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I, class O>
 -    using copy_n_result = copy_result<I, O>;
-+    struct copy_n_result;
++    using copy_n_result = in_out_result<I, O>;
 
      template<input_iterator I, weakly_incrementable O>
        requires indirectly_copyable<I, O>
@@ -141,7 +167,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I, class O>
 -    using copy_if_result = copy_result<I, O>;
-+    struct copy_if_result;
++    using copy_if_result = in_out_result<I, O>;
 
      template<input_iterator I, sentinel_for<I> S, weakly_incrementable O, class Proj = identity,
               indirect_unary_predicate<projected<I, Proj>> Pred>
@@ -160,7 +186,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I1, class I2>
 -    using copy_backward_result = copy_result<I1, I2>;
-+    struct copy_backward_result;
++    using copy_backward_result = in_out_result<I1, I2>;
 
      template<bidirectional_iterator I1, sentinel_for<I1> S1, bidirectional_iterator I2>
        requires indirectly_copyable<I1, I2>
@@ -177,7 +203,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I, class O>
 -    using move_result = copy_result<I, O>;
-+    struct move_result;
++    using move_result = in_out_result<I, O>;
 
      template<input_iterator I, sentinel_for<I> S, weakly_incrementable O>
        requires indirectly_movable<I, O>
@@ -194,7 +220,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I1, class I2>
 -    using move_backward_result = copy_result<I1, I2>;
-+    struct move_backward_result;
++    using move_backward_result = in_out_result<I1, I2>;
 
      template<bidirectional_iterator I1, sentinel_for<I1> S1, bidirectional_iterator I2>
        requires indirectly_movable<I1, I2>
@@ -211,7 +237,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I1, class I2>
 -    using swap_ranges_result = mismatch_result<I1, I2>;
-+    struct swap_ranges_result;
++    using swap_ranges_result = in_in_result<I1, I2>;
 
      template<input_iterator I1, sentinel_for<I1> S1, input_iterator I2, sentinel_for<I2> S2>
        requires indirectly_swappable<I1, I2>
@@ -228,7 +254,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I, class O>
 -    using unary_transform_result = copy_result<I, O>;
-+    struct unary_transform_result;
++    using unary_transform_result = in_out_result<I, O>;
 
      template<input_iterator I, sentinel_for<I> S, weakly_incrementable O,
               copy_constructible F, class Proj = identity>
@@ -242,8 +268,8 @@ Edit [algorithm.syn]{.sref} as indicated:
          transform(R&& r, O result, F op, Proj proj = {});
 
      template<class I1, class I2, class O>
++    using binary_transform_result = in_in_out_result<I1, I2, O>;
 -    struct binary_transform_result {
-+    struct binary_transform_result;
 -      [[no_unique_address]] I1 in1;
 -      [[no_unique_address]] I2 in2;
 -      [[no_unique_address]] O  out;
@@ -284,7 +310,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I, class O>
 -     using replace_copy_result = copy_result<I, O>;
-+     struct replace_copy_result;
++     using replace_copy_result = in_out_result<I, O>;
 
      template<input_iterator I, sentinel_for<I> S, class T1, class T2,
               output_iterator<const T2&> O, class Proj = identity>
@@ -304,7 +330,7 @@ Edit [algorithm.syn]{.sref} as indicated:
 
      template<class I, class O>
 -    using replace_copy_if_result = copy_result<I, O>;
-+    struct replace_copy_if_result;
++    using replace_copy_if_result = in_out_result<I, O>;
 
      template<input_iterator I, sentinel_for<I> S, class T, output_iterator<const T&> O,
               class Proj = identity, indirect_unary_predicate<projected<I, Proj>> Pred>
@@ -325,7 +351,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I, class O>
 -    using remove_copy_result = copy_result<I, O>;
-+    struct remove_copy_result;
++    using remove_copy_result = in_out_result<I, O>;
 
      template<input_iterator I, sentinel_for<I> S, weakly_incrementable O, class T,
               class Proj = identity>
@@ -342,7 +368,7 @@ Edit [algorithm.syn]{.sref} as indicated:
 
      template<class I, class O>
 -    using remove_copy_if_result = copy_result<I, O>;
-+    struct remove_copy_if_result;
++    using remove_copy_if_result = in_out_result<I, O>;
 
      template<input_iterator I, sentinel_for<I> S, weakly_incrementable O,
               class Proj = identity, indirect_unary_predicate<projected<I, Proj>> Pred>
@@ -361,7 +387,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I, class O>
 -    using unique_copy_result = copy_result<I, O>;
-+    struct unique_copy_result;
++    using unique_copy_result = in_out_result<I, O>;
 
      template<input_iterator I, sentinel_for<I> S, weakly_incrementable O, class Proj = identity,
               indirect_equivalence_relation<projected<I, Proj>> C = ranges::equal_to>
@@ -386,7 +412,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I, class O>
 -    using reverse_copy_result = copy_result<I, O>;
-+    struct reverse_copy_result;
++    using reverse_copy_result = in_out_result<I, O>;
 
      template<bidirectional_iterator I, sentinel_for<I> S, weakly_incrementable O>
        requires indirectly_copyable<I, O>
@@ -403,7 +429,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I, class O>
 -    using rotate_copy_result = copy_result<I, O>;
-+    struct rotate_copy_result;
++    using rotate_copy_result = in_out_result<I, O>;
 
      template<forward_iterator I, sentinel_for<I> S, weakly_incrementable O>
        requires indirectly_copyable<I, O>
@@ -420,7 +446,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
 -    template<class I, class O> using partial_sort_copy_result = copy_result<I, O>;
 +    template<class I, class O>
-+    struct partial_sort_copy_result;
++    using partial_sort_copy_result = in_out_result<I, O>;
 
      template<input_iterator I1, sentinel_for<I1> S1,
               random_access_iterator I2, sentinel_for<I2> S2,
@@ -445,8 +471,8 @@ Edit [algorithm.syn]{.sref} as indicated:
 
    namespace ranges {
      template<class I, class O1, class O2>
++    using partition_copy_result = in_out_out_result<I, O1, O2>;
 -    struct partition_copy_result {
-+    struct partition_copy_result;
 -      [[no_unique_address]] I  in;
 -      [[no_unique_address]] O1 out1;
 -      [[no_unique_address]] O2 out2;
@@ -487,7 +513,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I1, class I2, class O>
 -    using merge_result = binary_transform_result<I1, I2, O>;
-+    struct merge_result;
++    using merge_result = in_in_out_result<I1, I2, O>;
 
      template<input_iterator I1, sentinel_for<I1> S1, input_iterator I2, sentinel_for<I2> S2,
               weakly_incrementable O, class Comp = ranges::less, class Proj1 = identity,
@@ -509,7 +535,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I1, class I2, class O>
 -    using set_union_result = binary_transform_result<I1, I2, O>;
-+    struct set_union_result;
++    using set_union_result = in_in_out_result<I1, I2, O>;
 
      template<input_iterator I1, sentinel_for<I1> S1, input_iterator I2, sentinel_for<I2> S2,
               weakly_incrementable O, class Comp = ranges::less,
@@ -531,7 +557,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I1, class I2, class O>
 -    using set_intersection_result = binary_transform_result<I1, I2, O>;
-+    struct set_intersection_result;
++    using set_intersection_result = in_in_out_result<I1, I2, O>;
 
      template<input_iterator I1, sentinel_for<I1> S1, input_iterator I2, sentinel_for<I2> S2,
               weakly_incrementable O, class Comp = ranges::less,
@@ -553,7 +579,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I, class O>
 -    using set_difference_result = copy_result<I, O>;
-+    struct set_difference_result;
++    using set_difference_result = in_out_result<I, O>;
 
      template<input_iterator I1, sentinel_for<I1> S1, input_iterator I2, sentinel_for<I2> S2,
               weakly_incrementable O, class Comp = ranges::less,
@@ -575,7 +601,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I1, class I2, class O>
 -    using set_symmetric_difference_result = binary_transform_result<I1, I2, O>;
-+    struct set_symmetric_difference_result;
++    using set_symmetric_difference_result = in_in_out_result<I1, I2, O>;
 
      template<input_iterator I1, sentinel_for<I1> S1, input_iterator I2, sentinel_for<I2> S2,
               weakly_incrementable O, class Comp = ranges::less,
@@ -597,8 +623,8 @@ Edit [algorithm.syn]{.sref} as indicated:
 
    namespace ranges {
      template<class T>
++    using minmax_result = min_max_result<T>;
 -    struct minmax_result {
-+    struct minmax_result;
 -      [[no_unique_address]] T min;
 -      [[no_unique_address]] T max;
 -
@@ -635,7 +661,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I>
 -    using minmax_element_result = minmax_result<I>;
-+    struct minmax_element_result;
++    using minmax_element_result = min_max_result<I>;
 
      template<forward_iterator I, sentinel_for<I> S, class Proj = identity,
               indirect_strict_weak_order<projected<I, Proj>> Comp = ranges::less>
@@ -651,8 +677,8 @@ Edit [algorithm.syn]{.sref} as indicated:
 
    namespace ranges {
      template<class I>
++    using next_permutation_result = in_found_result<I>;
 -    struct next_permutation_result {
-+    struct next_permutation_result;
 -      bool found;
 -      I in;
 -    };
@@ -679,7 +705,7 @@ Edit [algorithm.syn]{.sref} as indicated:
    namespace ranges {
      template<class I>
 -    using prev_permutation_result = next_permutation_result<I>;
-+    struct prev_permutation_result;
++    using prev_permutation_result = in_found_result<I>;
 
      template<bidirectional_iterator I, sentinel_for<I> S, class Comp = ranges::less,
               class Proj = identity>
@@ -707,86 +733,67 @@ Add a new subclause after [algorithm.syn]{.sref}, or alternatively under [algori
 
 ::: add
 
-### ?.? Algorithm result types [algorithm.results] {-}
+### ?.? Algorithm result types [algorithms.results] {-}
 
-[1]{.pnum} Each of the class templates specified in this subclause has the template parameters, data members, and special members specified below, and has no base classes or members other than those specified. In this subclause, the name _`result`_ refers to
-the name of the class template being defined.
-
-[2]{.pnum} The class template `ranges::for_each_result` is defined as follows:
+[1]{.pnum} Each of the class templates specified in this subclause has the template parameters, data members, and special members specified below, and has no base classes or members other than those specified.
 
 ```c++
     template<class I, class F>
-    struct for_each_result {
+    struct in_fun_result {
       [[no_unique_address]] I in;
       [[no_unique_address]] F fun;
 
       template<class I2, class F2>
         requires convertible_to<const I&, I2> && convertible_to<const F&, F2>
-        operator for_each_result<I2, F2>() const & {
+        constexpr operator in_fun_result<I2, F2>() const & {
           return {in, fun};
         }
 
       template<class I2, class F2>
         requires convertible_to<I, I2> && convertible_to<F, F2>
-        operator for_each_result<I2, F2>() && {
+        constexpr operator in_fun_result<I2, F2>() && {
           return {std::move(in), std::move(fun)};
         }
     };
-```
 
-[3]{.pnum} The class templates `ranges::mismatch_result` and `ranges::swap_ranges_result` are each defined as follows:
-
-```c++
     template<class I1, class I2>
-    struct @_result_@ {
+    struct in_in_result {
       [[no_unique_address]] I1 in1;
       [[no_unique_address]] I2 in2;
 
       template<class II1, class II2>
         requires convertible_to<const I1&, II1> && convertible_to<const I2&, II2>
-        operator @_result_@<II1, II2>() const & {
+        constexpr operator in_in_result<II1, II2>() const & {
           return {in1, in2};
         }
 
       template<class II1, class II2>
         requires convertible_to<I1, II1> && convertible_to<I2, II2>
-        operator @_result_@<II1, II2>() && {
+        constexpr operator in_in_result<II1, II2>() && {
           return {std::move(in1), std::move(in2)};
         }
     };
-```
 
-[4]{.pnum} The class templates `ranges::copy_result`, `ranges::copy_n_result`, `range::copy_if_result`,
-`ranges::copy_backward_result`, `ranges::move_result`, `ranges::move_backward_result`, `ranges::unary_transform_result`,
-`ranges::replace_copy_result`, `ranges::replace_copy_if_result`, `ranges::remove_copy_result`, `ranges::remove_copy_if_result`,
-`ranges::unique_copy_result`, `ranges::reverse_copy_result`, `ranges::rotate_copy_result`, `ranges::partial_sort_copy_result`,
-and `ranges::set_difference_result` are each defined as follows:
-
-```c++
     template<class I, class O>
-    struct @_result_@ {
+    struct in_out_result {
       [[no_unique_address]] I in;
       [[no_unique_address]] O out;
 
       template<class I2, class O2>
         requires convertible_to<const I&, I2> && convertible_to<const O&, O2>
-        operator @_result_@<I2, O2>() const & {
+        constexpr operator in_out_result<I2, O2>() const & {
           return {in, out};
         }
 
       template<class I2, class O2>
         requires convertible_to<I, I2> && convertible_to<O, O2>
-        operator @_result_@<I2, O2>() && {
+        constexpr operator in_out_result<I2, O2>() && {
           return {std::move(in), std::move(out)};
         }
     };
-```
 
-[5]{.pnum} The class templates `ranges::binary_transform_result`, `ranges::merge_result`, `ranges::set_union_result`, `ranges::set_intersection_result`, and `ranges::set_symmetric_difference_result` are each defined as follows:
-
-```c++
     template<class I1, class I2, class O>
-    struct @_result_@ {
+    struct in_in_out_result {
       [[no_unique_address]] I1 in1;
       [[no_unique_address]] I2 in2;
       [[no_unique_address]] O  out;
@@ -794,24 +801,20 @@ and `ranges::set_difference_result` are each defined as follows:
       template<class II1, class II2, class OO>
         requires convertible_to<const I1&, II1> &&
           convertible_to<const I2&, II2> && convertible_to<const O&, OO>
-        operator @_result_@<II1, II2, OO>() const & {
+        constexpr operator in_in_out_result<II1, II2, OO>() const & {
           return {in1, in2, out};
         }
 
       template<class II1, class II2, class OO>
         requires convertible_to<I1, II1> &&
           convertible_to<I2, II2> && convertible_to<O, OO>
-        operator @_result_@<II1, II2, OO>() && {
+        constexpr operator in_in_out_result<II1, II2, OO>() && {
           return {std::move(in1), std::move(in2), std::move(out)};
         }
     };
-```
 
-[6]{.pnum} The class template `ranges::partition_copy_result` is defined as follows:
-
-```c++
     template<class I, class O1, class O2>
-    struct partition_copy_result {
+    struct in_out_out_result {
       [[no_unique_address]] I  in;
       [[no_unique_address]] O1 out1;
       [[no_unique_address]] O2 out2;
@@ -819,60 +822,156 @@ and `ranges::set_difference_result` are each defined as follows:
       template<class II, class OO1, class OO2>
         requires convertible_to<const I&, II> &&
           convertible_to<const O1&, OO1> && convertible_to<const O2&, OO2>
-        operator partition_copy_result<II, OO1, OO2>() const & {
+        constexpr operator in_out_out_result<II, OO1, OO2>() const & {
           return {in, out1, out2};
         }
 
       template<class II, class OO1, class OO2>
         requires convertible_to<I, II> &&
           convertible_to<O1, OO1> && convertible_to<O2, OO2>
-        operator partition_copy_result<II, OO1, OO2>() && {
+        constexpr operator in_out_out_result<II, OO1, OO2>() && {
           return {std::move(in), std::move(out1), std::move(out2)};
         }
     };
-```
 
-[7]{.pnum} The class templates `ranges::minmax_result` and `ranges::minmax_element_result` are each defined as follows:
-
-```c++
     template<class T>
-    struct @_result_@ {
+    struct min_max_result {
       [[no_unique_address]] T min;
       [[no_unique_address]] T max;
 
       template<class T2>
         requires convertible_to<const T&, T2>
-        operator @_result_@<T2>() const & {
+        constexpr operator min_max_result<T2>() const & {
           return {min, max};
         }
 
       template<class T2>
         requires convertible_to<T, T2>
-        operator @_result_@<T2>() && {
+        constexpr operator min_max_result<T2>() && {
           return {std::move(min), std::move(max)};
         }
     };
-```
 
-[8]{.pnum} The class templates `ranges::next_permutation_result` and `ranges::prev_permutation_result` are each defined as follows:
-
-```c++
     template<class I>
-    struct @_result_@ {
-        bool found;
+    struct in_found_result {
         [[no_unique_address]] I in;
+        bool found;
 
         template <class I2>
-        requires convertible_to<const I&, I2>
-        operator @_result_@<I2>()  const & {
-          return {found, in};
-        }
+          requires convertible_to<const I&, I2>
+          constexpr operator in_found_result<I2>() const & {
+            return {in, found};
+          }
         template <class I2>
-        requires convertible_to<I, I2>
-        operator @_result_@<I2>() && {
-          return {found, std::move(in)};
-        }
+          requires convertible_to<I, I2>
+          constexpr operator in_found_result<I2>() && {
+            return {std::move(in), found};
+          }
     };
 ```
 
 :::
+
+Edit [alg.permutation.generators]{.sref} p4 as indicated:
+
+::: bq
+
+[4]{.pnum} _Returns_: Let `B` be `true` if a next permutation was found and otherwise `false`. Returns:
+
+- [4.1]{.pnum} `B` for the overloads in namespace `std`.
+- [4.2]{.pnum} [`{ B, last }`]{.diffdel} [`{last, B}`]{.diffins} for the overloads in namespace `ranges`.
+
+:::
+
+
+Edit [alg.permutation.generators]{.sref} p9 as indicated:
+
+::: bq
+
+[9]{.pnum} _Returns_: Let `B` be `true` if a previous permutation was found and otherwise `false`. Returns:
+
+- [9.1]{.pnum} `B` for the overloads in namespace `std`.
+- [9.2]{.pnum} [`{ B, last }`]{.diffdel} [`{last, B}`]{.diffins} for the overloads in namespace `ranges`.
+
+:::
+
+Edit [memory.syn]{.sref}, header `<memory>` synopsis, as indicated:
+
+```diff
+ namespace std {
+
+     @_[...]_@
+
+     namespace ranges {
+     template<class I, class O>
+-      using uninitialized_copy_result = copy_result<I, O>;
++      using uninitialized_copy_result = in_out_result<I, O>;
+     template<input_iterator I, sentinel_for<I> S1,
+              no-throw-forward-iterator O, no-throw-sentinel<O> S2>
+       requires constructible_from<iter_value_t<O>, iter_reference_t<I>>
+         uninitialized_copy_result<I, O>
+           uninitialized_copy(I ifirst, S1 ilast, O ofirst, S2 olast);
+     template<input_range IR, no-throw-forward-range OR>
+       requires constructible_from<range_value_t<OR>, range_reference_t<IR>>
+         uninitialized_copy_result<safe_iterator_t<IR>, safe_iterator_t<OR>>
+           uninitialized_copy(IR&& in_range, OR&& out_range);
+
+     template<class I, class O>
+-      using uninitialized_copy_n_result = uninitialized_copy_result<I, O>;
++      using uninitialized_copy_n_result = in_out_result<I, O>;
+
+     template<input_iterator I, no-throw-forward-iterator O, no-throw-sentinel<O> S>
+       requires constructible_from<iter_value_t<O>, iter_reference_t<I>>
+         uninitialized_copy_n_result<I, O>
+           uninitialized_copy_n(I ifirst, iter_difference_t<I> n, O ofirst, S olast);
+   }
+
+   namespace ranges {
+     template<class I, class O>
+-      using uninitialized_move_result = uninitialized_copy_result<I, O>;
++      using uninitialized_move_result = in_out_result<I, O>;
+     template<input_iterator I, sentinel_for<I> S1,
+              no-throw-forward-iterator O, no-throw-sentinel<O> S2>
+       requires constructible_from<iter_value_t<O>, iter_rvalue_reference_t<I>>
+         uninitialized_move_result<I, O>
+           uninitialized_move(I ifirst, S1 ilast, O ofirst, S2 olast);
+     template<input_range IR, no-throw-forward-range OR>
+       requires constructible_from<range_value_t<OR>, range_rvalue_reference_t<IR>>
+         uninitialized_move_result<safe_iterator_t<IR>, safe_iterator_t<OR>>
+           uninitialized_move(IR&& in_range, OR&& out_range);
+
+     template<class I, class O>
+-      using uninitialized_move_n_result = uninitialized_copy_result<I, O>;
++      using uninitialized_move_n_result = in_out_result<I, O>;
+     template<input_iterator I,
+              no-throw-forward-iterator O, no-throw-sentinel<O> S>
+       requires constructible_from<iter_value_t<O>, iter_rvalue_reference_t<I>>
+         uninitialized_move_n_result<I, O>
+           uninitialized_move_n(I ifirst, iter_difference_t<I> n, O ofirst, S olast);
+   }
+
+   @_[...]_@
+ }
+```
+
+If [D1243R4](http://wiki.edg.com/pub/Wg21prague/LibraryWorkingGroup/D1243R4.pdf) is applied,
+edit [algorithm.syn] as indicated, immediately before the declaration of `ranges::for_each_n`:
+
+```diff
+ namespace std {
+
+   @_[...]_@
+
+   namespace ranges {
++    template<class I, class F>
++    using for_each_n_result = in_fun_result<I, F>;
+
+     template<input_iterator I, class Proj = identity,
+              indirectly_unary_invocable<projected<I, Proj>> Fun>
+       constexpr for_each_n_result<I, Fun>
+         for_each_n(I first, iter_difference_t<I> n, Fun f, Proj proj = {});
+   }
+
+   @_[...]_@
+ }
+```
