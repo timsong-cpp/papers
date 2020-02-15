@@ -954,7 +954,7 @@ Edit [memory.syn]{.sref}, header `<memory>` synopsis, as indicated:
  }
 ```
 
-If [D1243R4](http://wiki.edg.com/pub/Wg21prague/LibraryWorkingGroup/D1243R4.pdf) is applied,
+If [P1243R4](https://wg21.link/P1243R4) is applied,
 edit [algorithm.syn] as indicated, immediately before the declaration of `ranges::for_each_n`:
 
 ```diff
