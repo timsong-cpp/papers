@@ -90,7 +90,6 @@ def wordinglist(elem, doc):
     current_start = 1
 
     for e in elem.content:
-        print(type(e), file=sys.stderr)
         if isinstance(e, pf.BulletList) or isinstance(e, pf.OrderedList):
             if current_bq:
                 content.append(pf.BlockQuote(*current_bq))

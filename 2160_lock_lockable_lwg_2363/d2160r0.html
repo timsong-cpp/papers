@@ -813,6 +813,41 @@ blockquote { background-color: #f6f8fa; }
 </blockquote>
 </div>
 </blockquote>
+<ol start="14" type="1">
+<li>Edit <span>32.5.4.4.2 <a href="https://wg21.link/thread.lock.shared.locking">[thread.lock.shared.locking]</a></span> as indicated:</li>
+</ol>
+<blockquote>
+<div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> Clock, <span class="kw">class</span> Duration<span class="op">&gt;</span></span>
+<span id="cb25-2"><a href="#cb25-2"></a>  <span class="dt">bool</span> try_lock_until<span class="op">(</span><span class="kw">const</span> chrono<span class="op">::</span>time_point<span class="op">&lt;</span>Clock, Duration<span class="op">&gt;&amp;</span> abs_time<span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">9 ¾</a></span> <span class="diffins"><em>Preconditions</em>: <code class="sourceCode cpp">Mutex</code> meets the <em>Cpp17SharedTimedLockable</em> requirements (?.?.?.? [thread.req.lockable.shared.timed]).</span></p>
+<p><span class="marginalizedparent"><a class="marginalized">10</a></span> <em>Effects:</em> As if by <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­until<span class="op">(</span>abs_­time<span class="op">)</span></code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized">11</a></span> <em>Returns:</em> The value returned by the call to <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­until<span class="op">(</span>abs_­time<span class="op">)</span></code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized">12</a></span> <em>Postconditions:</em> <code class="sourceCode cpp">owns <span class="op">==</span> res</code>, where <code class="sourceCode cpp">res</code> is the value returned by the call to <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­until<span class="op">(</span>abs_­time<span class="op">)</span></code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized">13</a></span> <em>Throws</em>: Any exception thrown by <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­until<span class="op">(</span>abs_­time<span class="op">)</span></code>. <code class="sourceCode cpp">system_­error</code> when an exception is required ([thread.req.exception]{.sref).</p>
+<p><span class="marginalizedparent"><a class="marginalized">14</a></span> <em>Error conditions:</em></p>
+<ul>
+<li><span class="marginalizedparent"><a class="marginalized">(14.1)</a></span> <code class="sourceCode cpp">operation_­not_­permitted</code> — if <code class="sourceCode cpp">pm</code> is <code class="sourceCode cpp"><span class="kw">nullptr</span></code>.</li>
+<li><span class="marginalizedparent"><a class="marginalized">(14.2)</a></span> <code class="sourceCode cpp">resource_­deadlock_­would_­occur</code> — if on entry <code class="sourceCode cpp">owns</code> is <code class="sourceCode cpp"><span class="kw">true</span></code>.</li>
+</ul>
+</blockquote>
+<div class="sourceCode" id="cb26"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb26-1"><a href="#cb26-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> Rep, <span class="kw">class</span> Period<span class="op">&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a>  <span class="dt">bool</span> try_lock_for<span class="op">(</span><span class="kw">const</span> chrono<span class="op">::</span>duration<span class="op">&lt;</span>Rep, Period<span class="op">&gt;&amp;</span> rel_time<span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">14 ½</a></span> <span class="diffins"><em>Preconditions</em>: <code class="sourceCode cpp">Mutex</code> meets the <em>Cpp17SharedTimedLockable</em> requirements (?.?.?.? [thread.req.lockable.shared.timed]).</span></p>
+<p><span class="marginalizedparent"><a class="marginalized">15</a></span> <em>Effects:</em> As if by <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­for<span class="op">(</span>rel_­time<span class="op">)</span></code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized">16</a></span> <em>Returns:</em> The value returned by the call to <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­for<span class="op">(</span>rel_­time<span class="op">)</span></code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized">17</a></span> <em>Postconditions:</em> <code class="sourceCode cpp">owns <span class="op">==</span> res</code>, where <code class="sourceCode cpp">res</code> is the value returned by the call to <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­for<span class="op">(</span>rel_­time<span class="op">)</span></code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized">18</a></span> <em>Throws</em>: Any exception thrown by <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­for<span class="op">(</span>rel_­time<span class="op">)</span></code>. <code class="sourceCode cpp">system_­error</code> when an exception is required ([thread.req.exception]{.sref).</p>
+<p><span class="marginalizedparent"><a class="marginalized">19</a></span> <em>Error conditions:</em></p>
+<ul>
+<li><span class="marginalizedparent"><a class="marginalized">(19.1)</a></span> <code class="sourceCode cpp">operation_­not_­permitted</code> — if <code class="sourceCode cpp">pm</code> is <code class="sourceCode cpp"><span class="kw">nullptr</span></code>.</li>
+<li><span class="marginalizedparent"><a class="marginalized">(19.2)</a></span> <code class="sourceCode cpp">resource_­deadlock_­would_­occur</code> — if on entry <code class="sourceCode cpp">owns</code> is <code class="sourceCode cpp"><span class="kw">true</span></code>.</li>
+</ul>
+</blockquote>
+</div>
+</blockquote>
 </div>
 <h1 data-number="5" style="border-bottom:1px solid #cccccc" id="bibliography"><span class="header-section-number">5</span> References<a href="#bibliography" class="self-link"></a></h1>
 <div id="refs" class="references hanging-indent" role="doc-bibliography">
