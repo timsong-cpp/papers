@@ -117,7 +117,7 @@ div.addu code.sourceCode { text-decoration: underline; } */
 div.rm pre, div.add pre { background-color: #f6f8fa; }
 div.addu pre { background-color: var(--diff-ins); }
 
-div.add, div.add pre { background-color: var(--diff-ins); }
+div.add, div.add pre, div.add blockquote { background-color: var(--diff-ins); }
 
 div.addu blockquote {
     border-left: 4px solid #00a000;
@@ -132,3 +132,5 @@ div.addu blockquote pre code { text-decoration: none; }
 
 code.diff span.va { color: #000000; background-color: var(--diff-ins); }
 code.diff span.st { color: #000000; background-color: var(--diff-del); }
+
+blockquote { background-color: #f6f8fa; }

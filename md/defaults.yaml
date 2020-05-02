@@ -1,0 +1,5 @@
+css: /home/tim/papers/md/pandoc.css
+filters: [/home/tim/papers/md/pandoc.py]
+metadata:
+  highlighting:
+    inline-code: cpp

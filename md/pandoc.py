@@ -1,17 +1,6 @@
 #!/usr/bin/env python3
 import panflute as pf
-
-def code_cpp(elem, doc):
-    """
-    add cpp to the classes of empty code blocks so you can just write
-    `operator==` instead of `operator==`{.cpp}
-    """
-    if not isinstance(elem, pf.Code):
-        return None
-
-    if not elem.classes:
-        elem.classes.append('cpp')
-    return elem
+import sys;
 
 def h1hr(elem, doc):
     """
@@ -26,11 +15,6 @@ def h1hr(elem, doc):
     elem.attributes['style'] = 'border-bottom:1px solid #cccccc'
     return elem
 
-def printer(elem, doc):
-    import sys
-    print('{}\n'.format(elem), file=sys.stderr)
-    return None
-
 def bq(elem, doc):
     """
     Add a ::: bq div to make a <blockquote>
@@ -41,15 +25,87 @@ def bq(elem, doc):
     if elem.classes == ['bq']:
         return pf.BlockQuote(*elem.content)
 
-def cpp2language(elem, doc):
+def itemdecl(elem, doc):
     """
-    Change all the cpp to language-cpp for prism
+    Item decls.
+
+    Top-level code blocks specify the declaration of an item.
+
+    Everything in-between top-level code blocks are indented by wrapping
+    in a <blockquote>.
     """
-    if not isinstance(elem, (pf.Code, pf.CodeBlock)):
+
+    if not isinstance(elem, pf.Div):
         return None
 
-    elem.classes = ['language-cpp' if c == 'cpp' else c for c in elem.classes]
-    return elem
+    if not 'itemdecl' in elem.classes:
+        return None
+
+    content = []
+    current_bq = []
+
+    for e in elem.content:
+        if isinstance(e, pf.CodeBlock) or isinstance(e, pf.RawBlock):
+            if current_bq:
+                content.append(pf.BlockQuote(*current_bq))
+                current_bq = []
+            content.append(e)
+        else:
+            current_bq.append(e)
+
+    if current_bq:
+        content.append(pf.BlockQuote(*current_bq))
+        current_bq = []
+
+    if 'bq' in elem.classes:
+        return pf.BlockQuote(*content)
+    else:
+        return pf.Div(*content)
+
+
+def wordinglist(elem, doc):
+    """
+    A "wording list", in the form of alternating list and wording:
+
+    - Edit foo as indicated:
+    wording
+    - whatever
+    wording
+
+    The wording is automatically indented by wrapping into a blockquote.
+
+    The lists are converted into ordered lists and adjusted to have continuous
+    numbering.
+
+    """
+
+    if not isinstance(elem, pf.Div):
+        return None
+
+    if not 'wordinglist' in elem.classes:
+        return None
+
+    content = []
+    current_bq = []
+    current_start = 1
+
+    for e in elem.content:
+        print(type(e), file=sys.stderr)
+        if isinstance(e, pf.BulletList) or isinstance(e, pf.OrderedList):
+            if current_bq:
+                content.append(pf.BlockQuote(*current_bq))
+                current_bq = []
+            content.append(pf.OrderedList(*e.content, start=current_start))
+            current_start += len(e.content)
+        else:
+            current_bq.append(e)
+
+    if current_bq:
+        content.append(pf.BlockQuote(*current_bq))
+        current_bq = []
+
+    return pf.Div(*content)
+
 
 if __name__ == '__main__':
-    pf.run_filters([code_cpp, h1hr, bq])
+    pf.run_filters([h1hr, wordinglist, itemdecl, bq])
