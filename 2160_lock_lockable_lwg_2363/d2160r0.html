@@ -557,9 +557,9 @@ blockquote { background-color: #f6f8fa; }
 </header>
 <div style="clear:both">
 <h1 data-number="1" style="border-bottom:1px solid #cccccc" id="abstract"><span class="header-section-number">1</span> Abstract<a href="#abstract" class="self-link"></a></h1>
-<p>This paper provides wording to clean up <span>32.5.4 <a href="https://wg21.link/thread.lock">[thread.lock]</a></span> and resolve <span class="citation" data-cites="LWG2363">[<span class="citeproc-not-found" data-reference-id="LWG2363"><strong>???</strong></span>]</span>.</p>
+<p>This paper provides wording to clean up <span>32.5.4 <a href="https://wg21.link/thread.lock">[thread.lock]</a></span> and resolve <span class="citation" data-cites="LWG2363">[<a href="#ref-LWG2363" role="doc-biblioref">LWG2363</a>]</span>.</p>
 <h1 data-number="2" style="border-bottom:1px solid #cccccc" id="drafting-notes"><span class="header-section-number">2</span> Drafting notes<a href="#drafting-notes" class="self-link"></a></h1>
-<p>The original complaint of <span class="citation" data-cites="LWG2363">[<span class="citeproc-not-found" data-reference-id="LWG2363"><strong>???</strong></span>]</span> (a nonexistent <em>SharedTimedMutex</em> named requirement) has since been editorially resolved, and since these requirements are only intended to be used for standard library types rather than user code, I don’t see a need to promote them to <em>CamelCased</em> named requirements as in the current PR.</p>
+<p>The original complaint of <span class="citation" data-cites="LWG2363">[<a href="#ref-LWG2363" role="doc-biblioref">LWG2363</a>]</span> (a nonexistent <em>SharedTimedMutex</em> named requirement) has since been editorially resolved, and since these requirements are only intended to be used for standard library types rather than user code, I don’t see a need to promote them to <em>CamelCased</em> named requirements as in the current PR.</p>
 <p>However, the previous drafting did reveal additional issues:</p>
 <ol type="1">
 <li>the current WP says that <code class="sourceCode cpp">shared_lock<span class="op">&lt;</span>Mutex<span class="op">&gt;</span></code> requires <code class="sourceCode cpp">Mutex</code> to meet the “shared mutex requirements <span>32.5.3.5 <a href="https://wg21.link/thread.sharedtimedmutex.requirements">[thread.sharedtimedmutex.requirements]</a></span>”; this is a mismatch and also seemingly makes <code class="sourceCode cpp">shared_lock<span class="op">&lt;</span>shared_mutex<span class="op">&gt;</span></code> undefined behavior outright even if the user doesn’t call the timed wait functions.</li>
@@ -571,10 +571,10 @@ blockquote { background-color: #f6f8fa; }
 <p>The <code class="sourceCode cpp">adopt_lock_t</code> overloads retain their precondition that the lock has been acquired, but re-expressed in lockable terms. This is not strictly necessary - failure to lock results in a precondition violation when the unlocking occurs - but appears to be harmless and potentially permits early diagnosis.</p>
 <h1 data-number="3" style="border-bottom:1px solid #cccccc" id="open-issues"><span class="header-section-number">3</span> Open issues<a href="#open-issues" class="self-link"></a></h1>
 <ul>
-<li>An earlierd draft of this paper included <em>Cpp17Lockable</em> in the <em>Cpp17SharedLockable</em> requirements and similarly included <em>Cpp17TimedLockable</em> in the <em>Cpp17SharedTimedLockable</em> requirements. However, <code class="sourceCode cpp">shared_lock</code> does not appear to have a reason to care whether the lockable also allows non-shared locking, and those requirements have been removed from this version. Do we want to reinstate them?</li>
+<li>An earlier draft of this paper included <em>Cpp17Lockable</em> in the <em>Cpp17SharedLockable</em> requirements and similarly included <em>Cpp17TimedLockable</em> in the <em>Cpp17SharedTimedLockable</em> requirements. However, <code class="sourceCode cpp">shared_lock</code> does not appear to have a reason to care whether the lockable also allows non-shared locking, and those requirements have been removed from this version. Do we want to reinstate them?</li>
 </ul>
 <h1 data-number="4" style="border-bottom:1px solid #cccccc" id="wording"><span class="header-section-number">4</span> Wording<a href="#wording" class="self-link"></a></h1>
-<p>This wording is relative to <span class="citation" data-cites="N4861">[<span class="citeproc-not-found" data-reference-id="N4861"><strong>???</strong></span>]</span>.</p>
+<p>This wording is relative to <span class="citation" data-cites="N4861">[<a href="#ref-N4861" role="doc-biblioref">N4861</a>]</span>.</p>
 <div>
 <ol type="1">
 <li>Edit <span>32.2.5 <a href="https://wg21.link/thread.req.lockable">[thread.req.lockable]</a></span> p3 as indicated:</li>
@@ -587,7 +587,7 @@ blockquote { background-color: #f6f8fa; }
 </ol>
 <blockquote>
 <div class="add" style="color: #006e28">
-<p><span class="marginalizedparent"><a class="marginalized">4</a></span> A lock is said to be a <em>non-shared lock</em> if it is acquired by a call to <code class="sourceCode default">lock</code>, <code class="sourceCode default">try_lock</code>, <code class="sourceCode default">try_lock_for</code>, or <code class="sourceCode default">try_lock_until</code>, and a <em>shared lock</em> if it is acquired by a call to <code class="sourceCode default">lock_shared</code>, <code class="sourceCode default">try_lock_shared</code>, <code class="sourceCode default">try_lock_shared_for</code>, or <code class="sourceCode default">try_lock_shared_until</code>. <span class="note"><span>[ <em>Note:</em> </span>Only the method of lock acquisition is considered; the nature of any lock ownership is not part of these definitions.<span> — <em>end note</em> ]</span></span></p>
+<p><span class="marginalizedparent"><a class="marginalized">4</a></span> A lock on an object <code class="sourceCode default">m</code> is said to be a <em>non-shared lock</em> if it is acquired by a call to <code class="sourceCode default">lock</code>, <code class="sourceCode default">try_lock</code>, <code class="sourceCode default">try_lock_for</code>, or <code class="sourceCode default">try_lock_until</code> on <code class="sourceCode default">m</code>, and a <em>shared lock</em> if it is acquired by a call to <code class="sourceCode default">lock_shared</code>, <code class="sourceCode default">try_lock_shared</code>, <code class="sourceCode default">try_lock_shared_for</code>, or <code class="sourceCode default">try_lock_shared_until</code> on <code class="sourceCode default">m</code>. <span class="note"><span>[ <em>Note:</em> </span>Only the method of lock acquisition is considered; the nature of any lock ownership is not part of these definitions.<span> — <em>end note</em> ]</span></span></p>
 </div>
 </blockquote>
 <ol start="3" type="1">
@@ -813,6 +813,17 @@ blockquote { background-color: #f6f8fa; }
 </blockquote>
 </div>
 </blockquote>
+</div>
+<h1 data-number="5" style="border-bottom:1px solid #cccccc" id="bibliography"><span class="header-section-number">5</span> References<a href="#bibliography" class="self-link"></a></h1>
+<div id="refs" class="references hanging-indent" role="doc-bibliography">
+<div id="ref-LWG2363">
+<p>[LWG2363] Richard Smith. Defect in 30.4.1.4.1 [thread.sharedtimedmutex.class]. <br />
+<a href="https://wg21.link/lwg2363">https://wg21.link/lwg2363</a></p>
+</div>
+<div id="ref-N4861">
+<p>[N4861] Richard Smith, Thomas Koeppe, Jens Maurer, Dawn Perchik. 2020. Working Draft, Standard for Programming Language C++. <br />
+<a href="https://wg21.link/n4861">https://wg21.link/n4861</a></p>
+</div>
 </div>
 </div>
 </div>
