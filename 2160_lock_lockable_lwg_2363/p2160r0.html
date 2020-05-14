@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2020-05-02" />
+  <meta name="dcterms.date" content="2020-05-13" />
   <title>Locks lock lockables</title>
   <style>
       code{white-space: pre-wrap;}
@@ -530,11 +530,11 @@ blockquote { background-color: #f6f8fa; }
 <table style="border:none;float:right">
   <tr>
     <td>Document #:</td>
-    <td>D2160R0</td>
+    <td>P2160R0</td>
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2020-05-02</td>
+    <td>2020-05-13</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -610,7 +610,7 @@ blockquote { background-color: #f6f8fa; }
 <div class="add" style="color: #006e28">
 
 <h3 id="cpp17sharedlockable-requirements-thread.req.lockable.shared" class="unnumbered">?.?.?.? <em>Cpp17SharedLockable</em> requirements [thread.req.lockable.shared]<a href="#cpp17sharedlockable-requirements-thread.req.lockable.shared" class="self-link"></a></h3>
-<p><span class="marginalizedparent"><a class="marginalized">1</a></span> A type <code class="sourceCode default">L</code> meets the <em>Cpp17SharedLockable</em> requirements if the following expressions are well-formed and have the specified semantics (<code class="sourceCode default">m</code> denotes a value of type <code class="sourceCode default">L</code>):</p>
+<p><span class="marginalizedparent"><a class="marginalized">1</a></span> A type <code class="sourceCode default">L</code> meets the <em>Cpp17SharedLockable</em> requirements if the following expressions are well-formed, have the specified semantics, and the expression <code class="sourceCode default">m.try_lock_shared()</code> has type <code class="sourceCode default">bool</code> (<code class="sourceCode default">m</code> denotes a value of type <code class="sourceCode default">L</code>):</p>
 <div>
 <div class="sourceCode" id="cb2"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1"></a>m.lock_shared()</span></code></pre></div>
 <blockquote>
@@ -619,30 +619,27 @@ blockquote { background-color: #f6f8fa; }
 <div class="sourceCode" id="cb3"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1"></a>m.try_lock_shared()</span></code></pre></div>
 <blockquote>
 <p><span class="marginalizedparent"><a class="marginalized">3</a></span> <em>Effects:</em> Attempts to acquire a lock for the current execution agent without blocking. If an exception is thrown then a lock shall not have been acquired for the current execution agent.</p>
-<p><span class="marginalizedparent"><a class="marginalized">4</a></span> <em>Return type</em>: <code class="sourceCode default">bool</code></p>
-<p><span class="marginalizedparent"><a class="marginalized">5</a></span> <em>Returns</em>: <code class="sourceCode default">true</code> if the lock was acquired, <code class="sourceCode default">false</code> otherwise.</p>
+<p><span class="marginalizedparent"><a class="marginalized">4</a></span> <em>Returns</em>: <code class="sourceCode default">true</code> if the lock was acquired, <code class="sourceCode default">false</code> otherwise.</p>
 </blockquote>
 <div class="sourceCode" id="cb4"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1"></a>m.unlock_shared()</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">6</a></span> <em>Preconditions:</em> The current execution agent holds a shared lock on <code class="sourceCode default">m</code>.</p>
-<p><span class="marginalizedparent"><a class="marginalized">7</a></span> <em>Effects:</em> Releases a shared lock on <code class="sourceCode default">m</code> held by the current execution agent.</p>
-<p><span class="marginalizedparent"><a class="marginalized">8</a></span> <em>Throws:</em> Nothing.</p>
+<p><span class="marginalizedparent"><a class="marginalized">5</a></span> <em>Preconditions:</em> The current execution agent holds a shared lock on <code class="sourceCode default">m</code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized">6</a></span> <em>Effects:</em> Releases a shared lock on <code class="sourceCode default">m</code> held by the current execution agent.</p>
+<p><span class="marginalizedparent"><a class="marginalized">7</a></span> <em>Throws:</em> Nothing.</p>
 </blockquote>
 </div>
 <h3 id="cpp17sharedtimedlockable-requirements-thread.req.lockable.shared.timed" class="unnumbered">?.?.?.? <em>Cpp17SharedTimedLockable</em> requirements [thread.req.lockable.shared.timed]<a href="#cpp17sharedtimedlockable-requirements-thread.req.lockable.shared.timed" class="self-link"></a></h3>
-<p><span class="marginalizedparent"><a class="marginalized">1</a></span> A type <code class="sourceCode default">L</code> meets the <em>Cpp17SharedTimedLockable</em> requirements if it meets the <em>Cpp17SharedLockable</em> requirements, and the following expressions are well-formed and have the specified semantics (<code class="sourceCode default">m</code> denotes a value of type <code class="sourceCode default">L</code>, <code class="sourceCode default">rel_­time</code> denotes a value of a specialization of <code class="sourceCode default">duration</code>, and <code class="sourceCode default">abs_­time</code> denotes a value of a specialization of <code class="sourceCode default">time_­point</code>):</p>
+<p><span class="marginalizedparent"><a class="marginalized">1</a></span> A type <code class="sourceCode default">L</code> meets the <em>Cpp17SharedTimedLockable</em> requirements if it meets the <em>Cpp17SharedLockable</em> requirements, and the following expressions are well-formed, have type <code class="sourceCode default">bool</code>, and have the specified semantics (<code class="sourceCode default">m</code> denotes a value of type <code class="sourceCode default">L</code>, <code class="sourceCode default">rel_­time</code> denotes a value of a specialization of <code class="sourceCode default">duration</code>, and <code class="sourceCode default">abs_­time</code> denotes a value of a specialization of <code class="sourceCode default">time_­point</code>):</p>
 <div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1"></a>m.try_lock_shared_for(rel_time)</span></code></pre></div>
 <blockquote>
 <p><span class="marginalizedparent"><a class="marginalized">2</a></span> <em>Effects:</em> Attempts to acquire a lock for the current execution agent within the relative timeout (<span>32.2.4 <a href="https://wg21.link/thread.req.timing">[thread.req.timing]</a></span>) specified by <code class="sourceCode default">rel_­time</code>. The function will not return within the timeout specified by <code class="sourceCode default">rel_­time</code> unless it has obtained a lock on <code class="sourceCode default">m</code> for the current execution agent. If an exception is thrown then a lock has not been acquired for the current execution agent.</p>
-<p><span class="marginalizedparent"><a class="marginalized">3</a></span> <em>Return type</em>: <code class="sourceCode default">bool</code></p>
-<p><span class="marginalizedparent"><a class="marginalized">4</a></span> <em>Returns</em>: <code class="sourceCode default">true</code> if the lock was acquired, <code class="sourceCode default">false</code> otherwise.</p>
+<p><span class="marginalizedparent"><a class="marginalized">3</a></span> <em>Returns</em>: <code class="sourceCode default">true</code> if the lock was acquired, <code class="sourceCode default">false</code> otherwise.</p>
 </blockquote>
 <div class="sourceCode" id="cb6"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1"></a>m.try_lock_shared_until(abs_time)</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">5</a></span> <em>Effects:</em> Attempts to acquire a lock for the current execution agent before the absolute timeout (<span>32.2.4 <a href="https://wg21.link/thread.req.timing">[thread.req.timing]</a></span>) specified by <code class="sourceCode default">abs_­time</code>. The function will not return before the timeout specified by <code class="sourceCode default">abs_­time</code> unless it has obtained a lock on <code class="sourceCode default">m</code> for the current execution agent. If an exception is thrown then a lock has not been acquired for the current execution agent.</p>
-<p><span class="marginalizedparent"><a class="marginalized">6</a></span> <em>Return type</em>: <code class="sourceCode default">bool</code></p>
-<p><span class="marginalizedparent"><a class="marginalized">7</a></span> <em>Returns</em>: <code class="sourceCode default">true</code> if the lock was acquired, <code class="sourceCode default">false</code> otherwise.</p>
+<p><span class="marginalizedparent"><a class="marginalized">4</a></span> <em>Effects:</em> Attempts to acquire a lock for the current execution agent before the absolute timeout (<span>32.2.4 <a href="https://wg21.link/thread.req.timing">[thread.req.timing]</a></span>) specified by <code class="sourceCode default">abs_­time</code>. The function will not return before the timeout specified by <code class="sourceCode default">abs_­time</code> unless it has obtained a lock on <code class="sourceCode default">m</code> for the current execution agent. If an exception is thrown then a lock has not been acquired for the current execution agent.</p>
+<p><span class="marginalizedparent"><a class="marginalized">5</a></span> <em>Returns</em>: <code class="sourceCode default">true</code> if the lock was acquired, <code class="sourceCode default">false</code> otherwise.</p>
 </blockquote>
 </div>
 
@@ -826,7 +823,7 @@ blockquote { background-color: #f6f8fa; }
 <p><span class="marginalizedparent"><a class="marginalized">10</a></span> <em>Effects:</em> As if by <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­until<span class="op">(</span>abs_­time<span class="op">)</span></code>.</p>
 <p><span class="marginalizedparent"><a class="marginalized">11</a></span> <em>Returns:</em> The value returned by the call to <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­until<span class="op">(</span>abs_­time<span class="op">)</span></code>.</p>
 <p><span class="marginalizedparent"><a class="marginalized">12</a></span> <em>Postconditions:</em> <code class="sourceCode cpp">owns <span class="op">==</span> res</code>, where <code class="sourceCode cpp">res</code> is the value returned by the call to <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­until<span class="op">(</span>abs_­time<span class="op">)</span></code>.</p>
-<p><span class="marginalizedparent"><a class="marginalized">13</a></span> <em>Throws</em>: Any exception thrown by <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­until<span class="op">(</span>abs_­time<span class="op">)</span></code>. <code class="sourceCode cpp">system_­error</code> when an exception is required ([thread.req.exception]{.sref).</p>
+<p><span class="marginalizedparent"><a class="marginalized">13</a></span> <em>Throws</em>: Any exception thrown by <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­until<span class="op">(</span>abs_­time<span class="op">)</span></code>. <code class="sourceCode cpp">system_­error</code> when an exception is required (<span>32.2.2 <a href="https://wg21.link/thread.req.exception">[thread.req.exception]</a></span>).</p>
 <p><span class="marginalizedparent"><a class="marginalized">14</a></span> <em>Error conditions:</em></p>
 <ul>
 <li><span class="marginalizedparent"><a class="marginalized">(14.1)</a></span> <code class="sourceCode cpp">operation_­not_­permitted</code> — if <code class="sourceCode cpp">pm</code> is <code class="sourceCode cpp"><span class="kw">nullptr</span></code>.</li>
@@ -840,7 +837,7 @@ blockquote { background-color: #f6f8fa; }
 <p><span class="marginalizedparent"><a class="marginalized">15</a></span> <em>Effects:</em> As if by <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­for<span class="op">(</span>rel_­time<span class="op">)</span></code>.</p>
 <p><span class="marginalizedparent"><a class="marginalized">16</a></span> <em>Returns:</em> The value returned by the call to <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­for<span class="op">(</span>rel_­time<span class="op">)</span></code>.</p>
 <p><span class="marginalizedparent"><a class="marginalized">17</a></span> <em>Postconditions:</em> <code class="sourceCode cpp">owns <span class="op">==</span> res</code>, where <code class="sourceCode cpp">res</code> is the value returned by the call to <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­for<span class="op">(</span>rel_­time<span class="op">)</span></code>.</p>
-<p><span class="marginalizedparent"><a class="marginalized">18</a></span> <em>Throws</em>: Any exception thrown by <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­for<span class="op">(</span>rel_­time<span class="op">)</span></code>. <code class="sourceCode cpp">system_­error</code> when an exception is required ([thread.req.exception]{.sref).</p>
+<p><span class="marginalizedparent"><a class="marginalized">18</a></span> <em>Throws</em>: Any exception thrown by <code class="sourceCode cpp">pm<span class="op">-&gt;</span>try_­lock_­shared_­for<span class="op">(</span>rel_­time<span class="op">)</span></code>. <code class="sourceCode cpp">system_­error</code> when an exception is required (<span>32.2.2 <a href="https://wg21.link/thread.req.exception">[thread.req.exception]</a></span>).</p>
 <p><span class="marginalizedparent"><a class="marginalized">19</a></span> <em>Error conditions:</em></p>
 <ul>
 <li><span class="marginalizedparent"><a class="marginalized">(19.1)</a></span> <code class="sourceCode cpp">operation_­not_­permitted</code> — if <code class="sourceCode cpp">pm</code> is <code class="sourceCode cpp"><span class="kw">nullptr</span></code>.</li>
