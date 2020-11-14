@@ -106,5 +106,161 @@ def wordinglist(elem, doc):
     return pf.Div(*content)
 
 
+def longtable(table, doc):
+    """
+    Long tables: Like cmptable, but the first-class entities are
+    'ltcell' divs rather than code blocks.
+    Each 'ltcell' div is pushed onto the current row.
+    A horizontal rule (`---`) is used to move to the next row.
+
+    In the first row, the last header (if any) leading upto the i'th
+    div is the header for the i'th column of the table.
+
+    The last block quote (if any) is used as the caption.
+
+    # Example
+
+    ::: longtable
+
+    > compare inspect of unconstrained and constrained types
+
+    ### Before
+    ::: ltcell
+    ```cpp
+    std::visit([&](auto&& x) {
+      strm << "got auto: " << x;
+    }, v);
+    ```
+    :::
+
+    ### After
+    ::: ltcell
+    ```cpp
+    inspect (v) {
+      <auto> x: strm << "got auto: " << x;
+    }
+    ```
+    :::
+
+    ---
+    ::: ltcell
+    ```cpp
+    std::visit([&](auto&& x) {
+      using X = std::remove_cvref_t<decltype(x)>;
+      if constexpr (C1<X>()) {
+        strm << "got C1: " << x;
+      } else if constexpr (C2<X>()) {
+        strm << "got C2: " << x;
+      }
+    }, v);
+    ```
+    :::
+
+    ::: ltcell
+
+    ```cpp
+    inspect (v) {
+      <C1> c1: strm << "got C1: " << c1;
+      <C2> c2: strm << "got C2: " << c2;
+    }
+    ```
+    :::
+
+    :::
+
+    # Generates
+
+    Table: compare inspect of unconstrained and constrained types
+
+    +------------------------------------------------+---------------------------------------------+
+    | __Before__                                     | __After__                                   |
+    +================================================+=============================================+
+    | ```cpp                                         | ```cpp                                      |
+    | std::visit([&](auto&& x) {                     | inspect (v) {                               |
+    |   strm << "got auto: " << x;                   |   <auto> x: strm << "got auto: " << x;      |
+    | }, v);                                         | }                                           |
+    |                                                | ```                                         |
+    +------------------------------------------------+---------------------------------------------+
+    | std::visit([&](auto&& x) {                     | ```cpp                                      |
+    |   using X = std::remove_cvref_t<decltype(x)>;  | inspect (v) {                               |
+    |   if constexpr (C1<X>()) {                     |   <C1> c1: strm << "got C1: " << c1;        |
+    |     strm << "got C1: " << x;                   |   <C2> c2: strm << "got C2: " << c2;        |
+    |   } else if constexpr (C2<X>()) {              | }                                           |
+    |     strm << "got C2: " << x;                   | ```                                         |
+    |   }                                            |                                             |
+    | }, v);                                         |                                             |
+    +------------------------------------------------+---------------------------------------------+
+    """
+
+    if not isinstance(table, pf.Div):
+        return None
+
+    if 'longtable' not in table.classes:
+        return None
+
+    rows = []
+    kwargs = {}
+
+    headers = []
+    widths = []
+    examples = []
+
+    header = pf.Null()
+    caption = None
+    width = 0
+
+    first_row = True
+    table.content.append(pf.HorizontalRule())
+
+    def warn(elem):
+        pf.debug('mpark/wg21:', type(elem), pf.stringify(elem, newlines=False),
+                 'in a long table is ignored')
+
+    for elem in table.content:
+        if isinstance(elem, pf.Header):
+            if not isinstance(header, pf.Null):
+                warn(header)
+
+            if first_row:
+                header = pf.Plain(*elem.content)
+                width = float(elem.attributes['width']) if 'width' in elem.attributes else 0
+            else:
+                warn(elem)
+        elif isinstance(elem, pf.BlockQuote):
+            if caption is not None:
+                warn(caption)
+
+            caption = elem
+        elif isinstance(elem, pf.Div):
+            if 'ltcell' not in elem.classes:
+                warm(elem)
+
+            if first_row:
+                headers.append(header)
+                widths.append(width)
+
+                header = pf.Null()
+                width = 0
+
+            examples.append(elem)
+        elif isinstance(elem, pf.HorizontalRule) and examples:
+            first_row = False
+
+            rows.append(pf.TableRow(*[pf.TableCell(example) for example in examples]))
+            examples = []
+        else:
+            warn(elem)
+
+    if not all(isinstance(header, pf.Null) for header in headers):
+        kwargs['header'] = pf.TableRow(*[pf.TableCell(header) for header in headers])
+
+    if caption is not None:
+        kwargs['caption'] = caption.content[0].content
+
+    kwargs['width'] = widths
+
+    return pf.Table(*rows, **kwargs)
+
+
 if __name__ == '__main__':
-    pf.run_filters([h1hr, wordinglist, itemdecl, bq])
+    pf.run_filters([h1hr, wordinglist, itemdecl, bq, longtable])
