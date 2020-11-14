@@ -1,6 +1,6 @@
 ---
 title: A type trait to detect reference binding to temporary
-document: D2255R0
+document: P2255R0
 date: today
 audience:
   - EWG
