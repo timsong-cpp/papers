@@ -87,6 +87,12 @@ program-defined specializations. That simplifies the wording considerably
 by removing the need to separately consider whether `iterator_category` is
 present.
 
+# Implementation experience
+
+The wording in this paper has been implemented atop current libstdc++ trunk
+and passes all existing tests, and has been confirmed to fix the example at the
+beginning of this paper as well as the one in [@LWG3408].
+
 # Wording
 
 This wording is relative to [@N4868].
@@ -228,6 +234,9 @@ namespace std {
 
   // [...]
 
+  @[template&lt;class I>]{.diffdel}@
+    @[struct incrementable_traits<counted_iterator&lt;I>>;]{.diffdel}@
+
   template<input_­iterator I>
     @[requires _see below_]{.diffins}@
   struct iterator_traits<counted_iterator<I>>;
@@ -240,11 +249,15 @@ namespace std {
   [counted.iterator]{.sref} as indicated:
 
 ::: draftnote
+
 This resolves [@LWG3408] by only providing an `iterator_traits` specialization
 for `counted_iterator` when the underlying iterator does not use the specialization
-generated from the primary template. In other words, we should only use the
+generated from the primary template. In other words, we only use the
 "custom `iterator_traits`" path when the underlying iterator actually customized
-`iterator_traits`.
+`iterator_traits`. In the remaining cases, we let the usual deduction do its work
+since `counted_iterator` operations are already fully constrained based on the
+wrapped iterator.
+
 :::
 
 ```c++
@@ -254,6 +267,43 @@ generated from the primary template. In other words, we should only use the
      using pointer = void;
    };
 ```
+
+- Edit the definition of `counted_iterator` in [counted.iterator]{.sref} as indicated:
+
+::: draftnote
+
+Having removed the `iterator_traits` specialization in most cases, we need to
+provide `value_type` in `counted_iterator` again so that it models
+`indirectly_readable` when `I` does. We might as well provide `difference_type`
+here too; the `incrementable_traits` specialization does not appear to add value.
+
+:::
+
+```diff
+ namespace std {
+   template<input_­or_­output_­iterator I>
+   class counted_iterator {
+   public:
+     using iterator_type = I;
++    using value_type = iter_value_t<I>;           // present only if I models indirectly_readable
++    using difference_type = iter_difference_t<I>;
+
+     // [...]
+   };
+ }
+```
+
+- Strike the `incrementable_traits<counted_iterator<I>>` specialization in
+  [counted.iterator]{.sref} as unnecessary:
+
+::: rm
+```cpp
+  template<class I>
+  struct incrementable_traits<counted_iterator<I>> {
+    using difference_type = iter_difference_t<I>;
+  };
+```
+:::
 
 - Edit [range.iota.iterator]{.sref} as indicated:
 

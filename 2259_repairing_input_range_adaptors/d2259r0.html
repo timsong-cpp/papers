@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2020-11-18" />
+  <meta name="dcterms.date" content="2020-11-19" />
   <title>Repairing input range adaptors</title>
   <style>
       code{white-space: pre-wrap;}
@@ -533,7 +533,7 @@ blockquote { background-color: #f6f8fa; }
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2020-11-18</td>
+    <td>2020-11-19</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -578,7 +578,9 @@ blockquote { background-color: #f6f8fa; }
 <p>It follows that the concern noted in <span class="citation" data-cites="LWG3283">[<a href="#ref-LWG3283" role="doc-biblioref">LWG3283</a>]</span>’s discussion is unlikely to be materialize in practice. While <em>some</em> C++20 input iterators might look like C++17 output iterators, I suspect that a large majority will not look like C++17 iterators at all. The fraction of input iterators that take advantage of the C++20 permission to not define <code class="sourceCode cpp"><span class="op">==</span></code> but not the permission to make postfix increment return <code class="sourceCode cpp"><span class="dt">void</span></code> is likely small.</p>
 <p>The fact that the <code class="sourceCode cpp">iterator_traits</code> specializations for these not-a-C++17-iterators don’t have an <code class="sourceCode cpp">iterator_category</code> member (or any other) means that we don’t really have a choice on the fix: we have to handle this case gracefully in the adaptors. The <code class="sourceCode cpp">output_iterator_tag</code> hack proposed in <span class="citation" data-cites="LWG3289">[<a href="#ref-LWG3289" role="doc-biblioref">LWG3289</a>]</span> is not a viable approach because these iterators aren’t C++17 output iterators either, regardless of how hard we squint. Inventing a new <code class="sourceCode cpp">not_an_iterator_tag</code> defeats the purpose of C++20 <code class="sourceCode cpp">iterator_traits</code> as a C++17 compatibility layer: in C++17, if something is not an iterator, then <code class="sourceCode cpp">iterator_traits</code> is empty. We should keep this behavior, especially as the gain from making a new tag type is basically just somewhat simpler metaprogramming in the library.</p>
 <p>As it turns out, the iterators of the range adaptors are only valid C++17 iterators (with a postfix increment that doesn’t return <code class="sourceCode cpp"><span class="dt">void</span></code>) when they are at least C++20 forward iterators or stronger. As all valid C++20 forward iterators meet the C++17 input iterator requirements, we can simply restrict the provision of <code class="sourceCode cpp">iterator_category</code> members to C++20 forward iterators. In those cases, the adapted iterators must also be C++20 forward iterators, so <code class="sourceCode cpp">iterator_category</code> should always be present in their <code class="sourceCode cpp">iterator_traits</code>, ignoring pathological program-defined specializations. That simplifies the wording considerably by removing the need to separately consider whether <code class="sourceCode cpp">iterator_category</code> is present.</p>
-<h1 data-number="4" style="border-bottom:1px solid #cccccc" id="wording"><span class="header-section-number">4</span> Wording<a href="#wording" class="self-link"></a></h1>
+<h1 data-number="4" style="border-bottom:1px solid #cccccc" id="implementation-experience"><span class="header-section-number">4</span> Implementation experience<a href="#implementation-experience" class="self-link"></a></h1>
+<p>The wording in this paper has been implemented atop current libstdc++ trunk and passes all existing tests, and has been confirmed to fix the example at the beginning of this paper as well as the one in <span class="citation" data-cites="LWG3408">[<a href="#ref-LWG3408" role="doc-biblioref">LWG3408</a>]</span>.</p>
+<h1 data-number="5" style="border-bottom:1px solid #cccccc" id="wording"><span class="header-section-number">5</span> Wording<a href="#wording" class="self-link"></a></h1>
 <p>This wording is relative to <span class="citation" data-cites="N4868">[<a href="#ref-N4868" role="doc-biblioref">N4868</a>]</span>.</p>
 <div>
 <ol type="1">
@@ -680,19 +682,22 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb7-5"><a href="#cb7-5"></a></span>
 <span id="cb7-6"><a href="#cb7-6"></a>  <span class="co">// [...]</span></span>
 <span id="cb7-7"><a href="#cb7-7"></a></span>
-<span id="cb7-8"><a href="#cb7-8"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_­iterator I<span class="op">&gt;</span></span>
-<span id="cb7-9"><a href="#cb7-9"></a>    <span class="diffins">requires <em>see below</em></span></span>
-<span id="cb7-10"><a href="#cb7-10"></a>  <span class="kw">struct</span> iterator_traits<span class="op">&lt;</span>counted_iterator<span class="op">&lt;</span>I<span class="op">&gt;&gt;</span>;</span>
-<span id="cb7-11"><a href="#cb7-11"></a></span>
-<span id="cb7-12"><a href="#cb7-12"></a>  <span class="co">// [...]</span></span>
-<span id="cb7-13"><a href="#cb7-13"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb7-8"><a href="#cb7-8"></a>  <span class="diffdel">template&lt;class I&gt;</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a>    <span class="diffdel">struct incrementable_traits&lt;counted_iterator&lt;I&gt;&gt;;</span></span>
+<span id="cb7-10"><a href="#cb7-10"></a></span>
+<span id="cb7-11"><a href="#cb7-11"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_­iterator I<span class="op">&gt;</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a>    <span class="diffins">requires <em>see below</em></span></span>
+<span id="cb7-13"><a href="#cb7-13"></a>  <span class="kw">struct</span> iterator_traits<span class="op">&lt;</span>counted_iterator<span class="op">&lt;</span>I<span class="op">&gt;&gt;</span>;</span>
+<span id="cb7-14"><a href="#cb7-14"></a></span>
+<span id="cb7-15"><a href="#cb7-15"></a>  <span class="co">// [...]</span></span>
+<span id="cb7-16"><a href="#cb7-16"></a><span class="op">}</span></span></code></pre></div>
 </blockquote>
 <ol start="6" type="1">
 <li>Edit the definition of <code class="sourceCode cpp">iterator_traits<span class="op">&lt;</span>counted_iterator<span class="op">&lt;</span>I<span class="op">&gt;&gt;</span></code> in <span>23.5.6.1 <a href="https://wg21.link/counted.iterator">[counted.iterator]</a></span> as indicated:</li>
 </ol>
 <blockquote>
 <div class="draftnote" style="color: #01796F">
-<p>[ Drafting note: This resolves <span class="citation" data-cites="LWG3408">[<a href="#ref-LWG3408" role="doc-biblioref">LWG3408</a>]</span> by only providing an <code class="sourceCode cpp">iterator_traits</code> specialization for <code class="sourceCode cpp">counted_iterator</code> when the underlying iterator does not use the specialization generated from the primary template. In other words, we should only use the “custom <code class="sourceCode cpp">iterator_traits</code>” path when the underlying iterator actually customized <code class="sourceCode cpp">iterator_traits</code>. ]</p>
+<p>[ Drafting note: This resolves <span class="citation" data-cites="LWG3408">[<a href="#ref-LWG3408" role="doc-biblioref">LWG3408</a>]</span> by only providing an <code class="sourceCode cpp">iterator_traits</code> specialization for <code class="sourceCode cpp">counted_iterator</code> when the underlying iterator does not use the specialization generated from the primary template. In other words, we should only use the “custom <code class="sourceCode cpp">iterator_traits</code>” path when the underlying iterator actually customized <code class="sourceCode cpp">iterator_traits</code> - and when it does, we’ll use that and just voidify <code class="sourceCode cpp">pointer</code> on top. ]</p>
 </div>
 <div class="sourceCode" id="cb8"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb8-1"><a href="#cb8-1"></a>   <span class="kw">template</span><span class="op">&lt;</span>input_­iterator I<span class="op">&gt;</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a>     <span class="diffins">requires same_as&lt;<em>ITER_TRAITS</em>(I), iterator_traits&lt;I&gt;&gt; // see <span>23.3.4.1 <a href="https://wg21.link/iterator.concepts.general">[iterator.concepts.general]</a></span></span></span>
@@ -701,51 +706,85 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb8-5"><a href="#cb8-5"></a>   <span class="op">}</span>;</span></code></pre></div>
 </blockquote>
 <ol start="7" type="1">
+<li>Edit the definition of <code class="sourceCode cpp">counted_iterator</code> in <span>23.5.6.1 <a href="https://wg21.link/counted.iterator">[counted.iterator]</a></span> as indicated:</li>
+</ol>
+<blockquote>
+<div class="draftnote" style="color: #01796F">
+<p>[ Drafting note: Having removed the <code class="sourceCode cpp">iterator_traits</code> specialization in most cases, we need to provide <code class="sourceCode cpp">value_type</code> in <code class="sourceCode cpp">counted_iterator</code> again so that it models <code class="sourceCode cpp">indirectly_readable</code> when <code class="sourceCode cpp">I</code> does. We might as well provide <code class="sourceCode cpp">difference_type</code> here too; the <code class="sourceCode cpp">incrementable_traits</code> specialization does not appear to add any value. ]</p>
+</div>
+<div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode diff"><code class="sourceCode diff"><span id="cb9-1"><a href="#cb9-1"></a> namespace std {</span>
+<span id="cb9-2"><a href="#cb9-2"></a>   template&lt;input_­or_­output_­iterator I&gt;</span>
+<span id="cb9-3"><a href="#cb9-3"></a>   class counted_iterator {</span>
+<span id="cb9-4"><a href="#cb9-4"></a>   public:</span>
+<span id="cb9-5"><a href="#cb9-5"></a>     using iterator_type = I;</span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="va">+    using value_type = iter_value_t&lt;I&gt;;           // only present if I models indirectly_readable</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="va">+    using difference_type = iter_difference_t&lt;I&gt;;</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a></span>
+<span id="cb9-9"><a href="#cb9-9"></a>     // [...]</span>
+<span id="cb9-10"><a href="#cb9-10"></a>   };</span>
+<span id="cb9-11"><a href="#cb9-11"></a> }</span></code></pre></div>
+</div>
+</blockquote>
+<ol start="8" type="1">
+<li>Strike the <code class="sourceCode cpp">incrementable_traits<span class="op">&lt;</span>counted_iterator<span class="op">&lt;</span>I<span class="op">&gt;&gt;</span></code> specialization in <span>23.5.6.1 <a href="https://wg21.link/counted.iterator">[counted.iterator]</a></span> as unnecessary:</li>
+</ol>
+<blockquote>
+<div class="rm" style="color: #bf0303">
+
+<div class="sourceCode" id="cb10"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1"></a>  template&lt;class I&gt;</span>
+<span id="cb10-2"><a href="#cb10-2"></a>  struct incrementable_traits&lt;counted_iterator&lt;I&gt;&gt; {</span>
+<span id="cb10-3"><a href="#cb10-3"></a>    using difference_type = iter_difference_t&lt;I&gt;;</span>
+<span id="cb10-4"><a href="#cb10-4"></a>  };</span></code></pre></div>
+
+</div>
+</blockquote>
+<ol start="9" type="1">
 <li>Edit <span>24.6.4.3 <a href="https://wg21.link/range.iota.iterator">[range.iota.iterator]</a></span> as indicated:</li>
 </ol>
 <blockquote>
 <div class="draftnote" style="color: #01796F">
 <p>[ Drafting note: While this member typedef is arguably harmless, we should avoid providing misleading tags for something that is, in fact, not a C++17 iterator. ]</p>
 </div>
-<div class="sourceCode" id="cb9"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
-<span id="cb9-2"><a href="#cb9-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>weakly_­incrementable W, semiregular Bound<span class="op">&gt;</span></span>
-<span id="cb9-3"><a href="#cb9-3"></a>    <span class="kw">requires</span> <em>weakly-equality-comparable-with</em><span class="op">&lt;</span>W, Bound<span class="op">&gt;</span></span>
-<span id="cb9-4"><a href="#cb9-4"></a>  <span class="kw">struct</span> iota_view<span class="op">&lt;</span>W, Bound<span class="op">&gt;::</span><em>iterator</em> <span class="op">{</span></span>
-<span id="cb9-5"><a href="#cb9-5"></a>  <span class="kw">private</span><span class="op">:</span></span>
-<span id="cb9-6"><a href="#cb9-6"></a>    W <em>value_</em> <span class="op">=</span> W<span class="op">()</span>;             <span class="co">// exposition only</span></span>
-<span id="cb9-7"><a href="#cb9-7"></a>  <span class="kw">public</span><span class="op">:</span></span>
-<span id="cb9-8"><a href="#cb9-8"></a>    <span class="kw">using</span> iterator_concept <span class="op">=</span> <em>see below</em>;</span>
-<span id="cb9-9"><a href="#cb9-9"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> input_iterator_tag; <span class="diffins">// present only if W models incrementable</span></span>
-<span id="cb9-10"><a href="#cb9-10"></a>    <span class="kw">using</span> value_type <span class="op">=</span> W;</span>
-<span id="cb9-11"><a href="#cb9-11"></a>    <span class="kw">using</span> difference_type <span class="op">=</span> <em>IOTA-DIFF-T</em>(W);</span>
-<span id="cb9-12"><a href="#cb9-12"></a></span>
-<span id="cb9-13"><a href="#cb9-13"></a>    <span class="co">// [...]</span></span>
-<span id="cb9-14"><a href="#cb9-14"></a>  <span class="op">}</span>;</span>
-<span id="cb9-15"><a href="#cb9-15"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>weakly_­incrementable W, semiregular Bound<span class="op">&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a>    <span class="kw">requires</span> <em>weakly-equality-comparable-with</em><span class="op">&lt;</span>W, Bound<span class="op">&gt;</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a>  <span class="kw">struct</span> iota_view<span class="op">&lt;</span>W, Bound<span class="op">&gt;::</span><em>iterator</em> <span class="op">{</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a>  <span class="kw">private</span><span class="op">:</span></span>
+<span id="cb11-6"><a href="#cb11-6"></a>    W <em>value_</em> <span class="op">=</span> W<span class="op">()</span>;             <span class="co">// exposition only</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a>  <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a>    <span class="kw">using</span> iterator_concept <span class="op">=</span> <em>see below</em>;</span>
+<span id="cb11-9"><a href="#cb11-9"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> input_iterator_tag; <span class="diffins">// present only if W models incrementable</span></span>
+<span id="cb11-10"><a href="#cb11-10"></a>    <span class="kw">using</span> value_type <span class="op">=</span> W;</span>
+<span id="cb11-11"><a href="#cb11-11"></a>    <span class="kw">using</span> difference_type <span class="op">=</span> <em>IOTA-DIFF-T</em>(W);</span>
+<span id="cb11-12"><a href="#cb11-12"></a></span>
+<span id="cb11-13"><a href="#cb11-13"></a>    <span class="co">// [...]</span></span>
+<span id="cb11-14"><a href="#cb11-14"></a>  <span class="op">}</span>;</span>
+<span id="cb11-15"><a href="#cb11-15"></a><span class="op">}</span></span></code></pre></div>
 </blockquote>
-<ol start="8" type="1">
+<ol start="10" type="1">
 <li>Edit <span>24.7.5.3 <a href="https://wg21.link/range.filter.iterator">[range.filter.iterator]</a></span> as indicated:</li>
 </ol>
 <blockquote>
 <div class="draftnote" style="color: #01796F">
 <p>[ Drafting note: All C++20 forward iterators should qualify as C++17 input iterators, and so the wording expects <code class="sourceCode cpp">​iterator_­category</code> to be present. It seems unnecessary to accommodate hypothetical types that artificially define away C++17 iterator-ness. ]</p>
 </div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_­range V, indirect_­unary_­predicate<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;</span> Pred<span class="op">&gt;</span></span>
-<span id="cb10-3"><a href="#cb10-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> is_object_v<span class="op">&lt;</span>Pred<span class="op">&gt;</span></span>
-<span id="cb10-4"><a href="#cb10-4"></a>  <span class="kw">class</span> filter_view<span class="op">&lt;</span>V, Pred<span class="op">&gt;::</span><em>iterator</em> <span class="op">{</span></span>
-<span id="cb10-5"><a href="#cb10-5"></a>  <span class="kw">private</span><span class="op">:</span></span>
-<span id="cb10-6"><a href="#cb10-6"></a>    iterator_t<span class="op">&lt;</span>V<span class="op">&gt;</span> <em>current_</em> <span class="op">=</span> iterator_t<span class="op">&lt;</span>V<span class="op">&gt;()</span>;   <span class="co">// exposition only</span></span>
-<span id="cb10-7"><a href="#cb10-7"></a>    filter_view<span class="op">*</span> <em>parent_</em> <span class="op">=</span> <span class="kw">nullptr</span>;             <span class="co">// exposition only</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a>  <span class="kw">public</span><span class="op">:</span></span>
-<span id="cb10-9"><a href="#cb10-9"></a>    <span class="kw">using</span> iterator_concept  <span class="op">=</span> <em>see below</em>;</span>
-<span id="cb10-10"><a href="#cb10-10"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> <em>see below</em>;        <span class="diffins">// not always present</span></span>
-<span id="cb10-11"><a href="#cb10-11"></a>    <span class="kw">using</span> value_type        <span class="op">=</span> range_value_t<span class="op">&lt;</span>V<span class="op">&gt;</span>;</span>
-<span id="cb10-12"><a href="#cb10-12"></a>    <span class="kw">using</span> difference_type   <span class="op">=</span> range_difference_t<span class="op">&lt;</span>V<span class="op">&gt;</span>;</span>
-<span id="cb10-13"><a href="#cb10-13"></a></span>
-<span id="cb10-14"><a href="#cb10-14"></a>    <span class="co">// [...]</span></span>
-<span id="cb10-15"><a href="#cb10-15"></a>  <span class="op">}</span>;</span>
-<span id="cb10-16"><a href="#cb10-16"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_­range V, indirect_­unary_­predicate<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;</span> Pred<span class="op">&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> is_object_v<span class="op">&lt;</span>Pred<span class="op">&gt;</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a>  <span class="kw">class</span> filter_view<span class="op">&lt;</span>V, Pred<span class="op">&gt;::</span><em>iterator</em> <span class="op">{</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a>  <span class="kw">private</span><span class="op">:</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a>    iterator_t<span class="op">&lt;</span>V<span class="op">&gt;</span> <em>current_</em> <span class="op">=</span> iterator_t<span class="op">&lt;</span>V<span class="op">&gt;()</span>;   <span class="co">// exposition only</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a>    filter_view<span class="op">*</span> <em>parent_</em> <span class="op">=</span> <span class="kw">nullptr</span>;             <span class="co">// exposition only</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a>  <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a>    <span class="kw">using</span> iterator_concept  <span class="op">=</span> <em>see below</em>;</span>
+<span id="cb12-10"><a href="#cb12-10"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> <em>see below</em>;        <span class="diffins">// not always present</span></span>
+<span id="cb12-11"><a href="#cb12-11"></a>    <span class="kw">using</span> value_type        <span class="op">=</span> range_value_t<span class="op">&lt;</span>V<span class="op">&gt;</span>;</span>
+<span id="cb12-12"><a href="#cb12-12"></a>    <span class="kw">using</span> difference_type   <span class="op">=</span> range_difference_t<span class="op">&lt;</span>V<span class="op">&gt;</span>;</span>
+<span id="cb12-13"><a href="#cb12-13"></a></span>
+<span id="cb12-14"><a href="#cb12-14"></a>    <span class="co">// [...]</span></span>
+<span id="cb12-15"><a href="#cb12-15"></a>  <span class="op">}</span>;</span>
+<span id="cb12-16"><a href="#cb12-16"></a><span class="op">}</span></span></code></pre></div>
 <p>[…]</p>
 <div class="dummy">
 <p><span class="marginalizedparent"><a class="marginalized">3</a></span> <span class="diffins">The member <em>typedef-name</em> <code class="sourceCode cpp">iterator_category</code> is defined if and only if <code class="sourceCode cpp">V</code> models <code class="sourceCode cpp">forward_range</code>. In that case,</span> <code class="sourceCode cpp"><em>iterator</em>​<span class="op">::</span>​iterator_­category</code> is defined as follows:</p>
@@ -757,35 +796,35 @@ blockquote { background-color: #f6f8fa; }
 </ul>
 </div>
 </blockquote>
-<ol start="9" type="1">
+<ol start="11" type="1">
 <li>Edit <span>24.7.6.3 <a href="https://wg21.link/range.transform.iterator">[range.transform.iterator]</a></span> as indicated:</li>
 </ol>
 <blockquote>
-<div class="sourceCode" id="cb11"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
-<span id="cb11-2"><a href="#cb11-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_­range V, copy_­constructible F<span class="op">&gt;</span></span>
-<span id="cb11-3"><a href="#cb11-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> is_object_v<span class="op">&lt;</span>F<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
-<span id="cb11-4"><a href="#cb11-4"></a>             regular_invocable<span class="op">&lt;</span>F<span class="op">&amp;</span>, range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;</span> <span class="op">&amp;&amp;</span></span>
-<span id="cb11-5"><a href="#cb11-5"></a>             can<span class="op">-</span>reference<span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span>F<span class="op">&amp;</span>, range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb11-6"><a href="#cb11-6"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
-<span id="cb11-7"><a href="#cb11-7"></a>  <span class="kw">class</span> transform_view<span class="op">&lt;</span>V, F<span class="op">&gt;::</span><em>iterator</em> <span class="op">{</span></span>
-<span id="cb11-8"><a href="#cb11-8"></a>  <span class="kw">private</span><span class="op">:</span></span>
-<span id="cb11-9"><a href="#cb11-9"></a>    <span class="kw">using</span> <em>Parent</em> <span class="op">=</span>                              <span class="co">// exposition only</span></span>
-<span id="cb11-10"><a href="#cb11-10"></a>      conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> transform_view, transform_view<span class="op">&gt;</span>;</span>
-<span id="cb11-11"><a href="#cb11-11"></a>    <span class="kw">using</span> <em>Base</em>   <span class="op">=</span>                              <span class="co">// exposition only</span></span>
-<span id="cb11-12"><a href="#cb11-12"></a>      conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> V, V<span class="op">&gt;</span>;</span>
-<span id="cb11-13"><a href="#cb11-13"></a>    iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> current_ <span class="op">=</span>                 <span class="co">// exposition only</span></span>
-<span id="cb11-14"><a href="#cb11-14"></a>      iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;()</span>;</span>
-<span id="cb11-15"><a href="#cb11-15"></a>    Parent<span class="op">*</span> parent_ <span class="op">=</span> <span class="kw">nullptr</span>;                  <span class="co">// exposition only</span></span>
-<span id="cb11-16"><a href="#cb11-16"></a>  <span class="kw">public</span><span class="op">:</span></span>
-<span id="cb11-17"><a href="#cb11-17"></a>    <span class="kw">using</span> iterator_concept  <span class="op">=</span> <em>see below</em>;</span>
-<span id="cb11-18"><a href="#cb11-18"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> <em>see below</em>;        <span class="diffins">// not always present</span></span>
-<span id="cb11-19"><a href="#cb11-19"></a>    <span class="kw">using</span> value_type        <span class="op">=</span></span>
-<span id="cb11-20"><a href="#cb11-20"></a>      remove_cvref_t<span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span>F<span class="op">&amp;</span>, range_reference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;&gt;</span>;</span>
-<span id="cb11-21"><a href="#cb11-21"></a>    <span class="kw">using</span> difference_type   <span class="op">=</span> range_difference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
-<span id="cb11-22"><a href="#cb11-22"></a></span>
-<span id="cb11-23"><a href="#cb11-23"></a>    <span class="co">// [...]</span></span>
-<span id="cb11-24"><a href="#cb11-24"></a>  <span class="op">}</span>;</span>
-<span id="cb11-25"><a href="#cb11-25"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_­range V, copy_­constructible F<span class="op">&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> is_object_v<span class="op">&lt;</span>F<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a>             regular_invocable<span class="op">&lt;</span>F<span class="op">&amp;</span>, range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>             can<span class="op">-</span>reference<span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span>F<span class="op">&amp;</span>, range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;&gt;</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
+<span id="cb13-7"><a href="#cb13-7"></a>  <span class="kw">class</span> transform_view<span class="op">&lt;</span>V, F<span class="op">&gt;::</span><em>iterator</em> <span class="op">{</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a>  <span class="kw">private</span><span class="op">:</span></span>
+<span id="cb13-9"><a href="#cb13-9"></a>    <span class="kw">using</span> <em>Parent</em> <span class="op">=</span>                              <span class="co">// exposition only</span></span>
+<span id="cb13-10"><a href="#cb13-10"></a>      conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> transform_view, transform_view<span class="op">&gt;</span>;</span>
+<span id="cb13-11"><a href="#cb13-11"></a>    <span class="kw">using</span> <em>Base</em>   <span class="op">=</span>                              <span class="co">// exposition only</span></span>
+<span id="cb13-12"><a href="#cb13-12"></a>      conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> V, V<span class="op">&gt;</span>;</span>
+<span id="cb13-13"><a href="#cb13-13"></a>    iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> current_ <span class="op">=</span>                 <span class="co">// exposition only</span></span>
+<span id="cb13-14"><a href="#cb13-14"></a>      iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;()</span>;</span>
+<span id="cb13-15"><a href="#cb13-15"></a>    Parent<span class="op">*</span> parent_ <span class="op">=</span> <span class="kw">nullptr</span>;                  <span class="co">// exposition only</span></span>
+<span id="cb13-16"><a href="#cb13-16"></a>  <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb13-17"><a href="#cb13-17"></a>    <span class="kw">using</span> iterator_concept  <span class="op">=</span> <em>see below</em>;</span>
+<span id="cb13-18"><a href="#cb13-18"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> <em>see below</em>;        <span class="diffins">// not always present</span></span>
+<span id="cb13-19"><a href="#cb13-19"></a>    <span class="kw">using</span> value_type        <span class="op">=</span></span>
+<span id="cb13-20"><a href="#cb13-20"></a>      remove_cvref_t<span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span>F<span class="op">&amp;</span>, range_reference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;&gt;</span>;</span>
+<span id="cb13-21"><a href="#cb13-21"></a>    <span class="kw">using</span> difference_type   <span class="op">=</span> range_difference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb13-22"><a href="#cb13-22"></a></span>
+<span id="cb13-23"><a href="#cb13-23"></a>    <span class="co">// [...]</span></span>
+<span id="cb13-24"><a href="#cb13-24"></a>  <span class="op">}</span>;</span>
+<span id="cb13-25"><a href="#cb13-25"></a><span class="op">}</span></span></code></pre></div>
 <p>[…]</p>
 <div class="dummy">
 <p><span class="marginalizedparent"><a class="marginalized">2</a></span> <span class="diffins">The member <em>typedef-name</em> <code class="sourceCode cpp">iterator_category</code> is defined if and only if <em><code class="sourceCode cpp">Base</code></em> models <code class="sourceCode cpp">forward_range</code>. In that case,</span> <code class="sourceCode cpp">iterator​<span class="op">::</span>​iterator_­category</code> is defined as follows: Let <code class="sourceCode cpp">C</code> denote the type <code class="sourceCode cpp">iterator_­traits<span class="op">&lt;</span>iterator_­t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>​<span class="op">::</span>​iterator_­category</code>.</p>
@@ -799,36 +838,36 @@ blockquote { background-color: #f6f8fa; }
 </ul>
 </div>
 </blockquote>
-<ol start="10" type="1">
+<ol start="12" type="1">
 <li>Edit <span>24.7.11.3 <a href="https://wg21.link/range.join.iterator">[range.join.iterator]</a></span> as indicated:</li>
 </ol>
 <blockquote>
-<div class="sourceCode" id="cb12"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
-<span id="cb12-2"><a href="#cb12-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_­range V<span class="op">&gt;</span></span>
-<span id="cb12-3"><a href="#cb12-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> input_­range<span class="op">&lt;</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;</span> <span class="op">&amp;&amp;</span></span>
-<span id="cb12-4"><a href="#cb12-4"></a>             <span class="op">(</span>is_reference_v<span class="op">&lt;</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;</span> <span class="op">||</span></span>
-<span id="cb12-5"><a href="#cb12-5"></a>              view<span class="op">&lt;</span>range_value_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;)</span></span>
-<span id="cb12-6"><a href="#cb12-6"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
-<span id="cb12-7"><a href="#cb12-7"></a>  <span class="kw">struct</span> join_view<span class="op">&lt;</span>V<span class="op">&gt;::</span><em>iterator</em> <span class="op">{</span></span>
-<span id="cb12-8"><a href="#cb12-8"></a>  <span class="kw">private</span><span class="op">:</span></span>
-<span id="cb12-9"><a href="#cb12-9"></a>    <span class="kw">using</span> <em>Parent</em> <span class="op">=</span>                                              <span class="co">// exposition only</span></span>
-<span id="cb12-10"><a href="#cb12-10"></a>      conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> join_view, join_view<span class="op">&gt;</span>;</span>
-<span id="cb12-11"><a href="#cb12-11"></a>    <span class="kw">using</span> <em>Base</em>   <span class="op">=</span> conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> V, V<span class="op">&gt;</span>;            <span class="co">// exposition only</span></span>
-<span id="cb12-12"><a href="#cb12-12"></a></span>
-<span id="cb12-13"><a href="#cb12-13"></a>    <span class="kw">static</span> <span class="kw">constexpr</span> <span class="dt">bool</span> ref<span class="op">-</span>is<span class="op">-</span>glvalue <span class="op">=</span>                      <span class="co">// exposition only</span></span>
-<span id="cb12-14"><a href="#cb12-14"></a>      is_reference_v<span class="op">&lt;</span>range_reference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span>
-<span id="cb12-15"><a href="#cb12-15"></a></span>
-<span id="cb12-16"><a href="#cb12-16"></a>    <span class="co">// [...]</span></span>
-<span id="cb12-17"><a href="#cb12-17"></a></span>
-<span id="cb12-18"><a href="#cb12-18"></a>  <span class="kw">public</span><span class="op">:</span></span>
-<span id="cb12-19"><a href="#cb12-19"></a>    <span class="kw">using</span> iterator_concept  <span class="op">=</span> <em>see below</em>;</span>
-<span id="cb12-20"><a href="#cb12-20"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> <em>see below</em>;        <span class="diffins">// not always present</span></span>
-<span id="cb12-21"><a href="#cb12-21"></a>    <span class="kw">using</span> value_type        <span class="op">=</span> range_value_t<span class="op">&lt;</span>range_reference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span>
-<span id="cb12-22"><a href="#cb12-22"></a>    <span class="kw">using</span> difference_type   <span class="op">=</span> <em>see below</em>;</span>
-<span id="cb12-23"><a href="#cb12-23"></a></span>
-<span id="cb12-24"><a href="#cb12-24"></a>    <span class="co">// [...]</span></span>
-<span id="cb12-25"><a href="#cb12-25"></a>  <span class="op">}</span>;</span>
-<span id="cb12-26"><a href="#cb12-26"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_­range V<span class="op">&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> input_­range<span class="op">&lt;</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a>             <span class="op">(</span>is_reference_v<span class="op">&lt;</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;</span> <span class="op">||</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a>              view<span class="op">&lt;</span>range_value_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;)</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a>  <span class="kw">struct</span> join_view<span class="op">&lt;</span>V<span class="op">&gt;::</span><em>iterator</em> <span class="op">{</span></span>
+<span id="cb14-8"><a href="#cb14-8"></a>  <span class="kw">private</span><span class="op">:</span></span>
+<span id="cb14-9"><a href="#cb14-9"></a>    <span class="kw">using</span> <em>Parent</em> <span class="op">=</span>                                              <span class="co">// exposition only</span></span>
+<span id="cb14-10"><a href="#cb14-10"></a>      conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> join_view, join_view<span class="op">&gt;</span>;</span>
+<span id="cb14-11"><a href="#cb14-11"></a>    <span class="kw">using</span> <em>Base</em>   <span class="op">=</span> conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> V, V<span class="op">&gt;</span>;            <span class="co">// exposition only</span></span>
+<span id="cb14-12"><a href="#cb14-12"></a></span>
+<span id="cb14-13"><a href="#cb14-13"></a>    <span class="kw">static</span> <span class="kw">constexpr</span> <span class="dt">bool</span> ref<span class="op">-</span>is<span class="op">-</span>glvalue <span class="op">=</span>                      <span class="co">// exposition only</span></span>
+<span id="cb14-14"><a href="#cb14-14"></a>      is_reference_v<span class="op">&lt;</span>range_reference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span>
+<span id="cb14-15"><a href="#cb14-15"></a></span>
+<span id="cb14-16"><a href="#cb14-16"></a>    <span class="co">// [...]</span></span>
+<span id="cb14-17"><a href="#cb14-17"></a></span>
+<span id="cb14-18"><a href="#cb14-18"></a>  <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb14-19"><a href="#cb14-19"></a>    <span class="kw">using</span> iterator_concept  <span class="op">=</span> <em>see below</em>;</span>
+<span id="cb14-20"><a href="#cb14-20"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> <em>see below</em>;        <span class="diffins">// not always present</span></span>
+<span id="cb14-21"><a href="#cb14-21"></a>    <span class="kw">using</span> value_type        <span class="op">=</span> range_value_t<span class="op">&lt;</span>range_reference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span>
+<span id="cb14-22"><a href="#cb14-22"></a>    <span class="kw">using</span> difference_type   <span class="op">=</span> <em>see below</em>;</span>
+<span id="cb14-23"><a href="#cb14-23"></a></span>
+<span id="cb14-24"><a href="#cb14-24"></a>    <span class="co">// [...]</span></span>
+<span id="cb14-25"><a href="#cb14-25"></a>  <span class="op">}</span>;</span>
+<span id="cb14-26"><a href="#cb14-26"></a><span class="op">}</span></span></code></pre></div>
 <p>[…]</p>
 <div class="dummy">
 <p><span class="marginalizedparent"><a class="marginalized">2</a></span> <span class="diffins">The member <em>typedef-name</em> <code class="sourceCode cpp">iterator_category</code> is defined if and only if <em><code class="sourceCode cpp">ref<span class="op">-</span>is<span class="op">-</span>glvalue</code></em> is <code class="sourceCode cpp"><span class="kw">true</span></code>, <em><code class="sourceCode cpp">Base</code></em> models <code class="sourceCode cpp">forward_range</code>, and <code class="sourceCode cpp">range_reference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span></code> models <code class="sourceCode cpp">forward_range</code>. In that case,</span> <code class="sourceCode cpp">iterator​<span class="op">::</span>​iterator_­category</code> is defined as follows:</p>
@@ -841,56 +880,56 @@ blockquote { background-color: #f6f8fa; }
 </ul>
 </div>
 </blockquote>
-<ol start="11" type="1">
+<ol start="13" type="1">
 <li>Edit <span>24.7.12.3 <a href="https://wg21.link/range.split.outer">[range.split.outer]</a></span> as indicated:</li>
 </ol>
 <blockquote>
-<div class="sourceCode" id="cb13"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
-<span id="cb13-2"><a href="#cb13-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_­range V, forward_­range Pattern<span class="op">&gt;</span></span>
-<span id="cb13-3"><a href="#cb13-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> view<span class="op">&lt;</span>Pattern<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
-<span id="cb13-4"><a href="#cb13-4"></a>             indirectly_­comparable<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span>Pattern<span class="op">&gt;</span>, ranges<span class="op">::</span>equal_to<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
-<span id="cb13-5"><a href="#cb13-5"></a>             <span class="op">(</span>forward_­range<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">||</span> <em>tiny-range</em><span class="op">&lt;</span>Pattern<span class="op">&gt;)</span></span>
-<span id="cb13-6"><a href="#cb13-6"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
-<span id="cb13-7"><a href="#cb13-7"></a>  <span class="kw">struct</span> split_view<span class="op">&lt;</span>V, Pattern<span class="op">&gt;::</span><em>outer-iterator</em> <span class="op">{</span></span>
-<span id="cb13-8"><a href="#cb13-8"></a>  <span class="kw">private</span><span class="op">:</span></span>
-<span id="cb13-9"><a href="#cb13-9"></a>    <span class="kw">using</span> <em>Parent</em> <span class="op">=</span>                          <span class="co">// exposition only</span></span>
-<span id="cb13-10"><a href="#cb13-10"></a>      conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> split_view, split_view<span class="op">&gt;</span>;</span>
-<span id="cb13-11"><a href="#cb13-11"></a>    <span class="kw">using</span> <em>Base</em>   <span class="op">=</span>                          <span class="co">// exposition only</span></span>
-<span id="cb13-12"><a href="#cb13-12"></a>      conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> V, V<span class="op">&gt;</span>;</span>
-<span id="cb13-13"><a href="#cb13-13"></a></span>
-<span id="cb13-14"><a href="#cb13-14"></a>      <span class="co">// [...]</span></span>
-<span id="cb13-15"><a href="#cb13-15"></a>  <span class="kw">public</span><span class="op">:</span></span>
-<span id="cb13-16"><a href="#cb13-16"></a>    <span class="kw">using</span> iterator_concept  <span class="op">=</span></span>
-<span id="cb13-17"><a href="#cb13-17"></a>      conditional_t<span class="op">&lt;</span>forward_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, forward_iterator_tag, input_iterator_tag<span class="op">&gt;</span>;</span>
-<span id="cb13-18"><a href="#cb13-18"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> input_iterator_tag; <span class="diffins">// present only if <em>Base</em> models forward_range</span></span>
-<span id="cb13-19"><a href="#cb13-19"></a></span>
-<span id="cb13-20"><a href="#cb13-20"></a>    <span class="co">// [...]</span></span>
-<span id="cb13-21"><a href="#cb13-21"></a>  <span class="op">}</span>;</span>
-<span id="cb13-22"><a href="#cb13-22"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_­range V, forward_­range Pattern<span class="op">&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> view<span class="op">&lt;</span>Pattern<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb15-4"><a href="#cb15-4"></a>             indirectly_­comparable<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span>Pattern<span class="op">&gt;</span>, ranges<span class="op">::</span>equal_to<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb15-5"><a href="#cb15-5"></a>             <span class="op">(</span>forward_­range<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">||</span> <em>tiny-range</em><span class="op">&lt;</span>Pattern<span class="op">&gt;)</span></span>
+<span id="cb15-6"><a href="#cb15-6"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
+<span id="cb15-7"><a href="#cb15-7"></a>  <span class="kw">struct</span> split_view<span class="op">&lt;</span>V, Pattern<span class="op">&gt;::</span><em>outer-iterator</em> <span class="op">{</span></span>
+<span id="cb15-8"><a href="#cb15-8"></a>  <span class="kw">private</span><span class="op">:</span></span>
+<span id="cb15-9"><a href="#cb15-9"></a>    <span class="kw">using</span> <em>Parent</em> <span class="op">=</span>                          <span class="co">// exposition only</span></span>
+<span id="cb15-10"><a href="#cb15-10"></a>      conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> split_view, split_view<span class="op">&gt;</span>;</span>
+<span id="cb15-11"><a href="#cb15-11"></a>    <span class="kw">using</span> <em>Base</em>   <span class="op">=</span>                          <span class="co">// exposition only</span></span>
+<span id="cb15-12"><a href="#cb15-12"></a>      conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> V, V<span class="op">&gt;</span>;</span>
+<span id="cb15-13"><a href="#cb15-13"></a></span>
+<span id="cb15-14"><a href="#cb15-14"></a>      <span class="co">// [...]</span></span>
+<span id="cb15-15"><a href="#cb15-15"></a>  <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb15-16"><a href="#cb15-16"></a>    <span class="kw">using</span> iterator_concept  <span class="op">=</span></span>
+<span id="cb15-17"><a href="#cb15-17"></a>      conditional_t<span class="op">&lt;</span>forward_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, forward_iterator_tag, input_iterator_tag<span class="op">&gt;</span>;</span>
+<span id="cb15-18"><a href="#cb15-18"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> input_iterator_tag; <span class="diffins">// present only if <em>Base</em> models forward_range</span></span>
+<span id="cb15-19"><a href="#cb15-19"></a></span>
+<span id="cb15-20"><a href="#cb15-20"></a>    <span class="co">// [...]</span></span>
+<span id="cb15-21"><a href="#cb15-21"></a>  <span class="op">}</span>;</span>
+<span id="cb15-22"><a href="#cb15-22"></a><span class="op">}</span></span></code></pre></div>
 </blockquote>
-<ol start="12" type="1">
+<ol start="14" type="1">
 <li>Edit <span>24.7.12.5 <a href="https://wg21.link/range.split.inner">[range.split.inner]</a></span> as indicated:</li>
 </ol>
 <blockquote>
-<div class="sourceCode" id="cb14"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
-<span id="cb14-2"><a href="#cb14-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_­range V, forward_­range Pattern<span class="op">&gt;</span></span>
-<span id="cb14-3"><a href="#cb14-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> view<span class="op">&lt;</span>Pattern<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
-<span id="cb14-4"><a href="#cb14-4"></a>             indirectly_­comparable<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span>Pattern<span class="op">&gt;</span>, ranges<span class="op">::</span>equal_to<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
-<span id="cb14-5"><a href="#cb14-5"></a>             <span class="op">(</span>forward_­range<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">||</span> <em>tiny-range</em><span class="op">&lt;</span>Pattern<span class="op">&gt;)</span></span>
-<span id="cb14-6"><a href="#cb14-6"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
-<span id="cb14-7"><a href="#cb14-7"></a>  <span class="kw">struct</span> split_view<span class="op">&lt;</span>V, Pattern<span class="op">&gt;::</span><em>inner-iterator</em> <span class="op">{</span></span>
-<span id="cb14-8"><a href="#cb14-8"></a>  <span class="kw">private</span><span class="op">:</span></span>
-<span id="cb14-9"><a href="#cb14-9"></a>    <span class="kw">using</span> <em>Base</em> <span class="op">=</span> conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> V, V<span class="op">&gt;</span>;      <span class="co">// exposition only</span></span>
-<span id="cb14-10"><a href="#cb14-10"></a></span>
-<span id="cb14-11"><a href="#cb14-11"></a>    <span class="co">// [...]</span></span>
-<span id="cb14-12"><a href="#cb14-12"></a></span>
-<span id="cb14-13"><a href="#cb14-13"></a>  <span class="kw">public</span><span class="op">:</span></span>
-<span id="cb14-14"><a href="#cb14-14"></a>    <span class="kw">using</span> iterator_concept  <span class="op">=</span> <span class="kw">typename</span> <em>outer-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;::</span>iterator_concept;</span>
-<span id="cb14-15"><a href="#cb14-15"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> <em>see below</em>;               <span class="diffins">// present only if <em>Base</em> models forward_range</span></span>
-<span id="cb14-16"><a href="#cb14-16"></a></span>
-<span id="cb14-17"><a href="#cb14-17"></a>    <span class="co">// [...]</span></span>
-<span id="cb14-18"><a href="#cb14-18"></a>  <span class="op">}</span>;</span>
-<span id="cb14-19"><a href="#cb14-19"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_­range V, forward_­range Pattern<span class="op">&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> view<span class="op">&lt;</span>Pattern<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a>             indirectly_­comparable<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span>Pattern<span class="op">&gt;</span>, ranges<span class="op">::</span>equal_to<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a>             <span class="op">(</span>forward_­range<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">||</span> <em>tiny-range</em><span class="op">&lt;</span>Pattern<span class="op">&gt;)</span></span>
+<span id="cb16-6"><a href="#cb16-6"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
+<span id="cb16-7"><a href="#cb16-7"></a>  <span class="kw">struct</span> split_view<span class="op">&lt;</span>V, Pattern<span class="op">&gt;::</span><em>inner-iterator</em> <span class="op">{</span></span>
+<span id="cb16-8"><a href="#cb16-8"></a>  <span class="kw">private</span><span class="op">:</span></span>
+<span id="cb16-9"><a href="#cb16-9"></a>    <span class="kw">using</span> <em>Base</em> <span class="op">=</span> conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> V, V<span class="op">&gt;</span>;      <span class="co">// exposition only</span></span>
+<span id="cb16-10"><a href="#cb16-10"></a></span>
+<span id="cb16-11"><a href="#cb16-11"></a>    <span class="co">// [...]</span></span>
+<span id="cb16-12"><a href="#cb16-12"></a></span>
+<span id="cb16-13"><a href="#cb16-13"></a>  <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb16-14"><a href="#cb16-14"></a>    <span class="kw">using</span> iterator_concept  <span class="op">=</span> <span class="kw">typename</span> <em>outer-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;::</span>iterator_concept;</span>
+<span id="cb16-15"><a href="#cb16-15"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> <em>see below</em>;               <span class="diffins">// present only if <em>Base</em> models forward_range</span></span>
+<span id="cb16-16"><a href="#cb16-16"></a></span>
+<span id="cb16-17"><a href="#cb16-17"></a>    <span class="co">// [...]</span></span>
+<span id="cb16-18"><a href="#cb16-18"></a>  <span class="op">}</span>;</span>
+<span id="cb16-19"><a href="#cb16-19"></a><span class="op">}</span></span></code></pre></div>
 <p><span class="marginalizedparent"><a class="marginalized">1</a></span> The <em>typedef-name</em> <code class="sourceCode cpp">iterator_­category</code> denotes:</p>
 <div class="dummy">
 <ul>
@@ -899,27 +938,27 @@ blockquote { background-color: #f6f8fa; }
 </ul>
 </div>
 </blockquote>
-<ol start="13" type="1">
+<ol start="15" type="1">
 <li>Edit <span>24.7.16.3 <a href="https://wg21.link/range.elements.iterator">[range.elements.iterator]</a></span> as indicated:</li>
 </ol>
 <blockquote>
-<div class="sourceCode" id="cb15"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
-<span id="cb15-2"><a href="#cb15-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_range V, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
-<span id="cb15-3"><a href="#cb15-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <em>has-tuple-element</em><span class="op">&lt;</span>range_value_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, N<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
-<span id="cb15-4"><a href="#cb15-4"></a>             <em>has-tuple-element</em><span class="op">&lt;</span>remove_reference_t<span class="op">&lt;</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;</span>, N<span class="op">&gt;</span></span>
-<span id="cb15-5"><a href="#cb15-5"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
-<span id="cb15-6"><a href="#cb15-6"></a>  <span class="kw">class</span> elements_view<span class="op">&lt;</span>V, N<span class="op">&gt;::</span><em>iterator</em> <span class="op">{</span>                 <span class="co">// exposition only</span></span>
-<span id="cb15-7"><a href="#cb15-7"></a>    <span class="kw">using</span> <em>Base</em> <span class="op">=</span> conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> V, V<span class="op">&gt;</span>;      <span class="co">// exposition only</span></span>
-<span id="cb15-8"><a href="#cb15-8"></a></span>
-<span id="cb15-9"><a href="#cb15-9"></a>    iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> current_ <span class="op">=</span> iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;()</span>;</span>
-<span id="cb15-10"><a href="#cb15-10"></a>  <span class="kw">public</span><span class="op">:</span></span>
-<span id="cb15-11"><a href="#cb15-11"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> <span class="diffdel">typename iterator_traits&lt;iterator_t&lt;<em>Base</em>&gt;&gt;::iterator_category</span><span class="diffins"><em>see below</em></span>; <span class="diffins">// not always present</span></span>
-<span id="cb15-12"><a href="#cb15-12"></a>    <span class="kw">using</span> value_type <span class="op">=</span> remove_cvref_t<span class="op">&lt;</span>tuple_element_t<span class="op">&lt;</span>N, range_value_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;&gt;</span>;</span>
-<span id="cb15-13"><a href="#cb15-13"></a>    <span class="kw">using</span> difference_type <span class="op">=</span> range_difference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
-<span id="cb15-14"><a href="#cb15-14"></a></span>
-<span id="cb15-15"><a href="#cb15-15"></a>    <span class="co">// [...]</span></span>
-<span id="cb15-16"><a href="#cb15-16"></a>  <span class="op">}</span>;</span>
-<span id="cb15-17"><a href="#cb15-17"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_range V, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <em>has-tuple-element</em><span class="op">&lt;</span>range_value_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, N<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb17-4"><a href="#cb17-4"></a>             <em>has-tuple-element</em><span class="op">&lt;</span>remove_reference_t<span class="op">&lt;</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;&gt;</span>, N<span class="op">&gt;</span></span>
+<span id="cb17-5"><a href="#cb17-5"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
+<span id="cb17-6"><a href="#cb17-6"></a>  <span class="kw">class</span> elements_view<span class="op">&lt;</span>V, N<span class="op">&gt;::</span><em>iterator</em> <span class="op">{</span>                 <span class="co">// exposition only</span></span>
+<span id="cb17-7"><a href="#cb17-7"></a>    <span class="kw">using</span> <em>Base</em> <span class="op">=</span> conditional_t<span class="op">&lt;</span>Const, <span class="kw">const</span> V, V<span class="op">&gt;</span>;      <span class="co">// exposition only</span></span>
+<span id="cb17-8"><a href="#cb17-8"></a></span>
+<span id="cb17-9"><a href="#cb17-9"></a>    iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> current_ <span class="op">=</span> iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;()</span>;</span>
+<span id="cb17-10"><a href="#cb17-10"></a>  <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb17-11"><a href="#cb17-11"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> <span class="diffdel">typename iterator_traits&lt;iterator_t&lt;<em>Base</em>&gt;&gt;::iterator_category</span><span class="diffins"><em>see below</em></span>; <span class="diffins">// not always present</span></span>
+<span id="cb17-12"><a href="#cb17-12"></a>    <span class="kw">using</span> value_type <span class="op">=</span> remove_cvref_t<span class="op">&lt;</span>tuple_element_t<span class="op">&lt;</span>N, range_value_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;&gt;</span>;</span>
+<span id="cb17-13"><a href="#cb17-13"></a>    <span class="kw">using</span> difference_type <span class="op">=</span> range_difference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb17-14"><a href="#cb17-14"></a></span>
+<span id="cb17-15"><a href="#cb17-15"></a>    <span class="co">// [...]</span></span>
+<span id="cb17-16"><a href="#cb17-16"></a>  <span class="op">}</span>;</span>
+<span id="cb17-17"><a href="#cb17-17"></a><span class="op">}</span></span></code></pre></div>
 <div class="add" style="color: #006e28">
 <p><span class="marginalizedparent"><a class="marginalized">?</a></span> The member <em>typedef-name</em> <code class="sourceCode default">iterator_category</code> is defined if and only if <em><code class="sourceCode default">Base</code></em> models <code class="sourceCode default">forward_range</code>. In that case, <code class="sourceCode default">iterator_category</code> denotes:</p>
 <ul>
@@ -930,7 +969,7 @@ blockquote { background-color: #f6f8fa; }
 </div>
 </blockquote>
 </div>
-<h1 data-number="5" style="border-bottom:1px solid #cccccc" id="bibliography"><span class="header-section-number">5</span> References<a href="#bibliography" class="self-link"></a></h1>
+<h1 data-number="6" style="border-bottom:1px solid #cccccc" id="bibliography"><span class="header-section-number">6</span> References<a href="#bibliography" class="self-link"></a></h1>
 <div id="refs" class="references hanging-indent" role="doc-bibliography">
 <div id="ref-LWG3283">
 <p>[LWG3283] Eric Niebler. Types satisfying input_iterator but not equality_comparable look like C++17 output iterators. <br />
