@@ -1,5 +1,5 @@
 ---
-title: Repairing input range adaptors
+title: Repairing input range adaptors and `counted_iterator`
 document: D2259R0
 date: today
 audience:
@@ -11,10 +11,10 @@ toc: false
 ---
 
 # Abstract
-This paper proposes a fix for several issues with `iterator_category` for range
+This paper proposes fixes for several issues with `iterator_category` for range
 and iterator adaptors. This resolves [@LWG3283], [@LWG3289], and [@LWG3408].
 
-# The problem
+# The problem with `iterator_category`
 
 This code does not compile:
 
@@ -47,7 +47,7 @@ we have specified in the standard library, but also virtually _every_ range
 adaptor with its own iterator type when used in conditions that produce an input
 range.
 
-# The fix
+## The fix
 
 We shouldn't (and can't) change postfix increment on the adaptor's iterators.
 There's nothing we can meaningfully return from `operator++` for arbitrary input
@@ -87,15 +87,89 @@ program-defined specializations. That simplifies the wording considerably
 by removing the need to separately consider whether `iterator_category` is
 present.
 
+
+# `counted_iterator` woes
+
+As currently specified, the following test case fails (this is [@LWG3408]):
+
+```c++
+auto v = views::iota(0);
+auto i = counted_iterator{v.begin(), 5};
+static_assert(random_access_iterator<decltype(i)>);
+```
+
+Additionally, we can't even ask the question whether `counted_iterator<int*>`
+is a `contiguous_iterator`:
+
+```c++
+static_assert(contiguous_iterator<counted_iterator<int*>> || true);  // hard error
+```
+
+The problem here is that `counted_iterator` tries to emulate the behavior of the
+iterator it wraps (with the notable exception of `->`) by defining an
+`iterator_traits` specialization:
+
+```c++
+  template<input_­iterator I>
+  struct iterator_traits<counted_iterator<I>> : iterator_traits<I> {
+    using pointer = void;
+  };
+```
+
+But `iterator_traits` plays two very different roles in the C++20 iterator design:
+
+1. When generated from the primary template, it serves as a C++17 compatibility
+  layer. Notably, we never define an `iterator_concept` member in this case,
+  only `iterator_category`, and the latter is derived from the type's
+  C++17-iterator-ness.
+2. When explicitly or partially specialized, it serves as the non-intrusive
+  customization point for iterators that takes precedence over member types.
+  In particular, if `iterator_concept` is not defined, then we use
+  `iterator_category` to cap the type's C++20-iterator-ness.
+
+The problem with the `iterator_traits` partial specialization above is that it
+takes an `iterator_traits` being used for (1) and uses its contents for case (2).
+In the [@LWG3408] example, `iota_view<...>::iterator` properly reported that it is a
+_C++17_ input iterator, but the `counted_iterator` specialization means that we
+took that as saying that `counted_iterator<iota_view<...>::iterator>` is only a
+_C++20_ input iterator.
+
+Moreover, `counted_iterator` fails to handle wrapping `contiguous_iterator`s
+correctly: by inheriting from an `iterator_traits` specialization,
+can inherit the `contiguous_iterator_tag` opt-in (e.g., for pointers), but
+it neither defines `operator->` nor `pointer_traits::to_address`,
+so `std::to_address(ci)` is ill-formed, and the error happens outside the immediate
+context. As a result, even asking the question is ill-formed.
+
+## Fixing `counted_iterator`
+
+This paper proposes fixing `counted_iterator` as follows:
+
+- Constrain the `iterator_traits` specialization so that it is only used when
+  `iterator_traits<I>` is not generated from the primary template. In other words,
+  only provide the specialization for case (2) when we are already there.
+- Provide `value_type` and `difference_type` member typedefs, because they are
+  needed when there's no `iterator_traits` specialization.
+- Remove the `incrementable_traits` specialization, since that doesn't add
+  anything when we are defining a `difference_type` member.
+- Provide member `iterator_concept` and `iterator_category` when the wrapped
+  iterator type provides them, to honor its opt-in and opt-outs.
+- Provide member `operator->` if the wrapped iterator is contiguous, so
+  that `std::to_address` works and enable `counted_iterator` to be contiguous
+  itself if the wrapped iterator is also contiguous. The definition of `pointer`
+  in the `iterator_traits` specialization needs to be adjusted accordingly.
+
 # Implementation experience
 
 The wording in this paper has been implemented atop current libstdc++ trunk
-and passes all existing tests, and has been confirmed to fix the example at the
-beginning of this paper as well as the one in [@LWG3408].
+and passes all existing tests, and has been confirmed to fix the examples given
+above.
 
 # Wording
 
 This wording is relative to [@N4868].
+
+## `iterator_category`
 
 ::: wordinglist
 
@@ -222,87 +296,6 @@ public:
 ```
 :::
 :::
-:::
-
-- Edit [iterator.synopsis]{.sref}, Header `<iterator>` synopsis, as indicated:
-
-```c++
-#include <compare>              // see [compare.syn]
-#include <concepts>             // see [concepts.syn]
-
-namespace std {
-
-  // [...]
-
-  @[template&lt;class I>]{.diffdel}@
-    @[struct incrementable_traits<counted_iterator&lt;I>>;]{.diffdel}@
-
-  template<input_­iterator I>
-    @[requires _see below_]{.diffins}@
-  struct iterator_traits<counted_iterator<I>>;
-
-  // [...]
-}
-```
-
-- Edit the definition of  `iterator_traits<counted_iterator<I>>` in
-  [counted.iterator]{.sref} as indicated:
-
-::: draftnote
-
-This resolves [@LWG3408] by only providing an `iterator_traits` specialization
-for `counted_iterator` when the underlying iterator does not use the specialization
-generated from the primary template. In other words, we only use the
-"custom `iterator_traits`" path when the underlying iterator actually customized
-`iterator_traits`. In the remaining cases, we let the usual deduction do its work
-since `counted_iterator` operations are already fully constrained based on the
-wrapped iterator.
-
-:::
-
-```c++
-   template<input_­iterator I>
-     @[requires same_as<*ITER_TRAITS*(I), iterator_traits&lt;I>>   // see [iterator.concepts.general]{.sref}]{.diffins}@
-   struct iterator_traits<counted_iterator<I>> : iterator_traits<I> {
-     using pointer = void;
-   };
-```
-
-- Edit the definition of `counted_iterator` in [counted.iterator]{.sref} as indicated:
-
-::: draftnote
-
-Having removed the `iterator_traits` specialization in most cases, we need to
-provide `value_type` in `counted_iterator` again so that it models
-`indirectly_readable` when `I` does. We might as well provide `difference_type`
-here too; the `incrementable_traits` specialization does not appear to add value.
-
-:::
-
-```diff
- namespace std {
-   template<input_­or_­output_­iterator I>
-   class counted_iterator {
-   public:
-     using iterator_type = I;
-+    using value_type = iter_value_t<I>;           // present only if I models indirectly_readable
-+    using difference_type = iter_difference_t<I>;
-
-     // [...]
-   };
- }
-```
-
-- Strike the `incrementable_traits<counted_iterator<I>>` specialization in
-  [counted.iterator]{.sref} as unnecessary:
-
-::: rm
-```cpp
-  template<class I>
-  struct incrementable_traits<counted_iterator<I>> {
-    using difference_type = iter_difference_t<I>;
-  };
-```
 :::
 
 - Edit [range.iota.iterator]{.sref} as indicated:
@@ -565,4 +558,102 @@ if _`Base`_ models `forward_range`. In that case, `iterator_category` denotes:
 - [?.2]{.pnum} otherwise, `iterator_traits<iterator_t<@_Base_@>>::iterator_category`.
 :::
 
+:::
+
+## `counted_iterator`
+
+::: wordinglist
+
+
+- Edit [iterator.synopsis]{.sref}, Header `<iterator>` synopsis, as indicated:
+
+```c++
+#include <compare>              // see [compare.syn]
+#include <concepts>             // see [concepts.syn]
+
+namespace std {
+
+  // [...]
+
+  @[template&lt;class I>]{.diffdel}@
+    @[struct incrementable_traits<counted_iterator&lt;I>>;]{.diffdel}@
+
+  template<input_­iterator I>
+    @[requires _see below_]{.diffins}@
+  struct iterator_traits<counted_iterator<I>>;
+
+  // [...]
+}
+```
+
+- Edit the definition of  `iterator_traits<counted_iterator<I>>` in
+  [counted.iterator]{.sref} as indicated:
+
+```diff
+    template<input_­iterator I>
++      requires same_as<@*ITER_TRAITS*@(I), iterator_traits<I>>   // see @[iterator.concepts.general]{.sref}@
+    struct iterator_traits<counted_iterator<I>> : iterator_traits<I> {
+-     using pointer = void;
++     using pointer = conditional_t<contiguous_iterator<I>, add_pointer_t<iter_reference_t<I>>, void>;
+   };
+```
+
+- Edit the definition of `counted_iterator` in [counted.iterator]{.sref} as indicated:
+
+```diff
+ namespace std {
+   template<input_­or_­output_­iterator I>
+   class counted_iterator {
+   public:
+     using iterator_type = I;
++    using value_type = iter_value_t<I>;           // present only if I models indirectly_readable
++    using difference_type = iter_difference_t<I>;
++    using iterator_concept = typename I::iterator_concept;   // present only if the @_qualified-id_@ I::iterator_concept is valid and denotes a type
++    using iterator_category = typename I::iterator_category;  // present only if the @_qualified-id_@ I::iterator_category is valid and denotes a type
+
+     // [...]
+
+     constexpr I base() const & requires copy_constructible<I>;
+     constexpr I base() &&;
+     constexpr iter_difference_t<I> count() const noexcept;
+     constexpr decltype(auto) operator*();
+     constexpr decltype(auto) operator*() const
+       requires dereferenceable<const I>;
+
++    constexpr auto operator->() const noexcept
++      requires contiguous_iterator<I>;
+
+     // [...]
+   };
+ }
+```
+
+- Strike the `incrementable_traits<counted_iterator<I>>` specialization in
+  [counted.iterator]{.sref} as unnecessary:
+
+::: rm
+```cpp
+  template<class I>
+  struct incrementable_traits<counted_iterator<I>> {
+    using difference_type = iter_difference_t<I>;
+  };
+```
+:::
+
+- Add the following to [counted.iter.elem]{.sref}:
+
+::: add
+
+::: itemdecl
+
+```c++
+constexpr auto operator->() const noexcept
+  requires contiguous_iterator<I>;
+```
+
+[?]{.pnum} _Effects_: Equivalent to: `return to_address(current);`
+
+:::
+
+:::
 :::
