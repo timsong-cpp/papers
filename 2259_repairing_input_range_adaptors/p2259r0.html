@@ -5,7 +5,7 @@
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <meta name="dcterms.date" content="2020-11-19" />
-  <title>Repairing input range adaptors and </title>
+  <title>Repairing input range adaptors and counted_iterator</title>
   <style>
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
@@ -529,7 +529,7 @@ blockquote { background-color: #f6f8fa; }
 <table style="border:none;float:right">
   <tr>
     <td>Document #:</td>
-    <td>D2259R0</td>
+    <td>P2259R0</td>
   </tr>
   <tr>
     <td>Date:</td>
@@ -555,6 +555,27 @@ blockquote { background-color: #f6f8fa; }
 
 </header>
 <div style="clear:both">
+<div id="TOC" role="doc-toc">
+<h1 id="toctitle">Contents</h1>
+<ul>
+<li><a href="#abstract"><span class="toc-section-number">1</span> Abstract<span></span></a></li>
+<li><a href="#the-problem-with-iterator_category"><span class="toc-section-number">2</span> The problem with <code class="sourceCode cpp">iterator_category</code><span></span></a>
+<ul>
+<li><a href="#the-fix"><span class="toc-section-number">2.1</span> The fix<span></span></a></li>
+</ul></li>
+<li><a href="#counted_iterator-woes"><span class="toc-section-number">3</span> <code class="sourceCode cpp">counted_iterator</code> woes<span></span></a>
+<ul>
+<li><a href="#fixing-counted_iterator"><span class="toc-section-number">3.1</span> Fixing <code class="sourceCode cpp">counted_iterator</code><span></span></a></li>
+</ul></li>
+<li><a href="#implementation-experience"><span class="toc-section-number">4</span> Implementation experience<span></span></a></li>
+<li><a href="#wording"><span class="toc-section-number">5</span> Wording<span></span></a>
+<ul>
+<li><a href="#iterator_category"><span class="toc-section-number">5.1</span> <code class="sourceCode cpp">iterator_category</code><span></span></a></li>
+<li><a href="#counted_iterator"><span class="toc-section-number">5.2</span> <code class="sourceCode cpp">counted_iterator</code><span></span></a></li>
+</ul></li>
+<li><a href="#bibliography"><span class="toc-section-number">6</span> References<span></span></a></li>
+</ul>
+</div>
 <h1 data-number="1" style="border-bottom:1px solid #cccccc" id="abstract"><span class="header-section-number">1</span> Abstract<a href="#abstract" class="self-link"></a></h1>
 <p>This paper proposes fixes for several issues with <code class="sourceCode cpp">iterator_category</code> for range and iterator adaptors. This resolves <span class="citation" data-cites="LWG3283">[<a href="#ref-LWG3283" role="doc-biblioref">LWG3283</a>]</span>, <span class="citation" data-cites="LWG3289">[<a href="#ref-LWG3289" role="doc-biblioref">LWG3289</a>]</span>, and <span class="citation" data-cites="LWG3408">[<a href="#ref-LWG3408" role="doc-biblioref">LWG3408</a>]</span>.</p>
 <h1 data-number="2" style="border-bottom:1px solid #cccccc" id="the-problem-with-iterator_category"><span class="header-section-number">2</span> The problem with <code class="sourceCode cpp">iterator_category</code><a href="#the-problem-with-iterator_category" class="self-link"></a></h1>
@@ -596,18 +617,18 @@ blockquote { background-color: #f6f8fa; }
 <li>When explicitly or partially specialized, it serves as the non-intrusive customization point for iterators that takes precedence over member types. In particular, if <code class="sourceCode cpp">iterator_concept</code> is not defined, then we use <code class="sourceCode cpp">iterator_category</code> to cap the type’s C++20-iterator-ness.</li>
 </ol>
 <p>The problem with the <code class="sourceCode cpp">iterator_traits</code> partial specialization above is that it takes an <code class="sourceCode cpp">iterator_traits</code> being used for (1) and uses its contents for case (2). In the <span class="citation" data-cites="LWG3408">[<a href="#ref-LWG3408" role="doc-biblioref">LWG3408</a>]</span> example, <code class="sourceCode cpp">iota_view<span class="op">&lt;...&gt;::</span>iterator</code> properly reported that it is a <em>C++17</em> input iterator, but the <code class="sourceCode cpp">counted_iterator</code> specialization means that we took that as saying that <code class="sourceCode cpp">counted_iterator<span class="op">&lt;</span>iota_view<span class="op">&lt;...&gt;::</span>iterator<span class="op">&gt;</span></code> is only a <em>C++20</em> input iterator.</p>
-<p>Moreover, <code class="sourceCode cpp">counted_iterator</code> fails to handle wrapping <code class="sourceCode cpp">contiguous_iterator</code>s correctly: by inheriting from an <code class="sourceCode cpp">iterator_traits</code> specialization, can inherit the <code class="sourceCode cpp">contiguous_iterator_tag</code> opt-in (e.g., for pointers), but it neither defines <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">-&gt;</span></code> nor <code class="sourceCode cpp">pointer_traits<span class="op">::</span>to_address</code>, so <code class="sourceCode cpp">std<span class="op">::</span>to_address<span class="op">(</span>ci<span class="op">)</span></code> is ill-formed, and the error happens outside the immediate context. As a result, even asking the question is ill-formed.</p>
+<p>Moreover, <code class="sourceCode cpp">counted_iterator</code> fails to handle wrapping <code class="sourceCode cpp">contiguous_iterator</code>s correctly: by inheriting from an <code class="sourceCode cpp">iterator_traits</code> specialization, it can inherit the <code class="sourceCode cpp">contiguous_iterator_tag</code> opt-in (e.g., for pointers), but it neither defines <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">-&gt;</span></code> nor <code class="sourceCode cpp">pointer_traits<span class="op">::</span>to_address</code>, so <code class="sourceCode cpp">std<span class="op">::</span>to_address<span class="op">(</span>ci<span class="op">)</span></code> is ill-formed, and that function template uses a deduced return type, so the error happens outside the immediate context. As a result, even asking the question is ill-formed.</p>
 <h2 data-number="3.1" id="fixing-counted_iterator"><span class="header-section-number">3.1</span> Fixing <code class="sourceCode cpp">counted_iterator</code><a href="#fixing-counted_iterator" class="self-link"></a></h2>
 <p>This paper proposes fixing <code class="sourceCode cpp">counted_iterator</code> as follows:</p>
 <ul>
 <li>Constrain the <code class="sourceCode cpp">iterator_traits</code> specialization so that it is only used when <code class="sourceCode cpp">iterator_traits<span class="op">&lt;</span>I<span class="op">&gt;</span></code> is not generated from the primary template. In other words, only provide the specialization for case (2) when we are already there.</li>
-<li>Provide <code class="sourceCode cpp">value_type</code> and <code class="sourceCode cpp">difference_type</code> member typedefs, because they are needed when there’s no <code class="sourceCode cpp">iterator_traits</code> specialization.</li>
+<li>Provide <code class="sourceCode cpp">value_type</code> and <code class="sourceCode cpp">difference_type</code> member typedefs, as this is the usual way to providing these types in C++20 when there is no <code class="sourceCode cpp">iterator_traits</code> specialization.</li>
 <li>Remove the <code class="sourceCode cpp">incrementable_traits</code> specialization, since that doesn’t add anything when we are defining a <code class="sourceCode cpp">difference_type</code> member.</li>
-<li>Provide member <code class="sourceCode cpp">iterator_concept</code> and <code class="sourceCode cpp">iterator_category</code> when the wrapped iterator type provides them, to honor its opt-in and opt-outs.</li>
-<li>Provide member <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">-&gt;</span></code> if the wrapped iterator is contiguous, so that <code class="sourceCode cpp">std<span class="op">::</span>to_address</code> works and enable <code class="sourceCode cpp">counted_iterator</code> to be contiguous itself if the wrapped iterator is also contiguous. The definition of <code class="sourceCode cpp">pointer</code> in the <code class="sourceCode cpp">iterator_traits</code> specialization needs to be adjusted accordingly.</li>
+<li>Provide member <code class="sourceCode cpp">iterator_concept</code> and <code class="sourceCode cpp">iterator_category</code> when the wrapped iterator type provides them, to honor its opt-in/opt-outs.</li>
+<li>Provide member <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">-&gt;</span></code> if the wrapped iterator is contiguous, so that <code class="sourceCode cpp">std<span class="op">::</span>to_address</code> works and allows <code class="sourceCode cpp">counted_iterator</code> to be contiguous itself if the wrapped iterator is also contiguous. The definition of <code class="sourceCode cpp">pointer</code> in the <code class="sourceCode cpp">iterator_traits</code> specialization needs to be adjusted accordingly.</li>
 </ul>
 <h1 data-number="4" style="border-bottom:1px solid #cccccc" id="implementation-experience"><span class="header-section-number">4</span> Implementation experience<a href="#implementation-experience" class="self-link"></a></h1>
-<p>The wording in this paper has been implemented atop current libstdc++ trunk and passes all existing tests, and has been confirmed to fix the examples given above.</p>
+<p>The wording in this paper has been implemented atop current libstdc++ master and passes all existing tests, and has been confirmed to fix the examples given above.</p>
 <h1 data-number="5" style="border-bottom:1px solid #cccccc" id="wording"><span class="header-section-number">5</span> Wording<a href="#wording" class="self-link"></a></h1>
 <p>This wording is relative to <span class="citation" data-cites="N4868">[<a href="#ref-N4868" role="doc-biblioref">N4868</a>]</span>.</p>
 <h2 data-number="5.1" id="iterator_category"><span class="header-section-number">5.1</span> <code class="sourceCode cpp">iterator_category</code><a href="#iterator_category" class="self-link"></a></h2>
@@ -976,26 +997,28 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb19-3"><a href="#cb19-3"></a>   class counted_iterator {</span>
 <span id="cb19-4"><a href="#cb19-4"></a>   public:</span>
 <span id="cb19-5"><a href="#cb19-5"></a>     using iterator_type = I;</span>
-<span id="cb19-6"><a href="#cb19-6"></a><span class="va">+    using value_type = iter_value_t&lt;I&gt;;           // present only if I models indirectly_readable</span></span>
+<span id="cb19-6"><a href="#cb19-6"></a><span class="va">+    using value_type = iter_value_t&lt;I&gt;;                       // present only if I models indirectly_readable</span></span>
 <span id="cb19-7"><a href="#cb19-7"></a><span class="va">+    using difference_type = iter_difference_t&lt;I&gt;;</span></span>
-<span id="cb19-8"><a href="#cb19-8"></a><span class="va">+    using iterator_concept = typename I::iterator_concept;   // present only if the <em>qualified-id</em> I::iterator_concept is valid and denotes a type</span></span>
-<span id="cb19-9"><a href="#cb19-9"></a><span class="va">+    using iterator_category = typename I::iterator_category;  // present only if the <em>qualified-id</em> I::iterator_category is valid and denotes a type</span></span>
-<span id="cb19-10"><a href="#cb19-10"></a></span>
-<span id="cb19-11"><a href="#cb19-11"></a>     // [...]</span>
+<span id="cb19-8"><a href="#cb19-8"></a><span class="va">+    using iterator_concept = typename I::iterator_concept;    // present only if the <em>qualified-id</em></span></span>
+<span id="cb19-9"><a href="#cb19-9"></a><span class="va">+                                                              // I::iterator_concept is valid and denotes a type</span></span>
+<span id="cb19-10"><a href="#cb19-10"></a><span class="va">+    using iterator_category = typename I::iterator_category;  // present only if the <em>qualified-id</em></span></span>
+<span id="cb19-11"><a href="#cb19-11"></a><span class="va">+                                                              // I::iterator_category is valid and denotes a type</span></span>
 <span id="cb19-12"><a href="#cb19-12"></a></span>
-<span id="cb19-13"><a href="#cb19-13"></a>     constexpr I base() const &amp; requires copy_constructible&lt;I&gt;;</span>
-<span id="cb19-14"><a href="#cb19-14"></a>     constexpr I base() &amp;&amp;;</span>
-<span id="cb19-15"><a href="#cb19-15"></a>     constexpr iter_difference_t&lt;I&gt; count() const noexcept;</span>
-<span id="cb19-16"><a href="#cb19-16"></a>     constexpr decltype(auto) operator*();</span>
-<span id="cb19-17"><a href="#cb19-17"></a>     constexpr decltype(auto) operator*() const</span>
-<span id="cb19-18"><a href="#cb19-18"></a>       requires dereferenceable&lt;const I&gt;;</span>
-<span id="cb19-19"><a href="#cb19-19"></a></span>
-<span id="cb19-20"><a href="#cb19-20"></a><span class="va">+    constexpr auto operator-&gt;() const noexcept</span></span>
-<span id="cb19-21"><a href="#cb19-21"></a><span class="va">+      requires contiguous_iterator&lt;I&gt;;</span></span>
-<span id="cb19-22"><a href="#cb19-22"></a></span>
-<span id="cb19-23"><a href="#cb19-23"></a>     // [...]</span>
-<span id="cb19-24"><a href="#cb19-24"></a>   };</span>
-<span id="cb19-25"><a href="#cb19-25"></a> }</span></code></pre></div>
+<span id="cb19-13"><a href="#cb19-13"></a>     // [...]</span>
+<span id="cb19-14"><a href="#cb19-14"></a></span>
+<span id="cb19-15"><a href="#cb19-15"></a>     constexpr I base() const &amp; requires copy_constructible&lt;I&gt;;</span>
+<span id="cb19-16"><a href="#cb19-16"></a>     constexpr I base() &amp;&amp;;</span>
+<span id="cb19-17"><a href="#cb19-17"></a>     constexpr iter_difference_t&lt;I&gt; count() const noexcept;</span>
+<span id="cb19-18"><a href="#cb19-18"></a>     constexpr decltype(auto) operator*();</span>
+<span id="cb19-19"><a href="#cb19-19"></a>     constexpr decltype(auto) operator*() const</span>
+<span id="cb19-20"><a href="#cb19-20"></a>       requires dereferenceable&lt;const I&gt;;</span>
+<span id="cb19-21"><a href="#cb19-21"></a></span>
+<span id="cb19-22"><a href="#cb19-22"></a><span class="va">+    constexpr auto operator-&gt;() const noexcept</span></span>
+<span id="cb19-23"><a href="#cb19-23"></a><span class="va">+      requires contiguous_iterator&lt;I&gt;;</span></span>
+<span id="cb19-24"><a href="#cb19-24"></a></span>
+<span id="cb19-25"><a href="#cb19-25"></a>     // [...]</span>
+<span id="cb19-26"><a href="#cb19-26"></a>   };</span>
+<span id="cb19-27"><a href="#cb19-27"></a> }</span></code></pre></div>
 </div>
 </blockquote>
 <ol start="4" type="1">

@@ -1,13 +1,13 @@
 ---
 title: Repairing input range adaptors and `counted_iterator`
-document: D2259R0
+document: P2259R0
 date: today
 audience:
   - LWG
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
-toc: false
+toc: true
 ---
 
 # Abstract
@@ -135,11 +135,12 @@ took that as saying that `counted_iterator<iota_view<...>::iterator>` is only a
 _C++20_ input iterator.
 
 Moreover, `counted_iterator` fails to handle wrapping `contiguous_iterator`s
-correctly: by inheriting from an `iterator_traits` specialization,
-can inherit the `contiguous_iterator_tag` opt-in (e.g., for pointers), but
-it neither defines `operator->` nor `pointer_traits::to_address`,
-so `std::to_address(ci)` is ill-formed, and the error happens outside the immediate
-context. As a result, even asking the question is ill-formed.
+correctly: by inheriting from an `iterator_traits` specialization, it can
+inherit the `contiguous_iterator_tag` opt-in (e.g., for pointers), but it neither
+defines `operator->` nor `pointer_traits::to_address`, so `std::to_address(ci)`
+is ill-formed, and that function template uses a deduced return type, so the
+error happens outside the immediate context. As a result, even asking the
+question is ill-formed.
 
 ## Fixing `counted_iterator`
 
@@ -148,20 +149,21 @@ This paper proposes fixing `counted_iterator` as follows:
 - Constrain the `iterator_traits` specialization so that it is only used when
   `iterator_traits<I>` is not generated from the primary template. In other words,
   only provide the specialization for case (2) when we are already there.
-- Provide `value_type` and `difference_type` member typedefs, because they are
-  needed when there's no `iterator_traits` specialization.
+- Provide `value_type` and `difference_type` member typedefs, as this is the
+  usual way to providing these types in C++20 when there is no `iterator_traits`
+  specialization.
 - Remove the `incrementable_traits` specialization, since that doesn't add
   anything when we are defining a `difference_type` member.
 - Provide member `iterator_concept` and `iterator_category` when the wrapped
-  iterator type provides them, to honor its opt-in and opt-outs.
+  iterator type provides them, to honor its opt-in/opt-outs.
 - Provide member `operator->` if the wrapped iterator is contiguous, so
-  that `std::to_address` works and enable `counted_iterator` to be contiguous
+  that `std::to_address` works and allows `counted_iterator` to be contiguous
   itself if the wrapped iterator is also contiguous. The definition of `pointer`
   in the `iterator_traits` specialization needs to be adjusted accordingly.
 
 # Implementation experience
 
-The wording in this paper has been implemented atop current libstdc++ trunk
+The wording in this paper has been implemented atop current libstdc++ master
 and passes all existing tests, and has been confirmed to fix the examples given
 above.
 
@@ -606,10 +608,12 @@ namespace std {
    class counted_iterator {
    public:
      using iterator_type = I;
-+    using value_type = iter_value_t<I>;           // present only if I models indirectly_readable
++    using value_type = iter_value_t<I>;                       // present only if I models indirectly_readable
 +    using difference_type = iter_difference_t<I>;
-+    using iterator_concept = typename I::iterator_concept;   // present only if the @_qualified-id_@ I::iterator_concept is valid and denotes a type
-+    using iterator_category = typename I::iterator_category;  // present only if the @_qualified-id_@ I::iterator_category is valid and denotes a type
++    using iterator_concept = typename I::iterator_concept;    // present only if the @_qualified-id_@
++                                                              // I::iterator_concept is valid and denotes a type
++    using iterator_category = typename I::iterator_category;  // present only if the @_qualified-id_@
++                                                              // I::iterator_category is valid and denotes a type
 
      // [...]
 
