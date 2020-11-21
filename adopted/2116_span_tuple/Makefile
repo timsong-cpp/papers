@@ -1,2 +1,3 @@
-p2255r0.html : reference_temporary.md
+p2116r0.html : span_tuple.md
+
 include $(shell git rev-parse --show-toplevel)/md/mpark-wg21.mk

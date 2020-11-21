@@ -13,7 +13,9 @@ else
 full_index := --bibliography $(DATADIR)/index.yaml
 endif
 
+EXTRA_ARGS ?=
+
 %.html : $(DEPS)
 	$(PANDOC) \
     --bibliography $(THIS_DIR)wg21_fmt.yaml \
-	$(full_index)
+	$(full_index) $(EXTRA_ARGS)
