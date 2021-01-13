@@ -1,6 +1,6 @@
 ---
 title: Repairing input range adaptors and `counted_iterator`
-document: P2259R0
+document: P2259R1
 date: today
 audience:
   - LWG
@@ -13,6 +13,11 @@ toc: true
 # Abstract
 This paper proposes fixes for several issues with `iterator_category` for range
 and iterator adaptors. This resolves [@LWG3283], [@LWG3289], and [@LWG3408].
+
+# Revision history
+
+- R1: Corrected `iterator_category` definition for `elements_view::@_iterator_@`
+      and added `iterator_concept`.
 
 # The problem with `iterator_category`
 
@@ -542,6 +547,7 @@ namespace std::ranges {
 
     iterator_t<@_Base_@> current_ = iterator_t<@_Base_@>();
   public:
+    @[using iterator_concept = _see below_;]{.diffins}@
     using iterator_category = @[typename iterator_traits<iterator_t<_Base_>>::iterator_category]{.diffdel}[_see below_]{.diffins};  [// not always present]{.diffins}@
     using value_type = remove_cvref_t<tuple_element_t<N, range_value_t<@_Base_@>>>;
     using difference_type = range_difference_t<@_Base_@>;
@@ -552,12 +558,20 @@ namespace std::ranges {
 ```
 
 ::: add
+[?]{.pnum} The member _typedef-name_ `iterator_concept` is defined as follows:
+
+- [?.1]{.pnum} If `V` models `random_access_range`, then `iterator_concept` denotes `random_access_iterator_tag`.
+- [?.2]{.pnum} Otherwise, if `V` models `bidirectional_range`, then `iterator_concept` denotes `bidirectional_iterator_tag`.
+- [?.3]{.pnum} Otherwise, if `V` models `forward_range`, then `iterator_concept` denotes `forward_iterator_tag`.
+- [?.4]{.pnum} Otherwise, `iterator_concept` denotes `input_iterator_tag`.
 
 [?]{.pnum} The member _typedef-name_ `iterator_category` is defined if and only
-if _`Base`_ models `forward_range`. In that case, `iterator_category` denotes:
+if _`Base`_ models `forward_range`. In that case, `iterator_category` is defined as follows:
+Let `C` denote the type `iterator_traits<iterator_t<@_Base_@>>::iterator_category`.
 
-- [?.1]{.pnum} `input_iterator_tag` if `get<N>(*@*current_*@)` is an rvalue;
-- [?.2]{.pnum} otherwise, `iterator_traits<iterator_t<@_Base_@>>::iterator_category`.
+- [?.1]{.pnum} If `get<N>(*@*current_*@)` is an rvalue, `iterator_category` denotes `input_iterator_tag`.
+- [?.2]{.pnum} Otherwise, if `C` models `derived_from<random_access_iterator_tag>`, `iterator_category` denotes `random_access_iterator_tag`.
+- [?.3]{.pnum} Otherwise, `iterator_category` denotes `C`.
 :::
 
 :::
