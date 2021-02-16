@@ -210,9 +210,10 @@ This wording is relative to [@N4868].
 _`VAL<T>`_ for some type _`T`_ be an expression defined as follows:
 
 - [?.1]{.pnum} If _`T`_ is a reference or function type, _`VAL<T>`_ is an
-  expression with the same type and value category as `declval<@_T_@>()`.
+  expression with the same type and value category as `declval<@_T_@>()`. <!-- Can make this "referenceable function type", but doesn't super matter -->
 - [?.2]{.pnum} Otherwise, _`VAL<T>`_ is a prvalue that initially has type _`T`_. [If _`T`_ is
   cv-qualified, the cv-qualification is subject to adjustment ([expr.type]{.sref}).]{.note}
+<!-- Why not declval<T(&)()>()()? Because that doesn't work for array or function types.-->
 
 :::
 
