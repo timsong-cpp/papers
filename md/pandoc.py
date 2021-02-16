@@ -77,12 +77,18 @@ def wordinglist(elem, doc):
     The lists are converted into ordered lists and adjusted to have continuous
     numbering.
 
+    "wordinglist" accepts both ordered and bullet lists as delimiters.
+    "jwordinglist" accepts only ordered lists.
     """
 
     if not isinstance(elem, pf.Div):
         return None
 
-    if not 'wordinglist' in elem.classes:
+    recognizeBullets = False
+
+    if 'wordinglist' in elem.classes:
+        recognizeBullets = True
+    elif not 'jwordinglist' in elem.classes:
         return None
 
     content = []
@@ -90,7 +96,7 @@ def wordinglist(elem, doc):
     current_start = 1
 
     for e in elem.content:
-        if isinstance(e, pf.BulletList) or isinstance(e, pf.OrderedList):
+        if (recognizeBullets and isinstance(e, pf.BulletList)) or isinstance(e, pf.OrderedList):
             if current_bq:
                 content.append(pf.BlockQuote(*current_bq))
                 current_bq = []
