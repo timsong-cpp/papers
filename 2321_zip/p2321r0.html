@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2021-02-16" />
+  <meta name="dcterms.date" content="2021-02-18" />
   <title>zip</title>
   <style>
       code{white-space: pre-wrap;}
@@ -533,7 +533,7 @@ blockquote { background-color: #f6f8fa; }
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2021-02-16</td>
+    <td>2021-02-18</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -569,6 +569,14 @@ blockquote { background-color: #f6f8fa; }
 <li><a href="#zipping-nothing"><span class="toc-section-number">2.2.3</span> Zipping nothing?<span></span></a></li>
 <li><a href="#when-is-zip_view-a-common_range"><span class="toc-section-number">2.2.4</span> When is <code class="sourceCode cpp">zip_view</code> a <code class="sourceCode cpp">common_range</code>?<span></span></a></li>
 </ul></li>
+<li><a href="#adjacent-and-adjacent_transform"><span class="toc-section-number">2.3</span> <code class="sourceCode cpp">adjacent</code> and <code class="sourceCode cpp">adjacent_transform</code><span></span></a>
+<ul>
+<li><a href="#naming"><span class="toc-section-number">2.3.1</span> Naming<span></span></a></li>
+<li><a href="#value-type"><span class="toc-section-number">2.3.2</span> Value type<span></span></a></li>
+<li><a href="#common_range"><span class="toc-section-number">2.3.3</span> <code class="sourceCode cpp">common_range</code><span></span></a></li>
+<li><a href="#no-input-ranges"><span class="toc-section-number">2.3.4</span> No input ranges<span></span></a></li>
+<li><a href="#iter_swap"><span class="toc-section-number">2.3.5</span> <code class="sourceCode cpp">iter_swap</code><span></span></a></li>
+</ul></li>
 </ul></li>
 <li><a href="#wording"><span class="toc-section-number">3</span> Wording<span></span></a>
 <ul>
@@ -584,6 +592,14 @@ blockquote { background-color: #f6f8fa; }
 <ul>
 <li><a href="#zip-transform-view-range.zip.transform">24.7.? Zip transform view [range.zip.transform]<span></span></a></li>
 </ul></li>
+<li><a href="#adjacent"><span class="toc-section-number">3.7</span> <code class="sourceCode cpp">adjacent</code><span></span></a>
+<ul>
+<li><a href="#adjacent-view-range.adjacent">24.7.? Adjacent view [range.adjacent]<span></span></a></li>
+</ul></li>
+<li><a href="#adjacent_transform"><span class="toc-section-number">3.8</span> <code class="sourceCode cpp">adjacent_transform</code><span></span></a>
+<ul>
+<li><a href="#adjacent-transform-view-range.adjacent.transform">24.7.? Adjacent transform view [range.adjacent.transform]<span></span></a></li>
+</ul></li>
 </ul></li>
 <li><a href="#bibliography"><span class="toc-section-number">4</span> References<span></span></a></li>
 </ul>
@@ -591,13 +607,13 @@ blockquote { background-color: #f6f8fa; }
 <h1 data-number="1" style="border-bottom:1px solid #cccccc" id="abstract"><span class="header-section-number">1</span> Abstract<a href="#abstract" class="self-link"></a></h1>
 <p>This paper proposes</p>
 <ul>
-<li>two views, <code class="sourceCode cpp">zip</code> and <code class="sourceCode cpp">zip_transform</code>,</li>
-<li>changes to <code class="sourceCode cpp">tuple</code> and <code class="sourceCode cpp">pair</code> necessary to make them usable as proxy references (necessary for <code class="sourceCode cpp">zip</code>), and</li>
+<li>four views, <code class="sourceCode cpp">zip</code>, <code class="sourceCode cpp">zip_transform</code>, <code class="sourceCode cpp">adjacent</code>, and <code class="sourceCode cpp">adjacent_transform</code>,</li>
+<li>changes to <code class="sourceCode cpp">tuple</code> and <code class="sourceCode cpp">pair</code> necessary to make them usable as proxy references (necessary for <code class="sourceCode cpp">zip</code> and <code class="sourceCode cpp">adjacent</code>), and</li>
 <li>changes to <code class="sourceCode cpp">vector<span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;::</span>reference</code> to make it usable as a proxy reference for writing,</li>
 </ul>
 <p>all as described in section 3.2 of <span class="citation" data-cites="P2214R0">[<a href="#ref-P2214R0" role="doc-biblioref">P2214R0</a>]</span>.</p>
 <h1 data-number="2" style="border-bottom:1px solid #cccccc" id="discussion"><span class="header-section-number">2</span> Discussion<a href="#discussion" class="self-link"></a></h1>
-<p>The proposed wording below generally follows the design described in section 3.2 of <span class="citation" data-cites="P2214R0">[<a href="#ref-P2214R0" role="doc-biblioref">P2214R0</a>]</span>, and the discussion in this paper assumes familiarity with that paper. This section focuses on deviations from and additions to that paper, as well as certain details in the design of <code class="sourceCode cpp">zip</code> that should be called out.</p>
+<p>The proposed wording below generally follows the design described in section 3.2 of <span class="citation" data-cites="P2214R0">[<a href="#ref-P2214R0" role="doc-biblioref">P2214R0</a>]</span>, and the discussion in this paper assumes familiarity with that paper. This section focuses on deviations from and additions to that paper, as well as certain details in the design of the views that should be called out.</p>
 <h2 data-number="2.1" id="proxy-reference-changes"><span class="header-section-number">2.1</span> Proxy reference changes<a href="#proxy-reference-changes" class="self-link"></a></h2>
 <p>The basic rationale for changes to <code class="sourceCode cpp">tuple</code> and <code class="sourceCode cpp">pair</code> are described in exhaustive detail in <span class="citation" data-cites="P2214R0">[<a href="#ref-P2214R0" role="doc-biblioref">P2214R0</a>]</span> sections 3.2.1 and 3.2.2 and will not be repeated here. Several additions are worth noting:</p>
 <ul>
@@ -644,6 +660,18 @@ blockquote { background-color: #f6f8fa; }
 <li>Every range is either random-access and sized, or random-access and infinite, and at least one range is sized.</li>
 </ul>
 <p>The standard, however, generally does not recognize infinite ranges (despite providing <code class="sourceCode cpp">unreachable_sentinel</code>). It goes without saying that a complete design for infinite ranges support is outside the scope of this paper.</p>
+<h2 data-number="2.3" id="adjacent-and-adjacent_transform"><span class="header-section-number">2.3</span> <code class="sourceCode cpp">adjacent</code> and <code class="sourceCode cpp">adjacent_transform</code><a href="#adjacent-and-adjacent_transform" class="self-link"></a></h2>
+<p>As <code class="sourceCode cpp">adjacent</code> is a specialized version of <code class="sourceCode cpp">zip</code>, most of the discussion in above applies, <em>mutatis mutandis</em>, to <code class="sourceCode cpp">adjacent</code> as well, and will not be repeated here.</p>
+<h3 data-number="2.3.1" id="naming"><span class="header-section-number">2.3.1</span> Naming<a href="#naming" class="self-link"></a></h3>
+<p>The wording below tentatively uses <code class="sourceCode cpp">adjacent</code> for the general functionality, and <code class="sourceCode cpp">pairwise</code> for the <code class="sourceCode cpp">N <span class="op">==</span> <span class="dv">2</span></code> case. <span class="citation" data-cites="P2214R0">[<a href="#ref-P2214R0" role="doc-biblioref">P2214R0</a>]</span> section 3.2.5 suggests an alternative (<code class="sourceCode cpp">slide_as_tuple</code> for the general functionality and <code class="sourceCode cpp">adjacent</code> for the <code class="sourceCode cpp">N <span class="op">==</span> <span class="dv">2</span></code> case). The author has a mild preference for the current names due to the somewhat unwieldiness of the name <code class="sourceCode cpp">slide_as_tuple</code>.</p>
+<h3 data-number="2.3.2" id="value-type"><span class="header-section-number">2.3.2</span> Value type<a href="#value-type" class="self-link"></a></h3>
+<p>The value type of <code class="sourceCode cpp">adjacent_view</code> is a homogeneous <code class="sourceCode cpp">tuple</code> or <code class="sourceCode cpp">pair</code>. Since <code class="sourceCode cpp">array</code> cannot hold references and is defined to be an aggregate, using it as the value type poses significant usability issues (even if we somehow get the <code class="sourceCode cpp">common_reference_with</code> requirements in <code class="sourceCode cpp">indirectly_readable</code> to work with even more <code class="sourceCode cpp">tuple</code>/<code class="sourceCode cpp">pair</code> changes).</p>
+<h3 data-number="2.3.3" id="common_range"><span class="header-section-number">2.3.3</span> <code class="sourceCode cpp">common_range</code><a href="#common_range" class="self-link"></a></h3>
+<p>One notable difference from <code class="sourceCode cpp">zip</code> is that since <code class="sourceCode cpp">adjacent</code> comes from a single underlying view, it can be a <code class="sourceCode cpp">common_range</code> whenever its underlying view is.</p>
+<h3 data-number="2.3.4" id="no-input-ranges"><span class="header-section-number">2.3.4</span> No input ranges<a href="#no-input-ranges" class="self-link"></a></h3>
+<p>Because <code class="sourceCode cpp">adjacent</code> by definition holds multiple iterators to the same view, it requires forward ranges. It is true that the <code class="sourceCode cpp">N <span class="op">==</span> <span class="dv">1</span></code> case could theoretically support input ranges, but that adds extra complexity and seems entirely pointless. Besides, someone desperate to wrap their input range in a single element <code class="sourceCode cpp">tuple</code> can just use <code class="sourceCode cpp">zip</code> instead.</p>
+<h3 data-number="2.3.5" id="iter_swap"><span class="header-section-number">2.3.5</span> <code class="sourceCode cpp">iter_swap</code><a href="#iter_swap" class="self-link"></a></h3>
+<p>Since the iterators of <code class="sourceCode cpp">adjacent_view</code> refer to potentially overlapping elements of the underlying view, <code class="sourceCode cpp">iter_swap</code> cannot really “exchange the values” of the range elements when the iterators overlap. However, it does not appear to be possible to disable <code class="sourceCode cpp">ranges<span class="op">::</span>iter_swap</code> (deleting or not providing <code class="sourceCode cpp">iter_swap</code> will simply fallback to the default implementation), and swapping non-overlapping iterators is still useful functionality. Thus, the wording below retains <code class="sourceCode cpp">iter_swap</code> but gives it a precondition that there is no overlap.</p>
 <h1 data-number="3" style="border-bottom:1px solid #cccccc" id="wording"><span class="header-section-number">3</span> Wording<a href="#wording" class="self-link"></a></h1>
 <p>This wording is relative to <span class="citation" data-cites="N4878">[<a href="#ref-N4878" role="doc-biblioref">N4878</a>]</span>.</p>
 <h2 data-number="3.1" id="tuple"><span class="header-section-number">3.1</span> <code class="sourceCode cpp">tuple</code><a href="#tuple" class="self-link"></a></h2>
@@ -1404,7 +1432,33 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb36-21"><a href="#cb36-21"></a>  <span class="kw">class</span> zip_transform_view;</span>
 <span id="cb36-22"><a href="#cb36-22"></a></span>
 <span id="cb36-23"><a href="#cb36-23"></a>  <span class="kw">namespace</span> views <span class="op">{</span> <span class="kw">inline</span> <span class="kw">constexpr</span> <em>unspecified</em> zip_transform <span class="op">=</span> <em>unspecified</em>; <span class="op">}</span></span>
-<span id="cb36-24"><a href="#cb36-24"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb36-24"><a href="#cb36-24"></a></span>
+<span id="cb36-25"><a href="#cb36-25"></a>  <span class="co">// [range.adjacent], adjacent view</span></span>
+<span id="cb36-26"><a href="#cb36-26"></a>  <span class="kw">template</span><span class="op">&lt;</span>forward_range V, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
+<span id="cb36-27"><a href="#cb36-27"></a>      <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>N <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb36-28"><a href="#cb36-28"></a>  <span class="kw">class</span> adjacent_view;</span>
+<span id="cb36-29"><a href="#cb36-29"></a></span>
+<span id="cb36-30"><a href="#cb36-30"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> V, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
+<span id="cb36-31"><a href="#cb36-31"></a>  <span class="kw">inline</span> <span class="kw">constexpr</span> <span class="dt">bool</span> enable_borrowed_range<span class="op">&lt;</span>adjacent_view<span class="op">&lt;</span>V, N<span class="op">&gt;&gt;</span></span>
+<span id="cb36-32"><a href="#cb36-32"></a>      <span class="op">=</span> enable_borrowed_range<span class="op">&lt;</span>V<span class="op">&gt;</span>;</span>
+<span id="cb36-33"><a href="#cb36-33"></a></span>
+<span id="cb36-34"><a href="#cb36-34"></a>  <span class="kw">namespace</span> views <span class="op">{</span></span>
+<span id="cb36-35"><a href="#cb36-35"></a>    <span class="kw">template</span><span class="op">&lt;</span><span class="dt">size_t</span> N<span class="op">&gt;</span></span>
+<span id="cb36-36"><a href="#cb36-36"></a>    <span class="kw">inline</span> <span class="kw">constexpr</span> <em>unspecified</em> adjacent <span class="op">=</span> <em>unspecified</em>;</span>
+<span id="cb36-37"><a href="#cb36-37"></a>    <span class="kw">inline</span> <span class="kw">constexpr</span> <span class="kw">auto</span> pairwise <span class="op">=</span> adjacent<span class="op">&lt;</span><span class="dv">2</span><span class="op">&gt;</span>;</span>
+<span id="cb36-38"><a href="#cb36-38"></a>  <span class="op">}</span></span>
+<span id="cb36-39"><a href="#cb36-39"></a></span>
+<span id="cb36-40"><a href="#cb36-40"></a>  <span class="co">// [range.adjacent.transform], adjacent transform view</span></span>
+<span id="cb36-41"><a href="#cb36-41"></a>  <span class="kw">template</span><span class="op">&lt;</span>forward_range V, copy_constructible F, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
+<span id="cb36-42"><a href="#cb36-42"></a>    <span class="kw">requires</span> <em>see below</em></span>
+<span id="cb36-43"><a href="#cb36-43"></a>  <span class="kw">class</span> adjacent_transform_view;</span>
+<span id="cb36-44"><a href="#cb36-44"></a></span>
+<span id="cb36-45"><a href="#cb36-45"></a>  <span class="kw">namespace</span> views <span class="op">{</span></span>
+<span id="cb36-46"><a href="#cb36-46"></a>    <span class="kw">template</span><span class="op">&lt;</span><span class="dt">size_t</span> N<span class="op">&gt;</span></span>
+<span id="cb36-47"><a href="#cb36-47"></a>    <span class="kw">inline</span> <span class="kw">constexpr</span> <em>unspecified</em> adjacent_transform <span class="op">=</span> <em>unspecified</em>;</span>
+<span id="cb36-48"><a href="#cb36-48"></a>    <span class="kw">inline</span> <span class="kw">constexpr</span> <span class="kw">auto</span> pairwise_transform <span class="op">=</span> adjacent_transform<span class="op">&lt;</span><span class="dv">2</span><span class="op">&gt;</span>;</span>
+<span id="cb36-49"><a href="#cb36-49"></a>  <span class="op">}</span></span>
+<span id="cb36-50"><a href="#cb36-50"></a><span class="op">}</span></span></code></pre></div>
 <h2 data-number="3.5" id="zip"><span class="header-section-number">3.5</span> <code class="sourceCode cpp">zip</code><a href="#zip" class="self-link"></a></h2>
 <p>Add the following subclause to <span>24.7 <a href="https://wg21.link/range.adaptors">[range.adaptors]</a></span>.</p>
 <h3 class="unnumbered" data-number id="zip-view-range.zip">24.7.? Zip view [range.zip]<a href="#zip-view-range.zip" class="self-link"></a></h3>
@@ -1827,7 +1881,7 @@ blockquote { background-color: #f6f8fa; }
 <li><span class="marginalizedparent"><a class="marginalized">(2.1)</a></span> if <code class="sourceCode cpp">Es</code> is an empty pack, let <code class="sourceCode cpp">FD</code> be <code class="sourceCode cpp">decay_t<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">((</span>F<span class="op">))&gt;</span></code>.
 <ul>
 <li><span class="marginalizedparent"><a class="marginalized">(2.1.1)</a></span> if <code class="sourceCode cpp">copy_constructible<span class="op">&lt;</span>FD<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> regular_invocable<span class="op">&lt;</span>FD<span class="op">&amp;&gt;</span></code> is <code class="sourceCode cpp"><span class="kw">false</span></code>, <code class="sourceCode cpp">views<span class="op">::</span>zip_transform<span class="op">(</span>F, Es<span class="op">...)</span></code> is ill-formed.</li>
-<li><span class="marginalizedparent"><a class="marginalized">(2.1.2)</a></span> Otherwise, the expression <code class="sourceCode cpp">views<span class="op">::</span>zip_transform<span class="op">(</span>F, Es<span class="op">...)</span></code> is expression-equivalent to <code class="sourceCode cpp"><em>decay-copy</em><span class="op">(</span>views<span class="op">::</span>empty<span class="op">&lt;</span>decay_t<span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span>FD<span class="op">&amp;&gt;&gt;&gt;)</span></code>.</li>
+<li><span class="marginalizedparent"><a class="marginalized">(2.1.2)</a></span> Otherwise, the expression <code class="sourceCode cpp">views<span class="op">::</span>zip_transform<span class="op">(</span>F, Es<span class="op">...)</span></code> is expression-equivalent to <code class="sourceCode cpp"><span class="op">(</span><span class="dt">void</span><span class="op">)</span>F, <em>decay-copy</em><span class="op">(</span>views<span class="op">::</span>empty<span class="op">&lt;</span>decay_t<span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span>FD<span class="op">&amp;&gt;&gt;&gt;)</span></code>.</li>
 </ul></li>
 <li><span class="marginalizedparent"><a class="marginalized">(2.2)</a></span> Otherwise, the expression <code class="sourceCode cpp">views<span class="op">::</span>zip_transform<span class="op">(</span>F, Es<span class="op">...)</span></code> is expression-equivalent to<code class="sourceCode cpp">zip_transform_view<span class="op">(</span>F, Es<span class="op">...)</span></code>.</li>
 </ul>
@@ -1912,7 +1966,7 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb81-6"><a href="#cb81-6"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
 <span id="cb81-7"><a href="#cb81-7"></a>  <span class="kw">class</span> zip_transform_view<span class="op">&lt;</span>F, Views<span class="op">...&gt;::</span><em>iterator</em> <span class="op">{</span></span>
 <span id="cb81-8"><a href="#cb81-8"></a>    <span class="kw">using</span> <em>Parent</em> <span class="op">=</span> <em>maybe-const</em><span class="op">&lt;</span>Const, zip_transform_view<span class="op">&gt;</span>;      <span class="co">// exposition only</span></span>
-<span id="cb81-9"><a href="#cb81-9"></a>    <span class="kw">using</span> Base <span class="op">=</span> <em>maybe-const</em><span class="op">&lt;</span>Const, <em>InnerView</em><span class="op">&gt;</span>;                 <span class="co">// exposition only</span></span>
+<span id="cb81-9"><a href="#cb81-9"></a>    <span class="kw">using</span> <em>Base</em> <span class="op">=</span> <em>maybe-const</em><span class="op">&lt;</span>Const, <em>InnerView</em><span class="op">&gt;</span>;                 <span class="co">// exposition only</span></span>
 <span id="cb81-10"><a href="#cb81-10"></a>    <em>Parent</em><span class="op">*</span> parent <span class="op">=</span> <span class="kw">nullptr</span>;                                   <span class="co">// exposition only</span></span>
 <span id="cb81-11"><a href="#cb81-11"></a>    <em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span> <em>inner_</em>;                                    <span class="co">// exposition only</span></span>
 <span id="cb81-12"><a href="#cb81-12"></a></span>
@@ -1923,50 +1977,50 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb81-17"><a href="#cb81-17"></a>    <span class="kw">using</span> iterator_concept  <span class="op">=</span> <span class="kw">typename</span> <em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;::</span>iterator_concept;</span>
 <span id="cb81-18"><a href="#cb81-18"></a>    <span class="kw">using</span> value_type <span class="op">=</span></span>
 <span id="cb81-19"><a href="#cb81-19"></a>      remove_cvref_t<span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, F<span class="op">&gt;&amp;</span>, range_reference_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, Views<span class="op">&gt;&gt;...&gt;&gt;</span>;</span>
-<span id="cb81-20"><a href="#cb81-20"></a>    <span class="kw">using</span> difference_type <span class="op">=</span> range_difference_t<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb81-20"><a href="#cb81-20"></a>    <span class="kw">using</span> difference_type <span class="op">=</span> range_difference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb81-21"><a href="#cb81-21"></a></span>
 <span id="cb81-22"><a href="#cb81-22"></a>    <em>iterator</em><span class="op">()</span> <span class="op">=</span> <span class="cf">default</span>;</span>
 <span id="cb81-23"><a href="#cb81-23"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span><em>iterator</em><span class="op">&lt;!</span>Const<span class="op">&gt;</span> i<span class="op">)</span></span>
 <span id="cb81-24"><a href="#cb81-24"></a>      <span class="kw">requires</span> Const <span class="op">&amp;&amp;</span> convertible_to<span class="op">&lt;</span><em>ziperator</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;</span>, <em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span>
 <span id="cb81-25"><a href="#cb81-25"></a></span>
-<span id="cb81-26"><a href="#cb81-26"></a>    <span class="kw">constexpr</span> <span class="kw">decltype</span><span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="kw">operator</span><span class="op">*()</span> <span class="kw">const</span>;</span>
+<span id="cb81-26"><a href="#cb81-26"></a>    <span class="kw">constexpr</span> <span class="kw">decltype</span><span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="kw">operator</span><span class="op">*()</span> <span class="kw">const</span> <span class="kw">noexcept</span><span class="op">(</span><em>see below</em><span class="op">)</span>;</span>
 <span id="cb81-27"><a href="#cb81-27"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">++()</span>;</span>
 <span id="cb81-28"><a href="#cb81-28"></a>    <span class="kw">constexpr</span> <span class="dt">void</span> <span class="kw">operator</span><span class="op">++(</span><span class="dt">int</span><span class="op">)</span>;</span>
-<span id="cb81-29"><a href="#cb81-29"></a>    <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">++(</span><span class="dt">int</span><span class="op">)</span> <span class="kw">requires</span> forward_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb81-29"><a href="#cb81-29"></a>    <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">++(</span><span class="dt">int</span><span class="op">)</span> <span class="kw">requires</span> forward_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb81-30"><a href="#cb81-30"></a></span>
-<span id="cb81-31"><a href="#cb81-31"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">--()</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
-<span id="cb81-32"><a href="#cb81-32"></a>    <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">--(</span><span class="dt">int</span><span class="op">)</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb81-31"><a href="#cb81-31"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">--()</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb81-32"><a href="#cb81-32"></a>    <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">--(</span><span class="dt">int</span><span class="op">)</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb81-33"><a href="#cb81-33"></a></span>
-<span id="cb81-34"><a href="#cb81-34"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">+=(</span>difference_type x<span class="op">)</span> <span class="kw">requires</span> random_access_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
-<span id="cb81-35"><a href="#cb81-35"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">-=(</span>difference_type x<span class="op">)</span> <span class="kw">requires</span> random_access_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb81-34"><a href="#cb81-34"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">+=(</span>difference_type x<span class="op">)</span> <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb81-35"><a href="#cb81-35"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">-=(</span>difference_type x<span class="op">)</span> <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb81-36"><a href="#cb81-36"></a></span>
-<span id="cb81-37"><a href="#cb81-37"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">[](</span>difference_type n<span class="op">)</span> <span class="kw">const</span> <span class="kw">requires</span> random_access_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb81-37"><a href="#cb81-37"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">[](</span>difference_type n<span class="op">)</span> <span class="kw">const</span> <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb81-38"><a href="#cb81-38"></a></span>
 <span id="cb81-39"><a href="#cb81-39"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">==(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
 <span id="cb81-40"><a href="#cb81-40"></a>      <span class="kw">requires</span> equality_­comparable<span class="op">&lt;</span><em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span>
 <span id="cb81-41"><a href="#cb81-41"></a></span>
 <span id="cb81-42"><a href="#cb81-42"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&lt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
-<span id="cb81-43"><a href="#cb81-43"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb81-43"><a href="#cb81-43"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb81-44"><a href="#cb81-44"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&gt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
-<span id="cb81-45"><a href="#cb81-45"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb81-45"><a href="#cb81-45"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb81-46"><a href="#cb81-46"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&lt;=(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
-<span id="cb81-47"><a href="#cb81-47"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb81-47"><a href="#cb81-47"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb81-48"><a href="#cb81-48"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&gt;=(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
-<span id="cb81-49"><a href="#cb81-49"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb81-49"><a href="#cb81-49"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb81-50"><a href="#cb81-50"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">&lt;=&gt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
-<span id="cb81-51"><a href="#cb81-51"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span>Base<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> three_­way_­comparable<span class="op">&lt;</span><em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span>
+<span id="cb81-51"><a href="#cb81-51"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span> three_­way_­comparable<span class="op">&lt;</span><em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span>
 <span id="cb81-52"><a href="#cb81-52"></a></span>
 <span id="cb81-53"><a href="#cb81-53"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">+(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i, difference_type n<span class="op">)</span></span>
-<span id="cb81-54"><a href="#cb81-54"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb81-54"><a href="#cb81-54"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb81-55"><a href="#cb81-55"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">+(</span>difference_type n, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i<span class="op">)</span></span>
-<span id="cb81-56"><a href="#cb81-56"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb81-56"><a href="#cb81-56"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb81-57"><a href="#cb81-57"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, difference_type y<span class="op">)</span></span>
-<span id="cb81-58"><a href="#cb81-58"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb81-58"><a href="#cb81-58"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb81-59"><a href="#cb81-59"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> difference_type <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
 <span id="cb81-60"><a href="#cb81-60"></a>      <span class="kw">requires</span> sized_sentinel_for<span class="op">&lt;</span><em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span>, <em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span>
 <span id="cb81-61"><a href="#cb81-61"></a>  <span class="op">}</span>;</span>
 <span id="cb81-62"><a href="#cb81-62"></a><span class="op">}</span></span></code></pre></div>
-<p><span class="marginalizedparent"><a class="marginalized">1</a></span> The member <em>typedef-name</em> <code class="sourceCode cpp"><em>iterator</em><span class="op">::</span>iterator_category</code> is defined if and only if <code class="sourceCode cpp">Base</code> models <code class="sourceCode cpp">forward_range</code>. In that case, <code class="sourceCode cpp"><em>iterator</em><span class="op">::</span>iterator_category</code> is defined as follows:</p>
+<p><span class="marginalizedparent"><a class="marginalized">1</a></span> The member <em>typedef-name</em> <code class="sourceCode cpp"><em>iterator</em><span class="op">::</span>iterator_category</code> is defined if and only if <code class="sourceCode cpp"><em>Base</em></code> models <code class="sourceCode cpp">forward_range</code>. In that case, <code class="sourceCode cpp"><em>iterator</em><span class="op">::</span>iterator_category</code> is defined as follows:</p>
 <ul>
 <li>If <code class="sourceCode cpp">invoke_result_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, F<span class="op">&gt;&amp;</span>, range_reference_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, Views<span class="op">&gt;&gt;...&gt;</span></code> is not an lvalue reference, <code class="sourceCode cpp">iterator_category</code> denotes <code class="sourceCode cpp">input_iterator_tag</code>.</li>
 <li>Otherwise, let <code class="sourceCode cpp">Cs<span class="op">...</span></code> denote the pack of types <code class="sourceCode cpp">iterator_traits<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, Views<span class="op">&gt;&gt;&gt;::</span>iterator_category<span class="op">...</span></code>.
@@ -1987,7 +2041,7 @@ blockquote { background-color: #f6f8fa; }
 <blockquote>
 <p><span class="marginalizedparent"><a class="marginalized">3</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp"><em>parent_</em></code> with <code class="sourceCode cpp">i<span class="op">.</span><em>parent_</em></code> and <code class="sourceCode cpp"><em>inner_</em></code> with <code class="sourceCode cpp">std<span class="op">::</span>move<span class="op">(</span>i<span class="op">.</span><em>inner_</em><span class="op">)</span></code>.</p>
 </blockquote>
-<div class="sourceCode" id="cb84"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb84-1"><a href="#cb84-1"></a><span class="kw">constexpr</span> <span class="kw">decltype</span><span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="kw">operator</span><span class="op">*()</span> <span class="kw">const</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb84"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb84-1"><a href="#cb84-1"></a><span class="kw">constexpr</span> <span class="kw">decltype</span><span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="kw">operator</span><span class="op">*()</span> <span class="kw">const</span> <span class="kw">noexcept</span><span class="op">(</span><em>see below</em><span class="op">)</span>;</span></code></pre></div>
 <blockquote>
 <p><span class="marginalizedparent"><a class="marginalized">4</a></span> <em>Effects</em>: Equivalent to:</p>
 <blockquote>
@@ -1995,10 +2049,11 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb85-2"><a href="#cb85-2"></a>    <span class="cf">return</span> invoke<span class="op">(*</span><em>parent_</em><span class="op">-&gt;</span><em>fun_</em>, <span class="op">*</span>iters<span class="op">...)</span>;</span>
 <span id="cb85-3"><a href="#cb85-3"></a>  <span class="op">}</span>, <em>inner_</em><span class="op">.</span><em>current_</em><span class="op">)</span>;</span></code></pre></div>
 </blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">5</a></span> <em>Remarks:</em> The expression within <code class="sourceCode cpp"><span class="kw">noexcept</span></code> is equivalent to <code class="sourceCode cpp">is_nothrow_invocable_v<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, F<span class="op">&gt;&amp;</span>, range_reference_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, Views<span class="op">&gt;&gt;...&gt;</span></code>.</p>
 </blockquote>
 <div class="sourceCode" id="cb86"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb86-1"><a href="#cb86-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">++()</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">5</a></span> <em>Effects</em>: Equivalent to:</p>
+<p><span class="marginalizedparent"><a class="marginalized">6</a></span> <em>Effects</em>: Equivalent to:</p>
 <blockquote>
 <div class="sourceCode" id="cb87"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb87-1"><a href="#cb87-1"></a>  <span class="op">++</span><em>inner_</em>;</span>
 <span id="cb87-2"><a href="#cb87-2"></a>  <span class="cf">return</span> <span class="op">*</span><span class="kw">this</span>;</span></code></pre></div>
@@ -2006,28 +2061,28 @@ blockquote { background-color: #f6f8fa; }
 </blockquote>
 <div class="sourceCode" id="cb88"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb88-1"><a href="#cb88-1"></a><span class="kw">constexpr</span> <span class="dt">void</span> <span class="kw">operator</span><span class="op">++(</span><span class="dt">int</span><span class="op">)</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">6</a></span> <em>Effects</em>: Equivalent to <code class="sourceCode cpp"><span class="op">++*</span><span class="kw">this</span>;</code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized">7</a></span> <em>Effects</em>: Equivalent to <code class="sourceCode cpp"><span class="op">++*</span><span class="kw">this</span>;</code>.</p>
 </blockquote>
-<div class="sourceCode" id="cb89"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb89-1"><a href="#cb89-1"></a><span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">++(</span><span class="dt">int</span><span class="op">)</span> <span class="kw">requires</span> forward_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb89"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb89-1"><a href="#cb89-1"></a><span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">++(</span><span class="dt">int</span><span class="op">)</span> <span class="kw">requires</span> forward_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">7</a></span> <em>Effects</em>: Equivalent to:</p>
+<p><span class="marginalizedparent"><a class="marginalized">8</a></span> <em>Effects</em>: Equivalent to:</p>
 <blockquote>
 <div class="sourceCode" id="cb90"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb90-1"><a href="#cb90-1"></a>  <span class="kw">auto</span> tmp <span class="op">=</span> <span class="op">*</span><span class="kw">this</span>;</span>
 <span id="cb90-2"><a href="#cb90-2"></a>  <span class="op">++*</span><span class="kw">this</span>;</span>
 <span id="cb90-3"><a href="#cb90-3"></a>  <span class="cf">return</span> tmp;</span></code></pre></div>
 </blockquote>
 </blockquote>
-<div class="sourceCode" id="cb91"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb91-1"><a href="#cb91-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">--()</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb91"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb91-1"><a href="#cb91-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">--()</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">8</a></span> <em>Effects</em>: Equivalent to:</p>
+<p><span class="marginalizedparent"><a class="marginalized">9</a></span> <em>Effects</em>: Equivalent to:</p>
 <blockquote>
 <div class="sourceCode" id="cb92"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb92-1"><a href="#cb92-1"></a>  <span class="op">--</span><em>inner_</em>;</span>
 <span id="cb92-2"><a href="#cb92-2"></a>  <span class="cf">return</span> <span class="op">*</span><span class="kw">this</span>;</span></code></pre></div>
 </blockquote>
 </blockquote>
-<div class="sourceCode" id="cb93"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb93-1"><a href="#cb93-1"></a><span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">--(</span><span class="dt">int</span><span class="op">)</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb93"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb93-1"><a href="#cb93-1"></a><span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">--(</span><span class="dt">int</span><span class="op">)</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">9</a></span> <em>Effects</em>: Equivalent to:</p>
+<p><span class="marginalizedparent"><a class="marginalized">10</a></span> <em>Effects</em>: Equivalent to:</p>
 <blockquote>
 <div class="sourceCode" id="cb94"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb94-1"><a href="#cb94-1"></a>  <span class="kw">auto</span> tmp <span class="op">=</span> <span class="op">*</span><span class="kw">this</span>;</span>
 <span id="cb94-2"><a href="#cb94-2"></a>  <span class="op">--*</span><span class="kw">this</span>;</span>
@@ -2035,27 +2090,27 @@ blockquote { background-color: #f6f8fa; }
 </blockquote>
 </blockquote>
 <div class="sourceCode" id="cb95"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb95-1"><a href="#cb95-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">+=(</span>difference_type x<span class="op">)</span></span>
-<span id="cb95-2"><a href="#cb95-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span></code></pre></div>
+<span id="cb95-2"><a href="#cb95-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">10</a></span> <em>Effects</em>: Equivalent to:</p>
+<p><span class="marginalizedparent"><a class="marginalized">11</a></span> <em>Effects</em>: Equivalent to:</p>
 <blockquote>
 <div class="sourceCode" id="cb96"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb96-1"><a href="#cb96-1"></a>  <em>inner_</em> <span class="op">+=</span> x;</span>
 <span id="cb96-2"><a href="#cb96-2"></a>  <span class="cf">return</span> <span class="op">*</span><span class="kw">this</span>;</span></code></pre></div>
 </blockquote>
 </blockquote>
 <div class="sourceCode" id="cb97"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb97-1"><a href="#cb97-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">-=(</span>difference_type x<span class="op">)</span></span>
-<span id="cb97-2"><a href="#cb97-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span></code></pre></div>
+<span id="cb97-2"><a href="#cb97-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">11</a></span> <em>Effects</em>: Equivalent to:</p>
+<p><span class="marginalizedparent"><a class="marginalized">12</a></span> <em>Effects</em>: Equivalent to:</p>
 <blockquote>
 <div class="sourceCode" id="cb98"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb98-1"><a href="#cb98-1"></a>  <em>inner_</em> <span class="op">-=</span> x;</span>
 <span id="cb98-2"><a href="#cb98-2"></a>  <span class="cf">return</span> <span class="op">*</span><span class="kw">this</span>;</span></code></pre></div>
 </blockquote>
 </blockquote>
 <div class="sourceCode" id="cb99"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb99-1"><a href="#cb99-1"></a><span class="kw">constexpr</span> <span class="kw">decltype</span><span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="kw">operator</span><span class="op">[](</span>difference_type n<span class="op">)</span> <span class="kw">const</span></span>
-<span id="cb99-2"><a href="#cb99-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span></code></pre></div>
+<span id="cb99-2"><a href="#cb99-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">12</a></span> <em>Effects</em>: Equivalent to:</p>
+<p><span class="marginalizedparent"><a class="marginalized">13</a></span> <em>Effects</em>: Equivalent to:</p>
 <blockquote>
 <div class="sourceCode" id="cb100"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb100-1"><a href="#cb100-1"></a>  <span class="cf">return</span> apply<span class="op">([&amp;](</span><span class="kw">const</span> <span class="kw">auto</span><span class="op">&amp;...</span> iters<span class="op">)</span> <span class="op">-&gt;</span> <span class="kw">decltype</span><span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="op">{</span></span>
 <span id="cb100-2"><a href="#cb100-2"></a>    <span class="cf">return</span> invoke<span class="op">(*</span><em>parent_</em><span class="op">-&gt;</span><em>fun_</em>, iters<span class="op">[</span>n<span class="op">]...)</span>;</span>
@@ -2065,35 +2120,35 @@ blockquote { background-color: #f6f8fa; }
 <div class="sourceCode" id="cb101"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb101-1"><a href="#cb101-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">==(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
 <span id="cb101-2"><a href="#cb101-2"></a>  <span class="kw">requires</span> equality_­comparable<span class="op">&lt;</span><em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span>
 <span id="cb101-3"><a href="#cb101-3"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&lt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
-<span id="cb101-4"><a href="#cb101-4"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb101-4"><a href="#cb101-4"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb101-5"><a href="#cb101-5"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&gt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
-<span id="cb101-6"><a href="#cb101-6"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb101-6"><a href="#cb101-6"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb101-7"><a href="#cb101-7"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&lt;=(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
-<span id="cb101-8"><a href="#cb101-8"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb101-8"><a href="#cb101-8"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb101-9"><a href="#cb101-9"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&gt;=(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
-<span id="cb101-10"><a href="#cb101-10"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb101-10"><a href="#cb101-10"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb101-11"><a href="#cb101-11"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">&lt;=&gt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
-<span id="cb101-12"><a href="#cb101-12"></a>  <span class="kw">requires</span> random_access_range<span class="op">&lt;</span>Base<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> three_­way_­comparable<span class="op">&lt;</span><em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span></code></pre></div>
+<span id="cb101-12"><a href="#cb101-12"></a>  <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span> three_­way_­comparable<span class="op">&lt;</span><em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">13</a></span> Let <em><code class="sourceCode cpp">op</code></em> be the operator.</p>
-<p><span class="marginalizedparent"><a class="marginalized">14</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>current_</em> <em>op</em> y<span class="op">.</span><em>current_</em>;</code></p>
+<p><span class="marginalizedparent"><a class="marginalized">14</a></span> Let <em><code class="sourceCode cpp">op</code></em> be the operator.</p>
+<p><span class="marginalizedparent"><a class="marginalized">15</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>inner_</em> <em>op</em> y<span class="op">.</span><em>inner_</em>;</code></p>
 </blockquote>
 <div class="sourceCode" id="cb102"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb102-1"><a href="#cb102-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">+(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i, difference_type n<span class="op">)</span></span>
-<span id="cb102-2"><a href="#cb102-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span>
+<span id="cb102-2"><a href="#cb102-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
 <span id="cb102-3"><a href="#cb102-3"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">+(</span>difference_type n, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i<span class="op">)</span></span>
-<span id="cb102-4"><a href="#cb102-4"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span></code></pre></div>
+<span id="cb102-4"><a href="#cb102-4"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">15</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> <em>iterator</em><span class="op">(*</span>i<span class="op">.</span><em>parent_</em>, i<span class="op">.</span><em>inner_</em> <span class="op">+</span> n<span class="op">)</span>;</code></p>
+<p><span class="marginalizedparent"><a class="marginalized">16</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> <em>iterator</em><span class="op">(*</span>i<span class="op">.</span><em>parent_</em>, i<span class="op">.</span><em>inner_</em> <span class="op">+</span> n<span class="op">)</span>;</code></p>
 </blockquote>
 <div class="sourceCode" id="cb103"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb103-1"><a href="#cb103-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, difference_type y<span class="op">)</span></span>
-<span id="cb103-2"><a href="#cb103-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span>Base<span class="op">&gt;</span>;</span></code></pre></div>
+<span id="cb103-2"><a href="#cb103-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">16</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> <em>iterator</em><span class="op">(*</span>x<span class="op">.</span><em>parent_</em>, x<span class="op">.</span><em>inner_</em> <span class="op">-</span> y<span class="op">)</span>;</code></p>
+<p><span class="marginalizedparent"><a class="marginalized">17</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> <em>iterator</em><span class="op">(*</span>x<span class="op">.</span><em>parent_</em>, x<span class="op">.</span><em>inner_</em> <span class="op">-</span> y<span class="op">)</span>;</code></p>
 </blockquote>
 <div class="sourceCode" id="cb104"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb104-1"><a href="#cb104-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> difference_type <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
 <span id="cb104-2"><a href="#cb104-2"></a>  <span class="kw">requires</span> sized_sentinel_for<span class="op">&lt;</span><em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span>, <em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized">17</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>inner_</em> <span class="op">-</span> y<span class="op">.</span><em>inner_</em>;</code></p>
+<p><span class="marginalizedparent"><a class="marginalized">18</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>inner_</em> <span class="op">-</span> y<span class="op">.</span><em>inner_</em>;</code></p>
 </blockquote>
 </div>
 <h4 class="unnumbered" data-number id="class-template-zip_transform_view_sentinel_-range.zip.transform.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">zip_transform_view<span class="op">::</span><em>sentinel</em></code> [range.zip.transform.sentinel]<a href="#class-template-zip_transform_view_sentinel_-range.zip.transform.sentinel" class="self-link"></a></h4>
@@ -2151,6 +2206,692 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb109-7"><a href="#cb109-7"></a>  <span class="kw">requires</span> sized_­sentinel_­for<span class="op">&lt;</span><em>zentinel</em><span class="op">&lt;</span>Const<span class="op">&gt;</span>, <em>ziperator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&gt;</span></span>
 <span id="cb109-8"><a href="#cb109-8"></a><span class="kw">friend</span> <span class="kw">constexpr</span> range_difference_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, <em>InnerView</em><span class="op">&gt;&gt;</span></span>
 <span id="cb109-9"><a href="#cb109-9"></a>  <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> y<span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">4</a></span> <em>Effects</em>: Equivalent to <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>inner_</em> <span class="op">-</span> y<span class="op">.</span><em>inner_</em>;</code></p>
+</blockquote>
+</div>
+<h2 data-number="3.7" id="adjacent"><span class="header-section-number">3.7</span> <code class="sourceCode cpp">adjacent</code><a href="#adjacent" class="self-link"></a></h2>
+<p>Add the following subclause to <span>24.7 <a href="https://wg21.link/range.adaptors">[range.adaptors]</a></span>.</p>
+<h3 class="unnumbered" data-number id="adjacent-view-range.adjacent">24.7.? Adjacent view [range.adjacent]<a href="#adjacent-view-range.adjacent" class="self-link"></a></h3>
+<h4 class="unnumbered" data-number id="overview-range.adjacent.overview">24.7.?.1 Overview [range.adjacent.overview]<a href="#overview-range.adjacent.overview" class="self-link"></a></h4>
+<p><span class="marginalizedparent"><a class="marginalized">1</a></span> <code class="sourceCode cpp">adjacent_view</code> takes a <code class="sourceCode cpp">view</code> and produces a <code class="sourceCode cpp">view</code> whose <em>M</em> <sup>th</sup> element is a <code class="sourceCode cpp">tuple</code> or <code class="sourceCode cpp">pair</code> of the M <sup>th</sup> through (<em>M</em> + <em>N</em> - 1)<sup>th</sup> elements of the original view. If the original view has fewer than <em>N</em> elements, the resulting view is empty.</p>
+<p><span class="marginalizedparent"><a class="marginalized">2</a></span> The name <code class="sourceCode cpp">views<span class="op">::</span>adjacent<span class="op">&lt;</span>N<span class="op">&gt;</span></code> denotes a range adaptor object (<span>24.7.2 <a href="https://wg21.link/range.adaptor.object">[range.adaptor.object]</a></span>). Given a subexpression <code class="sourceCode cpp">E</code> and a constant expression <code class="sourceCode cpp">N</code>, the expression <code class="sourceCode cpp">views<span class="op">::</span>adjacent<span class="op">&lt;</span>N<span class="op">&gt;(</span>E<span class="op">)</span></code> is expression-equivalent to</p>
+<ul>
+<li><span class="marginalizedparent"><a class="marginalized">(2.1)</a></span> <code class="sourceCode cpp"><span class="op">(</span><span class="dt">void</span><span class="op">)</span>E, <em>decay-copy</em><span class="op">(</span>views<span class="op">::</span>empty<span class="op">&lt;</span>tuple<span class="op">&lt;&gt;&gt;)</span></code> if <code class="sourceCode cpp">N</code> is equal to <code class="sourceCode cpp"><span class="dv">0</span></code>,</li>
+<li><span class="marginalizedparent"><a class="marginalized">(2.2)</a></span> otherwise, <code class="sourceCode cpp">adjacent_view<span class="op">&lt;</span>views<span class="op">::</span>all_t<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">((</span>E<span class="op">))&gt;</span>, N<span class="op">&gt;(</span>E<span class="op">)</span></code>.</li>
+</ul>
+<p><span class="marginalizedparent"><a class="marginalized">3</a></span> Define <code class="sourceCode cpp"><em>REPEAT</em><span class="op">(</span>T, N<span class="op">)</span></code> as a pack of <em>N</em> types, each of which denotes the same type as <code class="sourceCode cpp">T</code>.</p>
+<h4 class="unnumbered" data-number id="class-template-adjacent_view-range.adjacent.view">24.7.?.2 Class template <code class="sourceCode cpp">adjacent_view</code> [range.adjacent.view]<a href="#class-template-adjacent_view-range.adjacent.view" class="self-link"></a></h4>
+<div class="sourceCode" id="cb110"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb110-1"><a href="#cb110-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb110-2"><a href="#cb110-2"></a></span>
+<span id="cb110-3"><a href="#cb110-3"></a><span class="kw">template</span><span class="op">&lt;</span>forward_range V, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
+<span id="cb110-4"><a href="#cb110-4"></a>  <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>N <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb110-5"><a href="#cb110-5"></a><span class="kw">class</span> adjacent_view <span class="op">:</span> <span class="kw">public</span> view_interface<span class="op">&lt;</span>adjacent_view<span class="op">&lt;</span>V, N<span class="op">&gt;&gt;{</span></span>
+<span id="cb110-6"><a href="#cb110-6"></a>  V <em>base_</em> <span class="op">=</span> V<span class="op">()</span>;                     <span class="co">// exposition only</span></span>
+<span id="cb110-7"><a href="#cb110-7"></a></span>
+<span id="cb110-8"><a href="#cb110-8"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span> <span class="kw">class</span> <em>iterator</em>;     <span class="co">// exposition only</span></span>
+<span id="cb110-9"><a href="#cb110-9"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span> <span class="kw">class</span> <em>sentinel</em>;     <span class="co">// exposition only</span></span>
+<span id="cb110-10"><a href="#cb110-10"></a></span>
+<span id="cb110-11"><a href="#cb110-11"></a>  <span class="kw">struct</span> <em>as_sentinel</em><span class="op">{}</span>;              <span class="co">// exposition only</span></span>
+<span id="cb110-12"><a href="#cb110-12"></a></span>
+<span id="cb110-13"><a href="#cb110-13"></a><span class="kw">public</span><span class="op">:</span></span>
+<span id="cb110-14"><a href="#cb110-14"></a>  <span class="kw">constexpr</span> adjacent_view<span class="op">()</span> <span class="op">=</span> <span class="cf">default</span>;</span>
+<span id="cb110-15"><a href="#cb110-15"></a>  <span class="kw">constexpr</span> <span class="kw">explicit</span> adjacent_view<span class="op">(</span>V base<span class="op">)</span> <span class="op">:</span> <em>base_</em><span class="op">(</span>std<span class="op">::</span>move<span class="op">(</span>base<span class="op">))</span> <span class="op">{}</span></span>
+<span id="cb110-16"><a href="#cb110-16"></a></span>
+<span id="cb110-17"><a href="#cb110-17"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> begin<span class="op">()</span> <span class="kw">requires</span> <span class="op">(!</span><em>simple-view</em><span class="op">&lt;</span>V<span class="op">&gt;)</span> <span class="op">{</span></span>
+<span id="cb110-18"><a href="#cb110-18"></a>    <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(</span>ranges<span class="op">::</span>begin<span class="op">(</span><em>base_</em><span class="op">)</span>, ranges<span class="op">::</span>end<span class="op">(</span><em>base_</em><span class="op">))</span>;</span>
+<span id="cb110-19"><a href="#cb110-19"></a>  <span class="op">}</span></span>
+<span id="cb110-20"><a href="#cb110-20"></a></span>
+<span id="cb110-21"><a href="#cb110-21"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> begin<span class="op">()</span> <span class="kw">const</span> <span class="kw">requires</span> range<span class="op">&lt;</span><span class="kw">const</span> V<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb110-22"><a href="#cb110-22"></a>    <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(</span>ranges<span class="op">::</span>begin<span class="op">(</span><em>base_</em><span class="op">)</span>, ranges<span class="op">::</span>end<span class="op">(</span><em>base_</em><span class="op">))</span>;</span>
+<span id="cb110-23"><a href="#cb110-23"></a>  <span class="op">}</span></span>
+<span id="cb110-24"><a href="#cb110-24"></a></span>
+<span id="cb110-25"><a href="#cb110-25"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">requires</span> <span class="op">(!</span><em>simple-view</em><span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">!</span>common_range<span class="op">&lt;</span>V<span class="op">&gt;)</span> <span class="op">{</span></span>
+<span id="cb110-26"><a href="#cb110-26"></a>    <span class="cf">return</span> <em>sentinel</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(</span>ranges<span class="op">::</span>end<span class="op">(</span><em>base_</em><span class="op">))</span>;</span>
+<span id="cb110-27"><a href="#cb110-27"></a>  <span class="op">}</span></span>
+<span id="cb110-28"><a href="#cb110-28"></a></span>
+<span id="cb110-29"><a href="#cb110-29"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">requires</span> <span class="op">(!</span><em>simple-view</em><span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> common_range<span class="op">&lt;</span>V<span class="op">&gt;){</span></span>
+<span id="cb110-30"><a href="#cb110-30"></a>    <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(</span><em>as_sentinel</em><span class="op">{}</span>, ranges<span class="op">::</span>begin<span class="op">(</span><em>base_</em><span class="op">)</span>, ranges<span class="op">::</span>end<span class="op">(</span><em>base_</em><span class="op">))</span>;</span>
+<span id="cb110-31"><a href="#cb110-31"></a>  <span class="op">}</span></span>
+<span id="cb110-32"><a href="#cb110-32"></a></span>
+<span id="cb110-33"><a href="#cb110-33"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">const</span> <span class="kw">requires</span> range<span class="op">&lt;</span><span class="kw">const</span> V<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb110-34"><a href="#cb110-34"></a>    <span class="cf">return</span> <em>sentinel</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(</span>ranges<span class="op">::</span>end<span class="op">(</span><em>base_</em><span class="op">))</span>;</span>
+<span id="cb110-35"><a href="#cb110-35"></a>  <span class="op">}</span></span>
+<span id="cb110-36"><a href="#cb110-36"></a></span>
+<span id="cb110-37"><a href="#cb110-37"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">const</span> <span class="kw">requires</span> common_range<span class="op">&lt;</span><span class="kw">const</span> V<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb110-38"><a href="#cb110-38"></a>    <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(</span><em>as_sentinel</em><span class="op">{}</span>, ranges<span class="op">::</span>begin<span class="op">(</span><em>base_</em><span class="op">)</span>, ranges<span class="op">::</span>end<span class="op">(</span><em>base_</em><span class="op">))</span>;</span>
+<span id="cb110-39"><a href="#cb110-39"></a>  <span class="op">}</span></span>
+<span id="cb110-40"><a href="#cb110-40"></a></span>
+<span id="cb110-41"><a href="#cb110-41"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> size<span class="op">()</span> <span class="kw">requires</span> sized_range<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb110-42"><a href="#cb110-42"></a>    <span class="kw">auto</span> sz <span class="op">=</span> ranges<span class="op">::</span>size<span class="op">(</span><em>base_</em><span class="op">)</span>;</span>
+<span id="cb110-43"><a href="#cb110-43"></a>    sz <span class="op">-=</span> ranges<span class="op">::</span>min<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">(</span>sz<span class="op">)&gt;(</span>sz, N<span class="op">-</span><span class="dv">1</span><span class="op">)</span>;</span>
+<span id="cb110-44"><a href="#cb110-44"></a>    <span class="cf">return</span> sz;</span>
+<span id="cb110-45"><a href="#cb110-45"></a>  <span class="op">}</span></span>
+<span id="cb110-46"><a href="#cb110-46"></a></span>
+<span id="cb110-47"><a href="#cb110-47"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> size<span class="op">()</span> <span class="kw">const</span> <span class="kw">requires</span> sized_range<span class="op">&lt;</span><span class="kw">const</span> V<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb110-48"><a href="#cb110-48"></a>    <span class="kw">auto</span> sz <span class="op">=</span> ranges<span class="op">::</span>size<span class="op">(</span><em>base_</em><span class="op">)</span>;</span>
+<span id="cb110-49"><a href="#cb110-49"></a>    sz <span class="op">-=</span> ranges<span class="op">::</span>min<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">(</span>sz<span class="op">)&gt;(</span>sz, N<span class="op">-</span><span class="dv">1</span><span class="op">)</span>;</span>
+<span id="cb110-50"><a href="#cb110-50"></a>    <span class="cf">return</span> sz;</span>
+<span id="cb110-51"><a href="#cb110-51"></a>  <span class="op">}</span></span>
+<span id="cb110-52"><a href="#cb110-52"></a><span class="op">}</span>;</span>
+<span id="cb110-53"><a href="#cb110-53"></a></span>
+<span id="cb110-54"><a href="#cb110-54"></a><span class="op">}</span></span></code></pre></div>
+<h4 class="unnumbered" data-number id="class-template-adjacent_view_iterator_-range.adjacent.iterator">24.7.?.3 Class template <code class="sourceCode cpp">adjacent_view<span class="op">::</span><em>iterator</em></code> [range.adjacent.iterator]<a href="#class-template-adjacent_view_iterator_-range.adjacent.iterator" class="self-link"></a></h4>
+<div class="sourceCode" id="cb111"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb111-1"><a href="#cb111-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb111-2"><a href="#cb111-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>forward_range V, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
+<span id="cb111-3"><a href="#cb111-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>N <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb111-4"><a href="#cb111-4"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
+<span id="cb111-5"><a href="#cb111-5"></a>  <span class="kw">class</span> adjacent_view<span class="op">&lt;</span>V, N<span class="op">&gt;::</span><em>iterator</em> <span class="op">{</span></span>
+<span id="cb111-6"><a href="#cb111-6"></a>    <span class="kw">using</span> <em>Base</em> <span class="op">=</span> <em>maybe-const</em><span class="op">&lt;</span>Const, V<span class="op">&gt;</span>;                                             <span class="co">// exposition only</span></span>
+<span id="cb111-7"><a href="#cb111-7"></a>    array<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, N<span class="op">&gt;</span> <em>current_</em> <span class="op">=</span> array<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, N<span class="op">&gt;()</span>;             <span class="co">// exposition only</span></span>
+<span id="cb111-8"><a href="#cb111-8"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span>iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> first, sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> last<span class="op">)</span>;              <span class="co">// exposition only</span></span>
+<span id="cb111-9"><a href="#cb111-9"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span>as_sentinel, iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> first, iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> last<span class="op">)</span>; <span class="co">// exposition only</span></span>
+<span id="cb111-10"><a href="#cb111-10"></a>  <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb111-11"><a href="#cb111-11"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> input_iterator_tag;</span>
+<span id="cb111-12"><a href="#cb111-12"></a>    <span class="kw">using</span> iterator_concept  <span class="op">=</span> <em>see below</em>;</span>
+<span id="cb111-13"><a href="#cb111-13"></a>    <span class="kw">using</span> value_type <span class="op">=</span> <em>tuple-or-pair</em><span class="op">&lt;</span><em>REPEAT</em><span class="op">(</span>range_value_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, N<span class="op">)...&gt;</span>;</span>
+<span id="cb111-14"><a href="#cb111-14"></a>    <span class="kw">using</span> difference_type <span class="op">=</span> range_difference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb111-15"><a href="#cb111-15"></a></span>
+<span id="cb111-16"><a href="#cb111-16"></a>    <em>iterator</em><span class="op">()</span> <span class="op">=</span> <span class="cf">default</span>;</span>
+<span id="cb111-17"><a href="#cb111-17"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span><em>iterator</em><span class="op">&lt;!</span>Const<span class="op">&gt;</span> i<span class="op">)</span></span>
+<span id="cb111-18"><a href="#cb111-18"></a>      <span class="kw">requires</span> Const <span class="op">&amp;&amp;</span> convertible_to<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span>
+<span id="cb111-19"><a href="#cb111-19"></a></span>
+<span id="cb111-20"><a href="#cb111-20"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">*()</span> <span class="kw">const</span>;</span>
+<span id="cb111-21"><a href="#cb111-21"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">++()</span>;</span>
+<span id="cb111-22"><a href="#cb111-22"></a>    <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">++(</span><span class="dt">int</span><span class="op">)</span>;</span>
+<span id="cb111-23"><a href="#cb111-23"></a></span>
+<span id="cb111-24"><a href="#cb111-24"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">--()</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb111-25"><a href="#cb111-25"></a>    <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">--(</span><span class="dt">int</span><span class="op">)</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb111-26"><a href="#cb111-26"></a></span>
+<span id="cb111-27"><a href="#cb111-27"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">+=(</span>difference_type x<span class="op">)</span></span>
+<span id="cb111-28"><a href="#cb111-28"></a>      <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb111-29"><a href="#cb111-29"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">-=(</span>difference_type x<span class="op">)</span></span>
+<span id="cb111-30"><a href="#cb111-30"></a>      <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb111-31"><a href="#cb111-31"></a></span>
+<span id="cb111-32"><a href="#cb111-32"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">[](</span>difference_type n<span class="op">)</span> <span class="kw">const</span></span>
+<span id="cb111-33"><a href="#cb111-33"></a>      <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb111-34"><a href="#cb111-34"></a></span>
+<span id="cb111-35"><a href="#cb111-35"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">==(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span>;</span>
+<span id="cb111-36"><a href="#cb111-36"></a></span>
+<span id="cb111-37"><a href="#cb111-37"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&lt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb111-38"><a href="#cb111-38"></a>      <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb111-39"><a href="#cb111-39"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&gt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb111-40"><a href="#cb111-40"></a>      <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb111-41"><a href="#cb111-41"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&lt;=(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb111-42"><a href="#cb111-42"></a>      <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb111-43"><a href="#cb111-43"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&gt;=(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb111-44"><a href="#cb111-44"></a>      <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb111-45"><a href="#cb111-45"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">&lt;=&gt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb111-46"><a href="#cb111-46"></a>      <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb111-47"><a href="#cb111-47"></a>               three_­way_­comparable<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span>
+<span id="cb111-48"><a href="#cb111-48"></a></span>
+<span id="cb111-49"><a href="#cb111-49"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">+(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i, difference_type n<span class="op">)</span></span>
+<span id="cb111-50"><a href="#cb111-50"></a>      <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb111-51"><a href="#cb111-51"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">+(</span>difference_type n, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i<span class="op">)</span></span>
+<span id="cb111-52"><a href="#cb111-52"></a>      <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb111-53"><a href="#cb111-53"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, difference_type y<span class="op">)</span></span>
+<span id="cb111-54"><a href="#cb111-54"></a>      <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb111-55"><a href="#cb111-55"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> difference_type <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb111-56"><a href="#cb111-56"></a>      <span class="kw">requires</span> sized_sentinel_for<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span>
+<span id="cb111-57"><a href="#cb111-57"></a></span>
+<span id="cb111-58"><a href="#cb111-58"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="kw">auto</span> iter_move<span class="op">(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i<span class="op">)</span> <span class="kw">noexcept</span><span class="op">(</span><em>see below</em><span class="op">)</span>;</span>
+<span id="cb111-59"><a href="#cb111-59"></a></span>
+<span id="cb111-60"><a href="#cb111-60"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="kw">auto</span> iter_swap<span class="op">(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> l, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> r<span class="op">)</span></span>
+<span id="cb111-61"><a href="#cb111-61"></a>      <span class="kw">noexcept</span><span class="op">(</span><em>see below</em><span class="op">)</span></span>
+<span id="cb111-62"><a href="#cb111-62"></a>      <span class="kw">requires</span> indirectly_swappable<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span>
+<span id="cb111-63"><a href="#cb111-63"></a>  <span class="op">}</span>;</span>
+<span id="cb111-64"><a href="#cb111-64"></a><span class="op">}</span></span></code></pre></div>
+<p><span class="marginalizedparent"><a class="marginalized">1</a></span> <code class="sourceCode cpp"><em>iterator</em><span class="op">::</span>iterator_concept</code> is defined as follows:</p>
+<ul>
+<li><span class="marginalizedparent"><a class="marginalized">(1.1)</a></span> If <code class="sourceCode cpp">V</code> models <code class="sourceCode cpp">random_access_range</code>, then <code class="sourceCode cpp">iterator_concept</code> denotes <code class="sourceCode cpp">random_access_iterator_tag</code>.</li>
+<li><span class="marginalizedparent"><a class="marginalized">(1.2)</a></span> Otherwise, if <code class="sourceCode cpp">V</code> models <code class="sourceCode cpp">bidirectional_­range</code>, then <code class="sourceCode cpp">iterator_concept</code> denotes <code class="sourceCode cpp">bidirectional_­iterator_­tag</code>.</li>
+<li><span class="marginalizedparent"><a class="marginalized">(1.3)</a></span> Otherwise, <code class="sourceCode cpp">iterator_concept</code> denotes <code class="sourceCode cpp">forward_iterator_tag</code>.</li>
+</ul>
+<div>
+<div class="sourceCode" id="cb112"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb112-1"><a href="#cb112-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span>iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> first, sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> last<span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">2</a></span> <em>Postconditions</em>: <code class="sourceCode cpp"><em>current_</em>[0] <span class="op">==</span> first</code> is <code class="sourceCode cpp"><span class="kw">true</span></code>, and for every integer <em>i</em> in <code class="sourceCode cpp"><span class="op">[</span><span class="dv">1</span>, N<span class="op">)</span></code>, <code class="sourceCode cpp"><em>current_</em><span class="op">[</span><em>i</em><span class="op">]</span> <span class="op">==</span> ranges<span class="op">::</span>next<span class="op">(</span><em>current_</em><span class="op">[</span><em>i</em><span class="op">-</span><span class="dv">1</span><span class="op">]</span>, <span class="dv">1</span>, last<span class="op">)</span></code> is <code class="sourceCode cpp"><span class="kw">true</span></code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb113"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb113-1"><a href="#cb113-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span>as_sentinel, iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> first, iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> last<span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">3</a></span> <em>Postconditions</em>: If <code class="sourceCode cpp"><em>Base</em></code> does not model <code class="sourceCode cpp">bidirectional_range</code>, each element of <code class="sourceCode cpp"><em>current_</em></code> is equal to <code class="sourceCode cpp">last</code>. Otherwise, <code class="sourceCode cpp"><em>current_</em>[N-1] <span class="op">==</span> last</code> is <code class="sourceCode cpp"><span class="kw">true</span></code>, and for every integer <em>i</em> in <code class="sourceCode cpp"><span class="op">[</span><span class="dv">0</span>, N<span class="op">-</span><span class="dv">1</span><span class="op">)</span></code>, <code class="sourceCode cpp"><em>current_</em><span class="op">[</span><em>i</em><span class="op">]</span> <span class="op">==</span> ranges<span class="op">::</span>prev<span class="op">(</span><em>current_</em><span class="op">[</span><em>i</em><span class="op">+</span><span class="dv">1</span><span class="op">]</span>, <span class="dv">1</span>, first<span class="op">)</span></code> is <code class="sourceCode cpp"><span class="kw">true</span></code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb114"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb114-1"><a href="#cb114-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span><em>iterator</em><span class="op">&lt;!</span>Const<span class="op">&gt;</span> i<span class="op">)</span></span>
+<span id="cb114-2"><a href="#cb114-2"></a>  <span class="kw">requires</span> Const <span class="op">&amp;&amp;</span> <span class="op">(</span>convertible_to<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">4</a></span> <em>Effects</em>: Initializes each element of <code class="sourceCode cpp"><em>current_</em></code> with the corresponding element of <code class="sourceCode cpp">i<span class="op">.</span><em>current_</em></code> as an xvalue.</p>
+</blockquote>
+<div class="sourceCode" id="cb115"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb115-1"><a href="#cb115-1"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">*()</span> <span class="kw">const</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">5</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb116"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb116-1"><a href="#cb116-1"></a>  <span class="cf">return</span> <em>tuple-transform</em><span class="op">([](</span><span class="kw">auto</span><span class="op">&amp;</span> i<span class="op">)</span> <span class="op">-&gt;</span> <span class="kw">decltype</span><span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="op">{</span> <span class="cf">return</span> <span class="op">*</span>i; <span class="op">}</span>, <em>current_</em><span class="op">)</span>;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb117"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb117-1"><a href="#cb117-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">++()</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">6</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb118"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb118-1"><a href="#cb118-1"></a>  ranges<span class="op">::</span>copy<span class="op">(</span><em>current_</em> <span class="op">|</span> views<span class="op">::</span>drop<span class="op">(</span><span class="dv">1</span><span class="op">)</span>, <em>current_</em><span class="op">.</span>begin<span class="op">())</span>;</span>
+<span id="cb118-2"><a href="#cb118-2"></a>  <span class="op">++</span><em>current_</em><span class="op">.</span>back<span class="op">()</span>;</span>
+<span id="cb118-3"><a href="#cb118-3"></a>  <span class="cf">return</span> <span class="op">*</span><span class="kw">this</span>;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb119"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb119-1"><a href="#cb119-1"></a><span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">++(</span><span class="dt">int</span><span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">7</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb120"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb120-1"><a href="#cb120-1"></a>  <span class="kw">auto</span> tmp <span class="op">=</span> <span class="op">*</span><span class="kw">this</span>;</span>
+<span id="cb120-2"><a href="#cb120-2"></a>  <span class="op">++*</span><span class="kw">this</span>;</span>
+<span id="cb120-3"><a href="#cb120-3"></a>  <span class="cf">return</span> tmp;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb121"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb121-1"><a href="#cb121-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">--()</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">8</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb122"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb122-1"><a href="#cb122-1"></a>  ranges<span class="op">::</span>copy_backward<span class="op">(</span><em>current_</em> <span class="op">|</span> views<span class="op">::</span>take<span class="op">(</span>N <span class="op">-</span> <span class="dv">1</span><span class="op">)</span>, <em>current_</em><span class="op">.</span>end<span class="op">())</span>;</span>
+<span id="cb122-2"><a href="#cb122-2"></a>  <span class="op">--</span><em>current_</em><span class="op">.</span>front<span class="op">()</span>;</span>
+<span id="cb122-3"><a href="#cb122-3"></a>  <span class="cf">return</span> <span class="op">*</span><span class="kw">this</span>;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb123"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb123-1"><a href="#cb123-1"></a><span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">--(</span><span class="dt">int</span><span class="op">)</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">9</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb124"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb124-1"><a href="#cb124-1"></a>  <span class="kw">auto</span> tmp <span class="op">=</span> <span class="op">*</span><span class="kw">this</span>;</span>
+<span id="cb124-2"><a href="#cb124-2"></a>  <span class="op">--*</span><span class="kw">this</span>;</span>
+<span id="cb124-3"><a href="#cb124-3"></a>  <span class="cf">return</span> tmp;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb125"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb125-1"><a href="#cb125-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">+=(</span>difference_type x<span class="op">)</span></span>
+<span id="cb125-2"><a href="#cb125-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">10</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb126"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb126-1"><a href="#cb126-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="kw">auto</span><span class="op">&amp;</span> i <span class="op">:</span> <em>current_</em><span class="op">)</span> <span class="op">{</span> i <span class="op">+=</span> x; <span class="op">}</span></span>
+<span id="cb126-2"><a href="#cb126-2"></a>  <span class="cf">return</span> <span class="op">*</span><span class="kw">this</span>;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb127"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb127-1"><a href="#cb127-1"></a>  <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">-=(</span>difference_type x<span class="op">)</span></span>
+<span id="cb127-2"><a href="#cb127-2"></a>    <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">11</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb128"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb128-1"><a href="#cb128-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="kw">auto</span><span class="op">&amp;</span> i <span class="op">:</span> <em>current_</em><span class="op">)</span> <span class="op">{</span> i <span class="op">-=</span> x; <span class="op">}</span></span>
+<span id="cb128-2"><a href="#cb128-2"></a>  <span class="cf">return</span> <span class="op">*</span><span class="kw">this</span>;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb129"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb129-1"><a href="#cb129-1"></a><span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">[](</span>difference_type n<span class="op">)</span> <span class="kw">const</span></span>
+<span id="cb129-2"><a href="#cb129-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">12</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb130"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb130-1"><a href="#cb130-1"></a>  <span class="cf">return</span> <em>tuple-transform</em><span class="op">([&amp;](</span><span class="kw">auto</span><span class="op">&amp;</span> i<span class="op">)</span> <span class="op">-&gt;</span> <span class="kw">decltype</span><span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="op">{</span> <span class="cf">return</span> i<span class="op">[</span>n<span class="op">]</span>; <span class="op">}</span>, <em>current_</em><span class="op">)</span>;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb131"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb131-1"><a href="#cb131-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">==(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">13</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>current_</em><span class="op">.</span>back<span class="op">()</span> <span class="op">==</span> y<span class="op">.</span><em>current_</em><span class="op">.</span>back<span class="op">()</span></code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb132"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb132-1"><a href="#cb132-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&lt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb132-2"><a href="#cb132-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">14</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>current_</em><span class="op">.</span>back<span class="op">()</span> <span class="op">&lt;</span> y<span class="op">.</span><em>current_</em><span class="op">.</span>back<span class="op">()</span>;</code></p>
+</blockquote>
+<div class="sourceCode" id="cb133"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb133-1"><a href="#cb133-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&gt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb133-2"><a href="#cb133-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">15</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> y <span class="op">&lt;</span> x;</code></p>
+</blockquote>
+<div class="sourceCode" id="cb134"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb134-1"><a href="#cb134-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&lt;=(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb134-2"><a href="#cb134-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">16</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> <span class="op">!(</span>y <span class="op">&lt;</span> x<span class="op">)</span>;</code></p>
+</blockquote>
+<div class="sourceCode" id="cb135"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb135-1"><a href="#cb135-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&gt;=(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb135-2"><a href="#cb135-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">17</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> <span class="op">!(</span>x <span class="op">&lt;</span> y<span class="op">)</span>;</code></p>
+</blockquote>
+<div class="sourceCode" id="cb136"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb136-1"><a href="#cb136-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">&lt;=&gt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb136-2"><a href="#cb136-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb136-3"><a href="#cb136-3"></a>           three_­way_­comparable<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">18</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>current_</em><span class="op">.</span>back<span class="op">()</span> <span class="op">&lt;=&gt;</span> y<span class="op">.</span><em>current_</em><span class="op">.</span>back<span class="op">()</span>;</code></p>
+</blockquote>
+<div class="sourceCode" id="cb137"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb137-1"><a href="#cb137-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">+(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i, difference_type n<span class="op">)</span></span>
+<span id="cb137-2"><a href="#cb137-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb137-3"><a href="#cb137-3"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">+(</span>difference_type n, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i<span class="op">)</span></span>
+<span id="cb137-4"><a href="#cb137-4"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">19</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb138"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb138-1"><a href="#cb138-1"></a>  <span class="kw">auto</span> r <span class="op">=</span> i;</span>
+<span id="cb138-2"><a href="#cb138-2"></a>  r <span class="op">+=</span> n;</span>
+<span id="cb138-3"><a href="#cb138-3"></a>  <span class="cf">return</span> r;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb139"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb139-1"><a href="#cb139-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, difference_type y<span class="op">)</span></span>
+<span id="cb139-2"><a href="#cb139-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">20</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb140"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb140-1"><a href="#cb140-1"></a>  <span class="kw">auto</span> r <span class="op">=</span> x;</span>
+<span id="cb140-2"><a href="#cb140-2"></a>  r <span class="op">-=</span> y;</span>
+<span id="cb140-3"><a href="#cb140-3"></a>  <span class="cf">return</span> r;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb141"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb141-1"><a href="#cb141-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> difference_type <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb141-2"><a href="#cb141-2"></a>  <span class="kw">requires</span> sized_sentinel_for<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">21</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>current_</em><span class="op">.</span>back<span class="op">()</span> <span class="op">-</span> y<span class="op">.</span><em>current_</em><span class="op">.</span>back<span class="op">()</span></code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb142"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb142-1"><a href="#cb142-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="kw">auto</span> iter_move<span class="op">(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i<span class="op">)</span> <span class="kw">noexcept</span><span class="op">(</span><em>see below</em><span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">22</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb143"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb143-1"><a href="#cb143-1"></a>  <span class="cf">return</span> <em>tuple-transform</em><span class="op">(</span>ranges<span class="op">::</span>iter_move, i<span class="op">.</span><em>current_</em><span class="op">)</span>;</span></code></pre></div>
+</blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">23</a></span> <em>Remarks:</em> The expression within <code class="sourceCode cpp"><span class="kw">noexcept</span></code> is equivalent to</p>
+<blockquote>
+<div class="sourceCode" id="cb144"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb144-1"><a href="#cb144-1"></a>  <span class="kw">noexcept</span><span class="op">(</span>ranges<span class="op">::</span>iter_move<span class="op">(</span>declval<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;()))</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb144-2"><a href="#cb144-2"></a>  is_nothrow_move_constructible_v<span class="op">&lt;</span>range_rvalue_reference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span></span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb145"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb145-1"><a href="#cb145-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="kw">auto</span> iter_swap<span class="op">(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> l, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> r<span class="op">)</span></span>
+<span id="cb145-2"><a href="#cb145-2"></a>  <span class="kw">noexcept</span><span class="op">(</span><em>see below</em><span class="op">)</span></span>
+<span id="cb145-3"><a href="#cb145-3"></a>  <span class="kw">requires</span> indirectly_swappable<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">24</a></span> <em>Preconditions:</em> None of the iterators in <code class="sourceCode cpp">l<span class="op">.</span><em>current_</em></code> is equal to an iterator in <code class="sourceCode cpp">r<span class="op">.</span><em>current_</em></code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized">25</a></span> <em>Effects</em>: For every integer <em>i</em> in <code class="sourceCode cpp"><span class="op">[</span><span class="dv">0</span>, N<span class="op">)</span></code>, performs <code class="sourceCode cpp">ranges<span class="op">::</span>iter_swap<span class="op">(</span>l<span class="op">.</span><em>current_</em><span class="op">[</span><em>i</em><span class="op">]</span>, r<span class="op">.</span><em>current_</em><span class="op">[</span><em>i</em><span class="op">])</span></code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized">26</a></span> <em>Remarks:</em> The expression within <code class="sourceCode cpp"><span class="kw">noexcept</span></code> is equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb146"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb146-1"><a href="#cb146-1"></a>  <span class="kw">noexcept</span><span class="op">(</span>ranges<span class="op">::</span>iter_swap<span class="op">(</span>declval<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;()</span>, declval<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;()))</span></span></code></pre></div>
+</blockquote>
+</blockquote>
+</div>
+<h4 class="unnumbered" data-number id="class-template-adjacent_view_sentinel_-range.adjacent.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">adjacent_view<span class="op">::</span><em>sentinel</em></code> [range.adjacent.sentinel]<a href="#class-template-adjacent_view_sentinel_-range.adjacent.sentinel" class="self-link"></a></h4>
+<div class="sourceCode" id="cb147"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb147-1"><a href="#cb147-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb147-2"><a href="#cb147-2"></a>  <span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb147-3"><a href="#cb147-3"></a>  <span class="kw">template</span><span class="op">&lt;</span>forward_range V, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
+<span id="cb147-4"><a href="#cb147-4"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>N <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb147-5"><a href="#cb147-5"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
+<span id="cb147-6"><a href="#cb147-6"></a>  <span class="kw">class</span> adjacent_view<span class="op">&lt;</span>V, N<span class="op">&gt;::</span><em>sentinel</em> <span class="op">{</span></span>
+<span id="cb147-7"><a href="#cb147-7"></a>    <span class="kw">using</span> <em>Base</em> <span class="op">=</span> <em>maybe-const</em><span class="op">&lt;</span>Const, V<span class="op">&gt;</span>;                     <span class="co">// exposition only</span></span>
+<span id="cb147-8"><a href="#cb147-8"></a>    sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> <em>end_</em> <span class="op">=</span> sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;()</span>;            <span class="co">// exposition only</span></span>
+<span id="cb147-9"><a href="#cb147-9"></a>    <span class="kw">constexpr</span> <span class="kw">explicit</span> <em>sentinel</em><span class="op">(</span>sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> end<span class="op">)</span>;      <span class="co">// exposition only</span></span>
+<span id="cb147-10"><a href="#cb147-10"></a>  <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb147-11"><a href="#cb147-11"></a>    <em>sentinel</em><span class="op">()</span> <span class="op">=</span> <span class="cf">default</span>;</span>
+<span id="cb147-12"><a href="#cb147-12"></a>    <span class="kw">constexpr</span> <em>sentinel</em><span class="op">(</span><em>sentinel</em><span class="op">&lt;!</span>Const<span class="op">&gt;</span> i<span class="op">)</span></span>
+<span id="cb147-13"><a href="#cb147-13"></a>      <span class="kw">requires</span> Const <span class="op">&amp;&amp;</span> convertible_to<span class="op">&lt;</span>sentinel_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span>
+<span id="cb147-14"><a href="#cb147-14"></a></span>
+<span id="cb147-15"><a href="#cb147-15"></a>    <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> OtherConst<span class="op">&gt;</span></span>
+<span id="cb147-16"><a href="#cb147-16"></a>      <span class="kw">requires</span> sentinel_­for<span class="op">&lt;</span>sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, V<span class="op">&gt;&gt;&gt;</span></span>
+<span id="cb147-17"><a href="#cb147-17"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">==(</span><span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> x, <span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> y<span class="op">)</span>;</span>
+<span id="cb147-18"><a href="#cb147-18"></a></span>
+<span id="cb147-19"><a href="#cb147-19"></a>    <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> OtherConst<span class="op">&gt;</span></span>
+<span id="cb147-20"><a href="#cb147-20"></a>      <span class="kw">requires</span> sized_­sentinel_­for<span class="op">&lt;</span>sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, V<span class="op">&gt;&gt;&gt;</span></span>
+<span id="cb147-21"><a href="#cb147-21"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> range_difference_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, V<span class="op">&gt;&gt;</span></span>
+<span id="cb147-22"><a href="#cb147-22"></a>      <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> x, <span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> y<span class="op">)</span>;</span>
+<span id="cb147-23"><a href="#cb147-23"></a></span>
+<span id="cb147-24"><a href="#cb147-24"></a>    <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> OtherConst<span class="op">&gt;</span></span>
+<span id="cb147-25"><a href="#cb147-25"></a>      <span class="kw">requires</span> sized_­sentinel_­for<span class="op">&lt;</span>sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, V<span class="op">&gt;&gt;&gt;</span></span>
+<span id="cb147-26"><a href="#cb147-26"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> range_difference_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, V<span class="op">&gt;&gt;</span></span>
+<span id="cb147-27"><a href="#cb147-27"></a>      <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> y, <span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> x<span class="op">)</span>;</span>
+<span id="cb147-28"><a href="#cb147-28"></a>  <span class="op">}</span>;</span>
+<span id="cb147-29"><a href="#cb147-29"></a><span class="op">}</span></span></code></pre></div>
+<div>
+<div class="sourceCode" id="cb148"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb148-1"><a href="#cb148-1"></a><span class="kw">constexpr</span> <span class="kw">explicit</span> <em>sentinel</em><span class="op">(</span>sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> end<span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">1</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp"><em>end_</em></code> with <code class="sourceCode cpp">end</code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb149"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb149-1"><a href="#cb149-1"></a><span class="kw">constexpr</span> <em>sentinel</em><span class="op">(</span><em>sentinel</em><span class="op">&lt;!</span>Const<span class="op">&gt;</span> i<span class="op">)</span></span>
+<span id="cb149-2"><a href="#cb149-2"></a>  <span class="kw">requires</span> Const <span class="op">&amp;&amp;</span> convertible_to<span class="op">&lt;</span>sentinel_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">2</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp"><em>end_</em></code> with <code class="sourceCode cpp">std<span class="op">::</span>move<span class="op">(</span>i<span class="op">.</span><em>end_</em><span class="op">)</span></code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb150"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb150-1"><a href="#cb150-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> OtherConst<span class="op">&gt;</span></span>
+<span id="cb150-2"><a href="#cb150-2"></a>  <span class="kw">requires</span> sentinel_­for<span class="op">&lt;</span>sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, V<span class="op">&gt;&gt;&gt;</span></span>
+<span id="cb150-3"><a href="#cb150-3"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">==(</span><span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> x, <span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> y<span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">3</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>current_</em><span class="op">.</span>back<span class="op">()</span> <span class="op">==</span> y<span class="op">.</span><em>end_</em>;</code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb151"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb151-1"><a href="#cb151-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> OtherConst<span class="op">&gt;</span></span>
+<span id="cb151-2"><a href="#cb151-2"></a>  <span class="kw">requires</span> sized_­sentinel_­for<span class="op">&lt;</span>sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, V<span class="op">&gt;&gt;&gt;</span></span>
+<span id="cb151-3"><a href="#cb151-3"></a><span class="kw">friend</span> <span class="kw">constexpr</span> range_difference_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, V<span class="op">&gt;&gt;</span></span>
+<span id="cb151-4"><a href="#cb151-4"></a>  <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> x, <span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> y<span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">4</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>current_</em><span class="op">.</span>back<span class="op">()</span> <span class="op">-</span> y<span class="op">.</span><em>end_</em>;</code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb152"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb152-1"><a href="#cb152-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> OtherConst<span class="op">&gt;</span></span>
+<span id="cb152-2"><a href="#cb152-2"></a>  <span class="kw">requires</span> sized_­sentinel_­for<span class="op">&lt;</span>sentinel_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, V<span class="op">&gt;&gt;&gt;</span></span>
+<span id="cb152-3"><a href="#cb152-3"></a><span class="kw">friend</span> <span class="kw">constexpr</span> range_difference_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, V<span class="op">&gt;&gt;</span></span>
+<span id="cb152-4"><a href="#cb152-4"></a>  <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> y, <span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> x<span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">5</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> y<span class="op">.</span><em>end_</em> <span class="op">-</span> x<span class="op">.</span><em>current_</em><span class="op">.</span>back<span class="op">()</span>;</code>.</p>
+</blockquote>
+</div>
+<h2 data-number="3.8" id="adjacent_transform"><span class="header-section-number">3.8</span> <code class="sourceCode cpp">adjacent_transform</code><a href="#adjacent_transform" class="self-link"></a></h2>
+<p>Add the following subclause to <span>24.7 <a href="https://wg21.link/range.adaptors">[range.adaptors]</a></span>.</p>
+<h3 class="unnumbered" data-number id="adjacent-transform-view-range.adjacent.transform">24.7.? Adjacent transform view [range.adjacent.transform]<a href="#adjacent-transform-view-range.adjacent.transform" class="self-link"></a></h3>
+<h4 class="unnumbered" data-number id="overview-range.adjacent.transform.overview">24.7.?.1 Overview [range.adjacent.transform.overview]<a href="#overview-range.adjacent.transform.overview" class="self-link"></a></h4>
+<p><span class="marginalizedparent"><a class="marginalized">1</a></span> <code class="sourceCode cpp">adjacent_transform_view</code> takes an invocable object and a <code class="sourceCode cpp">view</code> and produces a <code class="sourceCode cpp">view</code> whose <em>M <sup>th</sup></em> element is the result of applying the invocable object to the <em>M</em> <sup>th</sup> through (<em>M</em> + <em>N</em> - 1)<sup>th</sup> elements of the original view. If the original view has fewer than <em>N</em> elements, the resulting view is empty.</p>
+<p><span class="marginalizedparent"><a class="marginalized">2</a></span> The name <code class="sourceCode cpp">views<span class="op">::</span>adjacent_transform<span class="op">&lt;</span>N<span class="op">&gt;</span></code> denotes a range adaptor object (<span>24.7.2 <a href="https://wg21.link/range.adaptor.object">[range.adaptor.object]</a></span>). Given subexpressions <code class="sourceCode cpp">E</code> and <code class="sourceCode cpp">F</code>,</p>
+<ul>
+<li><span class="marginalizedparent"><a class="marginalized">(2.1)</a></span> if <code class="sourceCode cpp">N</code> is equal to 0, <code class="sourceCode cpp">views<span class="op">::</span>adjacent_transform<span class="op">&lt;</span>N<span class="op">&gt;(</span>E, F<span class="op">)</span></code> is expression-equivalent to <code class="sourceCode cpp"><span class="op">(</span><span class="dt">void</span><span class="op">)</span>E, views<span class="op">::</span>zip_transform<span class="op">(</span>F<span class="op">)</span></code>, except that the evaluations of <code class="sourceCode cpp">E</code> and <code class="sourceCode cpp">F</code> are indeterminately sequenced.</li>
+<li><span class="marginalizedparent"><a class="marginalized">(2.2)</a></span> Otherwise, the expression <code class="sourceCode cpp">views<span class="op">::</span>adjacent_transform<span class="op">&lt;</span>N<span class="op">&gt;(</span>E, F<span class="op">)</span></code> is expression-equivalent to <code class="sourceCode cpp">adjacent_transform_view<span class="op">&lt;</span>views<span class="op">::</span>all_t<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">((</span>E<span class="op">))&gt;</span>, decay_t<span class="op">&lt;</span>F<span class="op">&gt;</span>, N<span class="op">&gt;(</span>E, F<span class="op">)</span></code>.</li>
+</ul>
+<h4 class="unnumbered" data-number id="class-template-adjacent_transform_view-range.adjacent.transform.view">24.7.?.2 Class template <code class="sourceCode cpp">adjacent_transform_view</code> [range.adjacent.transform.view]<a href="#class-template-adjacent_transform_view-range.adjacent.transform.view" class="self-link"></a></h4>
+<div class="sourceCode" id="cb153"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb153-1"><a href="#cb153-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb153-2"><a href="#cb153-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>forward_range V, copy_constructible F, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
+<span id="cb153-3"><a href="#cb153-3"></a>   <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>N <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">&amp;&amp;</span> is_object_v<span class="op">&lt;</span>F<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb153-4"><a href="#cb153-4"></a>            regular_invocable<span class="op">&lt;</span>F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, N<span class="op">)...&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb153-5"><a href="#cb153-5"></a>            <em>can-reference</em><span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span>F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, N<span class="op">)...&gt;&gt;</span></span>
+<span id="cb153-6"><a href="#cb153-6"></a>  <span class="kw">class</span> adjacent_transform_view <span class="op">:</span> <span class="kw">public</span> view_interface<span class="op">&lt;</span>adjacent_transform_view<span class="op">&lt;</span>V, F, N<span class="op">&gt;&gt;</span> <span class="op">{</span></span>
+<span id="cb153-7"><a href="#cb153-7"></a>  <em>semiregular-box</em><span class="op">&lt;</span>F<span class="op">&gt;</span> <em>fun_</em>;                  <span class="co">// exposition only</span></span>
+<span id="cb153-8"><a href="#cb153-8"></a>  adjacent_view<span class="op">&lt;</span>V, N<span class="op">&gt;</span> <em>inner_</em>;               <span class="co">// exposition only</span></span>
+<span id="cb153-9"><a href="#cb153-9"></a></span>
+<span id="cb153-10"><a href="#cb153-10"></a>  <span class="kw">using</span> <em>InnerView</em> <span class="op">=</span> adjacent_view<span class="op">&lt;</span>V, N<span class="op">&gt;</span>;    <span class="co">// exposition only</span></span>
+<span id="cb153-11"><a href="#cb153-11"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
+<span id="cb153-12"><a href="#cb153-12"></a>  <span class="kw">using</span> <em>inner-iterator</em> <span class="op">=</span> iterator_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, <em>InnerView</em><span class="op">&gt;&gt;</span>;  <span class="co">// exposition only</span></span>
+<span id="cb153-13"><a href="#cb153-13"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
+<span id="cb153-14"><a href="#cb153-14"></a>  <span class="kw">using</span> <em>inner-sentinel</em> <span class="op">=</span> sentinel_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, <em>InnerView</em><span class="op">&gt;&gt;</span>;  <span class="co">// exposition only</span></span>
+<span id="cb153-15"><a href="#cb153-15"></a></span>
+<span id="cb153-16"><a href="#cb153-16"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span> <span class="kw">class</span> <em>iterator</em>;         <span class="co">// exposition only</span></span>
+<span id="cb153-17"><a href="#cb153-17"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span><span class="op">&gt;</span> <span class="kw">class</span> <em>sentinel</em>;         <span class="co">// exposition only</span></span>
+<span id="cb153-18"><a href="#cb153-18"></a></span>
+<span id="cb153-19"><a href="#cb153-19"></a><span class="kw">public</span><span class="op">:</span></span>
+<span id="cb153-20"><a href="#cb153-20"></a>  <span class="kw">constexpr</span> adjacent_transform_view<span class="op">()</span> <span class="op">=</span> <span class="cf">default</span>;</span>
+<span id="cb153-21"><a href="#cb153-21"></a></span>
+<span id="cb153-22"><a href="#cb153-22"></a>  <span class="kw">constexpr</span> <span class="kw">explicit</span> adjacent_transform_view<span class="op">(</span>V base, F fun<span class="op">)</span></span>
+<span id="cb153-23"><a href="#cb153-23"></a>    <span class="op">:</span> <em>fun_</em><span class="op">(</span>std<span class="op">::</span>move<span class="op">(</span>fun<span class="op">))</span>, <em>inner_</em><span class="op">(</span>std<span class="op">::</span>move<span class="op">(</span>base<span class="op">))</span> <span class="op">{}</span></span>
+<span id="cb153-24"><a href="#cb153-24"></a></span>
+<span id="cb153-25"><a href="#cb153-25"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> begin<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb153-26"><a href="#cb153-26"></a>    <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(*</span><span class="kw">this</span>, <em>inner_</em><span class="op">.</span>begin<span class="op">())</span>;</span>
+<span id="cb153-27"><a href="#cb153-27"></a>  <span class="op">}</span></span>
+<span id="cb153-28"><a href="#cb153-28"></a></span>
+<span id="cb153-29"><a href="#cb153-29"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> begin<span class="op">()</span> <span class="kw">const</span></span>
+<span id="cb153-30"><a href="#cb153-30"></a>    <span class="kw">requires</span> range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb153-31"><a href="#cb153-31"></a>             regular_invocable<span class="op">&lt;</span><span class="kw">const</span> F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span><span class="kw">const</span> V<span class="op">&gt;</span>, N<span class="op">)...&gt;</span></span>
+<span id="cb153-32"><a href="#cb153-32"></a>  <span class="op">{</span></span>
+<span id="cb153-33"><a href="#cb153-33"></a>    <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(*</span><span class="kw">this</span>, <em>inner_</em><span class="op">.</span>begin<span class="op">())</span>;</span>
+<span id="cb153-34"><a href="#cb153-34"></a>  <span class="op">}</span></span>
+<span id="cb153-35"><a href="#cb153-35"></a></span>
+<span id="cb153-36"><a href="#cb153-36"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb153-37"><a href="#cb153-37"></a>    <span class="cf">return</span> <em>sentinel</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(</span><em>inner_</em><span class="op">.</span>end<span class="op">())</span>;</span>
+<span id="cb153-38"><a href="#cb153-38"></a>  <span class="op">}</span></span>
+<span id="cb153-39"><a href="#cb153-39"></a></span>
+<span id="cb153-40"><a href="#cb153-40"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">requires</span> common_range<span class="op">&lt;</span><em>InnerView</em><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb153-41"><a href="#cb153-41"></a>    <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(*</span><span class="kw">this</span>, <em>inner_</em><span class="op">.</span>end<span class="op">())</span>;</span>
+<span id="cb153-42"><a href="#cb153-42"></a>  <span class="op">}</span></span>
+<span id="cb153-43"><a href="#cb153-43"></a></span>
+<span id="cb153-44"><a href="#cb153-44"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">const</span></span>
+<span id="cb153-45"><a href="#cb153-45"></a>    <span class="kw">requires</span> range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb153-46"><a href="#cb153-46"></a>             regular_invocable<span class="op">&lt;</span><span class="kw">const</span> F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span><span class="kw">const</span> V<span class="op">&gt;</span>, N<span class="op">)...&gt;</span></span>
+<span id="cb153-47"><a href="#cb153-47"></a>  <span class="op">{</span></span>
+<span id="cb153-48"><a href="#cb153-48"></a>    <span class="cf">return</span> <em>sentinel</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(</span><em>inner_</em><span class="op">.</span>end<span class="op">())</span>;</span>
+<span id="cb153-49"><a href="#cb153-49"></a>  <span class="op">}</span></span>
+<span id="cb153-50"><a href="#cb153-50"></a></span>
+<span id="cb153-51"><a href="#cb153-51"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">const</span></span>
+<span id="cb153-52"><a href="#cb153-52"></a>    <span class="kw">requires</span> common_range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb153-53"><a href="#cb153-53"></a>             regular_invocable<span class="op">&lt;</span><span class="kw">const</span> F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span><span class="kw">const</span> V<span class="op">&gt;</span>, N<span class="op">)...&gt;</span></span>
+<span id="cb153-54"><a href="#cb153-54"></a>  <span class="op">{</span></span>
+<span id="cb153-55"><a href="#cb153-55"></a>    <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(*</span><span class="kw">this</span>, <em>inner_</em><span class="op">.</span>end<span class="op">())</span>;</span>
+<span id="cb153-56"><a href="#cb153-56"></a>  <span class="op">}</span></span>
+<span id="cb153-57"><a href="#cb153-57"></a></span>
+<span id="cb153-58"><a href="#cb153-58"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> size<span class="op">()</span> <span class="kw">requires</span> sized_range<span class="op">&lt;</span><em>InnerView</em><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb153-59"><a href="#cb153-59"></a>    <span class="cf">return</span> <em>inner_</em><span class="op">.</span>size<span class="op">()</span>;</span>
+<span id="cb153-60"><a href="#cb153-60"></a>  <span class="op">}</span></span>
+<span id="cb153-61"><a href="#cb153-61"></a></span>
+<span id="cb153-62"><a href="#cb153-62"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> size<span class="op">()</span> <span class="kw">const</span> <span class="kw">requires</span> sized_range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb153-63"><a href="#cb153-63"></a>    <span class="cf">return</span> <em>inner_</em><span class="op">.</span>size<span class="op">()</span>;</span>
+<span id="cb153-64"><a href="#cb153-64"></a>  <span class="op">}</span></span>
+<span id="cb153-65"><a href="#cb153-65"></a><span class="op">}</span>;</span>
+<span id="cb153-66"><a href="#cb153-66"></a></span>
+<span id="cb153-67"><a href="#cb153-67"></a><span class="op">}</span></span></code></pre></div>
+<h4 class="unnumbered" data-number id="class-template-adjacent_transform_view_iterator_-range.adjacent.transform.iterator">24.7.?.3 Class template <code class="sourceCode cpp">adjacent_transform_view<span class="op">::</span><em>iterator</em></code> [range.adjacent.transform.iterator]<a href="#class-template-adjacent_transform_view_iterator_-range.adjacent.transform.iterator" class="self-link"></a></h4>
+<div class="sourceCode" id="cb154"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb154-1"><a href="#cb154-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb154-2"><a href="#cb154-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>forward_range V, copy_constructible F, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
+<span id="cb154-3"><a href="#cb154-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>N <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">&amp;&amp;</span> is_object_v<span class="op">&lt;</span>F<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb154-4"><a href="#cb154-4"></a>             regular_invocable<span class="op">&lt;</span>F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, N<span class="op">)...&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb154-5"><a href="#cb154-5"></a>             <em>can-reference</em><span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span>F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, N<span class="op">)...&gt;&gt;</span></span>
+<span id="cb154-6"><a href="#cb154-6"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
+<span id="cb154-7"><a href="#cb154-7"></a>  <span class="kw">class</span> adjacent_transform_view<span class="op">&lt;</span>F, V<span class="op">...&gt;::</span><em>iterator</em> <span class="op">{</span></span>
+<span id="cb154-8"><a href="#cb154-8"></a>    <span class="kw">using</span> <em>Parent</em> <span class="op">=</span> <em>maybe-const</em><span class="op">&lt;</span>Const, adjacent_transform_view<span class="op">&gt;</span>;      <span class="co">// exposition only</span></span>
+<span id="cb154-9"><a href="#cb154-9"></a>    <span class="kw">using</span> <em>Base</em> <span class="op">=</span> <em>maybe-const</em><span class="op">&lt;</span>Const, V<span class="op">&gt;</span>;                 <span class="co">// exposition only</span></span>
+<span id="cb154-10"><a href="#cb154-10"></a>    <em>Parent</em><span class="op">*</span> parent <span class="op">=</span> <span class="kw">nullptr</span>;                                   <span class="co">// exposition only</span></span>
+<span id="cb154-11"><a href="#cb154-11"></a>    <em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span> <em>inner_</em>;                                    <span class="co">// exposition only</span></span>
+<span id="cb154-12"><a href="#cb154-12"></a></span>
+<span id="cb154-13"><a href="#cb154-13"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span><em>Parent</em><span class="op">&amp;</span> parent, <em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span> inner<span class="op">)</span>; <span class="co">// exposition only</span></span>
+<span id="cb154-14"><a href="#cb154-14"></a></span>
+<span id="cb154-15"><a href="#cb154-15"></a>  <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb154-16"><a href="#cb154-16"></a>    <span class="kw">using</span> iterator_category <span class="op">=</span> <em>see below</em>;</span>
+<span id="cb154-17"><a href="#cb154-17"></a>    <span class="kw">using</span> iterator_concept  <span class="op">=</span> <span class="kw">typename</span> <em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;::</span>iterator_concept;</span>
+<span id="cb154-18"><a href="#cb154-18"></a>    <span class="kw">using</span> value_type <span class="op">=</span></span>
+<span id="cb154-19"><a href="#cb154-19"></a>      remove_cvref_t<span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, F<span class="op">&gt;&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, N<span class="op">)...&gt;&gt;</span>;</span>
+<span id="cb154-20"><a href="#cb154-20"></a>    <span class="kw">using</span> difference_type <span class="op">=</span> range_difference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb154-21"><a href="#cb154-21"></a></span>
+<span id="cb154-22"><a href="#cb154-22"></a>    <em>iterator</em><span class="op">()</span> <span class="op">=</span> <span class="cf">default</span>;</span>
+<span id="cb154-23"><a href="#cb154-23"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span><em>iterator</em><span class="op">&lt;!</span>Const<span class="op">&gt;</span> i<span class="op">)</span></span>
+<span id="cb154-24"><a href="#cb154-24"></a>      <span class="kw">requires</span> Const <span class="op">&amp;&amp;</span> convertible_to<span class="op">&lt;</span><em>inner-iterator</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;</span>, <em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span>
+<span id="cb154-25"><a href="#cb154-25"></a></span>
+<span id="cb154-26"><a href="#cb154-26"></a>    <span class="kw">constexpr</span> <span class="kw">decltype</span><span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="kw">operator</span><span class="op">*()</span> <span class="kw">const</span> <span class="kw">noexcept</span><span class="op">(</span><em>see below</em><span class="op">)</span>;</span>
+<span id="cb154-27"><a href="#cb154-27"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">++()</span>;</span>
+<span id="cb154-28"><a href="#cb154-28"></a>    <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">++(</span><span class="dt">int</span><span class="op">)</span>;</span>
+<span id="cb154-29"><a href="#cb154-29"></a></span>
+<span id="cb154-30"><a href="#cb154-30"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">--()</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb154-31"><a href="#cb154-31"></a>    <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">--(</span><span class="dt">int</span><span class="op">)</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb154-32"><a href="#cb154-32"></a></span>
+<span id="cb154-33"><a href="#cb154-33"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">+=(</span>difference_type x<span class="op">)</span> <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb154-34"><a href="#cb154-34"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">-=(</span>difference_type x<span class="op">)</span> <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb154-35"><a href="#cb154-35"></a></span>
+<span id="cb154-36"><a href="#cb154-36"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">[](</span>difference_type n<span class="op">)</span> <span class="kw">const</span> <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb154-37"><a href="#cb154-37"></a></span>
+<span id="cb154-38"><a href="#cb154-38"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">==(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span>;</span>
+<span id="cb154-39"><a href="#cb154-39"></a></span>
+<span id="cb154-40"><a href="#cb154-40"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&lt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb154-41"><a href="#cb154-41"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb154-42"><a href="#cb154-42"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&gt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb154-43"><a href="#cb154-43"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb154-44"><a href="#cb154-44"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&lt;=(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb154-45"><a href="#cb154-45"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb154-46"><a href="#cb154-46"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&gt;=(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb154-47"><a href="#cb154-47"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb154-48"><a href="#cb154-48"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">&lt;=&gt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb154-49"><a href="#cb154-49"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span> three_­way_­comparable<span class="op">&lt;</span><em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span>
+<span id="cb154-50"><a href="#cb154-50"></a></span>
+<span id="cb154-51"><a href="#cb154-51"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">+(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i, difference_type n<span class="op">)</span></span>
+<span id="cb154-52"><a href="#cb154-52"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb154-53"><a href="#cb154-53"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">+(</span>difference_type n, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i<span class="op">)</span></span>
+<span id="cb154-54"><a href="#cb154-54"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb154-55"><a href="#cb154-55"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, difference_type y<span class="op">)</span></span>
+<span id="cb154-56"><a href="#cb154-56"></a>      <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb154-57"><a href="#cb154-57"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> difference_type <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb154-58"><a href="#cb154-58"></a>      <span class="kw">requires</span> sized_sentinel_for<span class="op">&lt;</span><em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span>, <em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span>
+<span id="cb154-59"><a href="#cb154-59"></a>  <span class="op">}</span>;</span>
+<span id="cb154-60"><a href="#cb154-60"></a><span class="op">}</span></span></code></pre></div>
+<p><span class="marginalizedparent"><a class="marginalized">1</a></span> The member <em>typedef-name</em> <code class="sourceCode cpp"><em>iterator</em><span class="op">::</span>iterator_category</code> is defined as follows:</p>
+<ul>
+<li>If <code class="sourceCode cpp">invoke_result_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, F<span class="op">&gt;&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, N<span class="op">)...&gt;</span></code> is not an lvalue reference, <code class="sourceCode cpp">iterator_category</code> denotes <code class="sourceCode cpp">input_iterator_tag</code>.</li>
+<li>Otherwise, let <code class="sourceCode cpp">C</code> denote the type <code class="sourceCode cpp">iterator_traits<span class="op">&lt;</span><em>Base</em><span class="op">&gt;::</span>iterator_category</code>.
+<ul>
+<li>If <code class="sourceCode cpp">derived_from<span class="op">&lt;</span>C, random_access_iterator_tag<span class="op">&gt;</span></code> is <code class="sourceCode cpp"><span class="kw">true</span></code>, <code class="sourceCode cpp">iterator_category</code> denotes <code class="sourceCode cpp">random_access_iterator_tag</code>;</li>
+<li>Otherwise, if <code class="sourceCode cpp">derived_from<span class="op">&lt;</span>C, bidirectional_iterator_tag<span class="op">&gt;</span></code> is <code class="sourceCode cpp"><span class="kw">true</span></code>, <code class="sourceCode cpp">iterator_category</code> denotes <code class="sourceCode cpp">bidirectional_iterator_tag</code>;</li>
+<li>Otherwise, if <code class="sourceCode cpp">derived_from<span class="op">&lt;</span>C, forward_iterator_tag<span class="op">&gt;</span></code> is <code class="sourceCode cpp"><span class="kw">true</span></code>, <code class="sourceCode cpp">iterator_category</code> denotes <code class="sourceCode cpp">forward_iterator_tag</code>;</li>
+<li>Otherwise, <code class="sourceCode cpp">iterator_category</code> denotes <code class="sourceCode cpp">input_iterator_tag</code>.</li>
+</ul></li>
+</ul>
+<div>
+<div class="sourceCode" id="cb155"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb155-1"><a href="#cb155-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span><em>Parent</em><span class="op">&amp;</span> parent, <em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span> inner<span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">2</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp"><em>parent_</em></code> with <code class="sourceCode cpp">addressof<span class="op">(</span>parent<span class="op">)</span></code> and <code class="sourceCode cpp"><em>inner_</em></code> with <code class="sourceCode cpp">std<span class="op">::</span>move<span class="op">(</span>inner<span class="op">)</span></code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb156"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb156-1"><a href="#cb156-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span><em>iterator</em><span class="op">&lt;!</span>Const<span class="op">&gt;</span> i<span class="op">)</span></span>
+<span id="cb156-2"><a href="#cb156-2"></a>  <span class="kw">requires</span> Const <span class="op">&amp;&amp;</span> convertible_to<span class="op">&lt;</span><em>inner-iterator</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;</span>, <em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">3</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp"><em>parent_</em></code> with <code class="sourceCode cpp">i<span class="op">.</span><em>parent_</em></code> and <code class="sourceCode cpp"><em>inner_</em></code> with <code class="sourceCode cpp">std<span class="op">::</span>move<span class="op">(</span>i<span class="op">.</span><em>inner_</em><span class="op">)</span></code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb157"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb157-1"><a href="#cb157-1"></a><span class="kw">constexpr</span> <span class="kw">decltype</span><span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="kw">operator</span><span class="op">*()</span> <span class="kw">const</span> <span class="kw">noexcept</span><span class="op">(</span><em>see below</em><span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">4</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb158"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb158-1"><a href="#cb158-1"></a>  <span class="cf">return</span> apply<span class="op">([&amp;](</span><span class="kw">const</span> <span class="kw">auto</span><span class="op">&amp;...</span> iters<span class="op">)</span> <span class="op">-&gt;</span> <span class="kw">decltype</span><span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb158-2"><a href="#cb158-2"></a>    <span class="cf">return</span> invoke<span class="op">(*</span><em>parent_</em><span class="op">-&gt;</span><em>fun_</em>, <span class="op">*</span>iters<span class="op">...)</span>;</span>
+<span id="cb158-3"><a href="#cb158-3"></a>  <span class="op">}</span>, <em>inner_</em><span class="op">.</span><em>current_</em><span class="op">)</span>;</span></code></pre></div>
+</blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">5</a></span> <em>Remarks:</em> The expression within <code class="sourceCode cpp"><span class="kw">noexcept</span></code> is equivalent to <code class="sourceCode cpp">is_nothrow_invocable_v<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, F<span class="op">&gt;&amp;</span>,  <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>, N<span class="op">)...&gt;</span></code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb159"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb159-1"><a href="#cb159-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">++()</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">6</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb160"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb160-1"><a href="#cb160-1"></a>  <span class="op">++</span><em>inner_</em>;</span>
+<span id="cb160-2"><a href="#cb160-2"></a>  <span class="cf">return</span> <span class="op">*</span><span class="kw">this</span>;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb161"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb161-1"><a href="#cb161-1"></a><span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">++(</span><span class="dt">int</span><span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">7</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb162"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb162-1"><a href="#cb162-1"></a>  <span class="kw">auto</span> tmp <span class="op">=</span> <span class="op">*</span><span class="kw">this</span>;</span>
+<span id="cb162-2"><a href="#cb162-2"></a>  <span class="op">++*</span><span class="kw">this</span>;</span>
+<span id="cb162-3"><a href="#cb162-3"></a>  <span class="cf">return</span> tmp;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb163"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb163-1"><a href="#cb163-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">--()</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">8</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb164"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb164-1"><a href="#cb164-1"></a>  <span class="op">--</span><em>inner_</em>;</span>
+<span id="cb164-2"><a href="#cb164-2"></a>  <span class="cf">return</span> <span class="op">*</span><span class="kw">this</span>;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb165"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb165-1"><a href="#cb165-1"></a><span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">--(</span><span class="dt">int</span><span class="op">)</span> <span class="kw">requires</span> bidirectional_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">9</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb166"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb166-1"><a href="#cb166-1"></a>  <span class="kw">auto</span> tmp <span class="op">=</span> <span class="op">*</span><span class="kw">this</span>;</span>
+<span id="cb166-2"><a href="#cb166-2"></a>  <span class="op">--*</span><span class="kw">this</span>;</span>
+<span id="cb166-3"><a href="#cb166-3"></a>  <span class="cf">return</span> tmp;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb167"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb167-1"><a href="#cb167-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">+=(</span>difference_type x<span class="op">)</span></span>
+<span id="cb167-2"><a href="#cb167-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">10</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb168"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb168-1"><a href="#cb168-1"></a>  <em>inner_</em> <span class="op">+=</span> x;</span>
+<span id="cb168-2"><a href="#cb168-2"></a>  <span class="cf">return</span> <span class="op">*</span><span class="kw">this</span>;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb169"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb169-1"><a href="#cb169-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">-=(</span>difference_type x<span class="op">)</span></span>
+<span id="cb169-2"><a href="#cb169-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">11</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb170"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb170-1"><a href="#cb170-1"></a>  <em>inner_</em> <span class="op">-=</span> x;</span>
+<span id="cb170-2"><a href="#cb170-2"></a>  <span class="cf">return</span> <span class="op">*</span><span class="kw">this</span>;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb171"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb171-1"><a href="#cb171-1"></a><span class="kw">constexpr</span> <span class="kw">decltype</span><span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="kw">operator</span><span class="op">[](</span>difference_type n<span class="op">)</span> <span class="kw">const</span></span>
+<span id="cb171-2"><a href="#cb171-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">12</a></span> <em>Effects</em>: Equivalent to:</p>
+<blockquote>
+<div class="sourceCode" id="cb172"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb172-1"><a href="#cb172-1"></a>  <span class="cf">return</span> apply<span class="op">([&amp;](</span><span class="kw">const</span> <span class="kw">auto</span><span class="op">&amp;...</span> iters<span class="op">)</span> <span class="op">-&gt;</span> <span class="kw">decltype</span><span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb172-2"><a href="#cb172-2"></a>    <span class="cf">return</span> invoke<span class="op">(*</span><em>parent_</em><span class="op">-&gt;</span><em>fun_</em>, iters<span class="op">[</span>n<span class="op">]...)</span>;</span>
+<span id="cb172-3"><a href="#cb172-3"></a>  <span class="op">}</span>, <em>inner_</em><span class="op">.</span><em>current_</em><span class="op">)</span>;</span></code></pre></div>
+</blockquote>
+</blockquote>
+<div class="sourceCode" id="cb173"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb173-1"><a href="#cb173-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">==(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span>;</span>
+<span id="cb173-2"><a href="#cb173-2"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&lt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb173-3"><a href="#cb173-3"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb173-4"><a href="#cb173-4"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&gt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb173-5"><a href="#cb173-5"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb173-6"><a href="#cb173-6"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&lt;=(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb173-7"><a href="#cb173-7"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb173-8"><a href="#cb173-8"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">&gt;=(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb173-9"><a href="#cb173-9"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb173-10"><a href="#cb173-10"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">&lt;=&gt;(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb173-11"><a href="#cb173-11"></a>  <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span> three_­way_­comparable<span class="op">&lt;</span><em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">13</a></span> Let <em><code class="sourceCode cpp">op</code></em> be the operator.</p>
+<p><span class="marginalizedparent"><a class="marginalized">14</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>inner_</em> <em>op</em> y<span class="op">.</span><em>inner_</em>;</code></p>
+</blockquote>
+<div class="sourceCode" id="cb174"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb174-1"><a href="#cb174-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">+(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i, difference_type n<span class="op">)</span></span>
+<span id="cb174-2"><a href="#cb174-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span>
+<span id="cb174-3"><a href="#cb174-3"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">+(</span>difference_type n, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> i<span class="op">)</span></span>
+<span id="cb174-4"><a href="#cb174-4"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">15</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> <em>iterator</em><span class="op">(*</span>i<span class="op">.</span><em>parent_</em>, i<span class="op">.</span><em>inner_</em> <span class="op">+</span> n<span class="op">)</span>;</code></p>
+</blockquote>
+<div class="sourceCode" id="cb175"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb175-1"><a href="#cb175-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <em>iterator</em> <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, difference_type y<span class="op">)</span></span>
+<span id="cb175-2"><a href="#cb175-2"></a>  <span class="kw">requires</span> random_­access_­range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">16</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> <em>iterator</em><span class="op">(*</span>x<span class="op">.</span><em>parent_</em>, x<span class="op">.</span><em>inner_</em> <span class="op">-</span> y<span class="op">)</span>;</code></p>
+</blockquote>
+<div class="sourceCode" id="cb176"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb176-1"><a href="#cb176-1"></a><span class="kw">friend</span> <span class="kw">constexpr</span> difference_type <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&amp;</span> y<span class="op">)</span></span>
+<span id="cb176-2"><a href="#cb176-2"></a>  <span class="kw">requires</span> sized_sentinel_for<span class="op">&lt;</span><em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span>, <em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">17</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>inner_</em> <span class="op">-</span> y<span class="op">.</span><em>inner_</em>;</code></p>
+</blockquote>
+</div>
+<h4 class="unnumbered" data-number id="class-template-adjacent_transform_view_sentinel_-range.adjacent.transform.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">adjacent_transform_view<span class="op">::</span><em>sentinel</em></code> [range.adjacent.transform.sentinel]<a href="#class-template-adjacent_transform_view_sentinel_-range.adjacent.transform.sentinel" class="self-link"></a></h4>
+<div class="sourceCode" id="cb177"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb177-1"><a href="#cb177-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
+<span id="cb177-2"><a href="#cb177-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>forward_range V, copy_constructible F, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
+<span id="cb177-3"><a href="#cb177-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>N <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">&amp;&amp;</span> is_object_v<span class="op">&lt;</span>F<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb177-4"><a href="#cb177-4"></a>             regular_invocable<span class="op">&lt;</span>F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, N<span class="op">)...&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb177-5"><a href="#cb177-5"></a>             <em>can-reference</em><span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span>F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, N<span class="op">)...&gt;&gt;</span></span>
+<span id="cb177-6"><a href="#cb177-6"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
+<span id="cb177-7"><a href="#cb177-7"></a>  <span class="kw">class</span> adjacent_transform_view<span class="op">&lt;</span>V, F, N<span class="op">&gt;::</span><em>sentinel</em> <span class="op">{</span></span>
+<span id="cb177-8"><a href="#cb177-8"></a>    <em>inner-sentinel</em><span class="op">&lt;</span>Const<span class="op">&gt;</span> <em>inner_</em>;                             <span class="co">// exposition only</span></span>
+<span id="cb177-9"><a href="#cb177-9"></a>    <span class="kw">constexpr</span> <span class="kw">explicit</span> <em>sentinel</em><span class="op">(</span><em>inner-sentinel</em><span class="op">&lt;</span>Const<span class="op">&gt;</span> inner<span class="op">)</span>;  <span class="co">// exposition only</span></span>
+<span id="cb177-10"><a href="#cb177-10"></a>  <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb177-11"><a href="#cb177-11"></a>    <em>sentinel</em><span class="op">()</span> <span class="op">=</span> <span class="cf">default</span>;</span>
+<span id="cb177-12"><a href="#cb177-12"></a>    <span class="kw">constexpr</span> <em>sentinel</em><span class="op">(</span><em>sentinel</em><span class="op">&lt;!</span>Const<span class="op">&gt;</span> i<span class="op">)</span></span>
+<span id="cb177-13"><a href="#cb177-13"></a>      <span class="kw">requires</span> Const <span class="op">&amp;&amp;</span> convertible_to<span class="op">&lt;</span><em>inner-sentinel</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;</span>, <em>inner-sentinel</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span>
+<span id="cb177-14"><a href="#cb177-14"></a></span>
+<span id="cb177-15"><a href="#cb177-15"></a>    <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> OtherConst<span class="op">&gt;</span></span>
+<span id="cb177-16"><a href="#cb177-16"></a>      <span class="kw">requires</span> sentinel_­for<span class="op">&lt;</span><em>inner-sentinel</em><span class="op">&lt;</span>Const<span class="op">&gt;</span>, <em>inner-iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&gt;</span></span>
+<span id="cb177-17"><a href="#cb177-17"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">==(</span><span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> x, <span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> y<span class="op">)</span>;</span>
+<span id="cb177-18"><a href="#cb177-18"></a></span>
+<span id="cb177-19"><a href="#cb177-19"></a>    <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> OtherConst<span class="op">&gt;</span></span>
+<span id="cb177-20"><a href="#cb177-20"></a>      <span class="kw">requires</span> sized_­sentinel_­for<span class="op">&lt;</span><em>inner-sentinel</em><span class="op">&lt;</span>Const<span class="op">&gt;</span>, <em>inner-iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&gt;</span></span>
+<span id="cb177-21"><a href="#cb177-21"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> range_difference_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, <em>InnerView</em><span class="op">&gt;&gt;</span></span>
+<span id="cb177-22"><a href="#cb177-22"></a>      <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> x, <span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> y<span class="op">)</span>;</span>
+<span id="cb177-23"><a href="#cb177-23"></a></span>
+<span id="cb177-24"><a href="#cb177-24"></a>    <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> OtherConst<span class="op">&gt;</span></span>
+<span id="cb177-25"><a href="#cb177-25"></a>      <span class="kw">requires</span> sized_­sentinel_­for<span class="op">&lt;</span><em>inner-sentinel</em><span class="op">&lt;</span>Const<span class="op">&gt;</span>, <em>inner-iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&gt;</span></span>
+<span id="cb177-26"><a href="#cb177-26"></a>    <span class="kw">friend</span> <span class="kw">constexpr</span> range_difference_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, <em>InnerView</em><span class="op">&gt;&gt;</span></span>
+<span id="cb177-27"><a href="#cb177-27"></a>      <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> y<span class="op">)</span>;</span>
+<span id="cb177-28"><a href="#cb177-28"></a>  <span class="op">}</span>;</span>
+<span id="cb177-29"><a href="#cb177-29"></a><span class="op">}</span></span></code></pre></div>
+<div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb178-1"><a href="#cb178-1"></a><span class="kw">constexpr</span> <span class="kw">explicit</span> <em>sentinel</em><span class="op">(</span><em>inner-sentinel</em><span class="op">&lt;</span>Const<span class="op">&gt;</span> inner<span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">1</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp"><em>inner_</em></code> with <code class="sourceCode cpp">inner</code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb179"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb179-1"><a href="#cb179-1"></a><span class="kw">constexpr</span> <em>sentinel</em><span class="op">(</span><em>sentinel</em><span class="op">&lt;!</span>Const<span class="op">&gt;</span> i<span class="op">)</span></span>
+<span id="cb179-2"><a href="#cb179-2"></a>  <span class="kw">requires</span> Const <span class="op">&amp;&amp;</span> convertible_to<span class="op">&lt;</span><em>inner-sentinel</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;</span>, <em>inner-sentinel</em><span class="op">&lt;</span>Const<span class="op">&gt;&gt;</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">2</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp"><em>inner_</em></code> with <code class="sourceCode cpp">std<span class="op">::</span>move<span class="op">(</span>i<span class="op">.</span><em>inner_</em><span class="op">)</span></code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb180"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb180-1"><a href="#cb180-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> OtherConst<span class="op">&gt;</span></span>
+<span id="cb180-2"><a href="#cb180-2"></a>  <span class="kw">requires</span> sentinel_­for<span class="op">&lt;</span><em>inner-sentinel</em><span class="op">&lt;</span>Const<span class="op">&gt;</span>, <em>inner-iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&gt;</span></span>
+<span id="cb180-3"><a href="#cb180-3"></a><span class="kw">friend</span> <span class="kw">constexpr</span> <span class="dt">bool</span> <span class="kw">operator</span><span class="op">==(</span><span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> x, <span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> y<span class="op">)</span>;</span></code></pre></div>
+<blockquote>
+<p><span class="marginalizedparent"><a class="marginalized">3</a></span> <em>Effects</em>: Equivalent to <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>inner_</em> <span class="op">==</span> y<span class="op">.</span><em>inner_</em>;</code></p>
+</blockquote>
+<div class="sourceCode" id="cb181"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb181-1"><a href="#cb181-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> OtherConst<span class="op">&gt;</span></span>
+<span id="cb181-2"><a href="#cb181-2"></a>  <span class="kw">requires</span> sized_­sentinel_­for<span class="op">&lt;</span><em>inner-sentinel</em><span class="op">&lt;</span>Const<span class="op">&gt;</span>, <em>inner-iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&gt;</span></span>
+<span id="cb181-3"><a href="#cb181-3"></a><span class="kw">friend</span> <span class="kw">constexpr</span> range_difference_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, <em>InnerView</em><span class="op">&gt;&gt;</span></span>
+<span id="cb181-4"><a href="#cb181-4"></a>  <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> x, <span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> y<span class="op">)</span>;</span>
+<span id="cb181-5"><a href="#cb181-5"></a></span>
+<span id="cb181-6"><a href="#cb181-6"></a><span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> OtherConst<span class="op">&gt;</span></span>
+<span id="cb181-7"><a href="#cb181-7"></a>  <span class="kw">requires</span> sized_­sentinel_­for<span class="op">&lt;</span><em>inner-sentinel</em><span class="op">&lt;</span>Const<span class="op">&gt;</span>, <em>inner-iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&gt;</span></span>
+<span id="cb181-8"><a href="#cb181-8"></a><span class="kw">friend</span> <span class="kw">constexpr</span> range_difference_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, <em>InnerView</em><span class="op">&gt;&gt;</span></span>
+<span id="cb181-9"><a href="#cb181-9"></a>  <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> x, <span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> y<span class="op">)</span>;</span></code></pre></div>
 <blockquote>
 <p><span class="marginalizedparent"><a class="marginalized">4</a></span> <em>Effects</em>: Equivalent to <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>inner_</em> <span class="op">-</span> y<span class="op">.</span><em>inner_</em>;</code></p>
 </blockquote>
