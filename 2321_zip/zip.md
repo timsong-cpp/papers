@@ -1798,8 +1798,10 @@ constexpr decltype(auto) operator*() const noexcept(@_see below_@);
 ```
 :::
 
-[5]{.pnum} _Remarks:_ The expression within `noexcept` is equivalent to
-`is_nothrow_invocable_v<@_maybe-const_@<Const, F>&, range_reference_t<@_maybe-const_@<Const, Views>>...>`.
+[5]{.pnum} _Remarks:_
+Let `Is` be the pack `0, 1, ..., (sizeof...(Views)-1)`.
+The expression within `noexcept` is equivalent to
+`noexcept(invoke(*@_parent\__@->@_fun\__@, *get<Is>(@_inner\__@.@_current\__@)...))`.
 
 ```cpp
 constexpr @_iterator_@& operator++();
@@ -2700,8 +2702,9 @@ constexpr decltype(auto) operator*() const noexcept(@_see below_@);
 :::
 
 [5]{.pnum} _Remarks:_
+Let `Is` be the pack `0, 1, ..., (N-1)`.
 The expression within `noexcept` is equivalent to
-`is_nothrow_invocable_v<@_maybe-const_@<Const, F>&,  @_REPEAT_@(range_reference_t<@_Base_@>, N)...>`.
+`noexcept(invoke(*@_parent\__@->@_fun\__@, *get<Is>(@_inner\__@.@_current\__@)...))`.
 
 ```cpp
 constexpr @_iterator_@& operator++();
