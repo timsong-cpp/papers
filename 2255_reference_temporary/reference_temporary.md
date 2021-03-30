@@ -280,12 +280,12 @@ template<class U1, class U2> constexpr explicit(@_see below_@) pair(U1&& x, U2&&
 
 [11]{.pnum} _Constraints:_
 
-- [11.1]{.pnum} `is_­constructible_­v<first_­type, U1>` is `true`[,]{.diffins} [and]{.diffdel}
-- [11.2]{.pnum} `is_­constructible_­v<second_­type, U2>` is `true`[,]{.diffins}
+- [11.1]{.pnum} `is_constructible_v<first_type, U1>` is `true`[,]{.diffins} [and]{.diffdel}
+- [11.2]{.pnum} `is_constructible_v<second_type, U2>` is `true`[,]{.diffins}
 - [11.3]{.pnum} [`reference_constructs_from_temporary_v<first_type, U1&&>` is `false`, and]{.diffins}
-- [11.4]{.pnum} [`reference_constructs_from_temporary_v<second_­type, U2&&>` is `false`]{.diffins}.
+- [11.4]{.pnum} [`reference_constructs_from_temporary_v<second_type, U2&&>` is `false`]{.diffins}.
 
-[12]{.pnum} _Effects:_ Initializes `first` with `std​::​forward<U1>(x)` and `second` with `std​::​forward<U2>(y)`.
+[12]{.pnum} _Effects:_ Initializes `first` with `std::forward<U1>(x)` and `second` with `std::forward<U2>(y)`.
 
 [13]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!is_convertible_v<U1, first_type> || !is_convertible_v<U2, second_type>`
@@ -295,10 +295,10 @@ template<class U1, class U2> constexpr explicit(@_see below_@) pair(const pair<U
 ```
 [14]{.pnum} _Constraints:_
 
-- [14.1]{.pnum} `is_­constructible_­v<first_­type, const U1&>` is `true`[,]{.diffins} [and]{.diffdel}
-- [14.2]{.pnum} `is_­constructible_­v<second_­type, const U2&>` is `true`[,]{.diffins}
+- [14.1]{.pnum} `is_constructible_v<first_type, const U1&>` is `true`[,]{.diffins} [and]{.diffdel}
+- [14.2]{.pnum} `is_constructible_v<second_type, const U2&>` is `true`[,]{.diffins}
 - [14.3]{.pnum} [`reference_constructs_from_temporary_v<first_type, const U1&>` is `false`, and]{.diffins}
-- [14.4]{.pnum} [`reference_constructs_from_temporary_v<second_­type, const U2&>` is `false`]{.diffins}.
+- [14.4]{.pnum} [`reference_constructs_from_temporary_v<second_type, const U2&>` is `false`]{.diffins}.
 
 [15]{.pnum} _Effects:_  Initializes members from the corresponding members of the argument.
 
@@ -312,12 +312,12 @@ template<class U1, class U2> constexpr explicit(@_see below_@) pair(pair<U1, U2>
 
 [17]{.pnum} _Constraints:_
 
-- [17.1]{.pnum} `is_­constructible_­v<first_­type, U1>` is `true`[,]{.diffins} [and]{.diffdel}
-- [17.2]{.pnum} `is_­constructible_­v<second_­type, U2>` is `true`[,]{.diffins}
+- [17.1]{.pnum} `is_constructible_v<first_type, U1>` is `true`[,]{.diffins} [and]{.diffdel}
+- [17.2]{.pnum} `is_constructible_v<second_type, U2>` is `true`[,]{.diffins}
 - [17.3]{.pnum} [`reference_constructs_from_temporary_v<first_type, U1&&>` is `false`, and]{.diffins}
-- [17.4]{.pnum} [`reference_constructs_from_temporary_v<second_­type, U2&&>` is `false`]{.diffins}.
+- [17.4]{.pnum} [`reference_constructs_from_temporary_v<second_type, U2&&>` is `false`]{.diffins}.
 
-[18]{.pnum} _Effects:_ Initializes `first` with `std​::​forward<U1>(p.first)` and `second` with `std​::​forward<U2>(​p.second)`.
+[18]{.pnum} _Effects:_ Initializes `first` with `std::forward<U1>(p.first)` and `second` with `std::forward<U2>(p.second)`.
 
 [19]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!is_convertible_v<U1, first_type> || !is_convertible_v<U2, second_type>`
@@ -333,14 +333,14 @@ template<class... Args1, class... Args2>
 
 [20]{.pnum} _Mandates:_
 
-- [20.1]{.pnum} `is_­constructible_­v<first_­type, Args1...>` is `true` and
-- [20.2]{.pnum} `is_­constructible_­v<second_­type, Args2...>` is `true`.
+- [20.1]{.pnum} `is_constructible_v<first_type, Args1...>` is `true` and
+- [20.2]{.pnum} `is_constructible_v<second_type, Args2...>` is `true`.
 
 [21]{.pnum} _Effects:_ Initializes `first` with arguments of types `Args1...`
-obtained by forwarding the elements of `first_­args` and initializes `second`
+obtained by forwarding the elements of `first_args` and initializes `second`
 with arguments of types `Args2...` obtained by forwarding the elements of
-`second_­args`. (Here, forwarding an element `x` of type `U` within a tuple
-object means calling `std​::​forward<U>(x)`.) This form of construction,
+`second_args`. (Here, forwarding an element `x` of type `U` within a tuple
+object means calling `std::forward<U>(x)`.) This form of construction,
 whereby constructor arguments for `first` and `second` are each provided in a
 separate `tuple` object, is called _piecewise construction_.
 
@@ -360,10 +360,10 @@ template<class... UTypes> constexpr explicit(@_see below_@) tuple(UTypes&&... u)
 
 - [11.1]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes`)[,]{.diffins} and
 - [11.2]{.pnum} `sizeof...(Types)` &ge; 1 [,]{.diffins} and
-- [11.3]{.pnum}`is_­constructible_­v<T@_<sub>i</sub>_@, U@_<sub>i</sub>_@>` is `true` for all _i_[, and]{.diffins}
+- [11.3]{.pnum}`is_constructible_v<T@_<sub>i</sub>_@, U@_<sub>i</sub>_@>` is `true` for all _i_[, and]{.diffins}
 - [11.4]{.pnum} [`reference_constructs_from_temporary_v<T@_<sub>i</sub>_@, U@_<sub>i</sub>_@&&>` is `false` for all _i_.]{.diffins}
 
-[12]{.pnum} _Effects:_ Initializes the elements in the tuple with the corresponding value in `std​::​forward<UTypes>(u)`.
+[12]{.pnum} _Effects:_ Initializes the elements in the tuple with the corresponding value in `std::forward<UTypes>(u)`.
 
 [13]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!conjunction_v<is_convertible<UTypes, Types>...>`
@@ -380,10 +380,10 @@ template<class... UTypes> constexpr explicit(@_see below_@) tuple(const tuple<UT
 [18]{.pnum} _Constraints:_
 
 - [18.1]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes`)[,]{.diffins} and
-- [18.2]{.pnum}`is_­constructible_­v<T@_<sub>i</sub>_@, const U@_<sub>i</sub>_@&>` is `true` for all _i_, and
+- [18.2]{.pnum}`is_constructible_v<T@_<sub>i</sub>_@, const U@_<sub>i</sub>_@&>` is `true` for all _i_, and
 - [18.?]{.pnum} [`reference_constructs_from_temporary_v<T@_<sub>i</sub>_@, const U@_<sub>i</sub>_@&>` is `false` for all _i_, and]{.diffins}
 - [18.3]{.pnum} either `sizeof...(Types)` is not 1, or (when `Types...` expands to `T` and `UTypes...` expands to `U`)
-  `is_­convertible_­v<const tuple<U>&, T>`, `is_­constructible_­v<T, const tuple<U>&>`, and `is_­same_­v<T, U>` are all `false`.
+  `is_convertible_v<const tuple<U>&, T>`, `is_constructible_v<T, const tuple<U>&>`, and `is_same_v<T, U>` are all `false`.
 
 [19]{.pnum} _Effects:_ Initializes each element of `*this` with the corresponding element of `u`.
 
@@ -396,10 +396,10 @@ template<class... UTypes> constexpr explicit(@_see below_@) tuple(tuple<UTypes..
 [21]{.pnum} _Constraints:_
 
 - [21.1]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes`), and
-- [21.2]{.pnum}`is_­constructible_­v<T@_<sub>i</sub>_@, U@_<sub>i</sub>_@>` is `true` for all _i_, and
+- [21.2]{.pnum}`is_constructible_v<T@_<sub>i</sub>_@, U@_<sub>i</sub>_@>` is `true` for all _i_, and
 - [21.?]{.pnum} [`reference_constructs_from_temporary_v<T@_<sub>i</sub>_@, U@_<sub>i</sub>_@&&>` is `false` for all _i_, and]{.diffins}
 - [21.3]{.pnum} either `sizeof...(Types)` is not 1, or (when `Types...` expands to `T` and `UTypes...` expands to `U`)
-  `is_­convertible_­v<tuple<U>, T>`, `is_­constructible_­v<T, tuple<U>>`, and `is_­same_­v<T, U>` are all `false`.
+  `is_convertible_v<tuple<U>, T>`, `is_constructible_v<T, tuple<U>>`, and `is_same_v<T, U>` are all `false`.
 
 [22]{.pnum} _Effects:_ For all _i_, initializes the _i_<sup>th</sup> element of `*this` with `std::forward<U@_<sub>i</sub>_@>(get<@_i_@>(u))`.
 
@@ -413,8 +413,8 @@ template<class U1, class U2> constexpr explicit(@_see below_@) tuple(const pair<
 [24]{.pnum} _Constraints:_
 
 - [24.1]{.pnum} `sizeof...(Types)` is 2,
-- [24.2]{.pnum} `is_­constructible_­v<T@<sub>0</sub>@, const U1&>` is `true`, [and]{.diffdel}
-- [24.3]{.pnum} `is_­constructible_­v<T@<sub>1</sub>@, const U2&>` is `true`[,]{.diffins}
+- [24.2]{.pnum} `is_constructible_v<T@<sub>0</sub>@, const U1&>` is `true`, [and]{.diffdel}
+- [24.3]{.pnum} `is_constructible_v<T@<sub>1</sub>@, const U2&>` is `true`[,]{.diffins}
 - [24.4]{.pnum} [`reference_constructs_from_temporary_v<T@<sub>0</sub>@, const U1&>` is `false`, and]{.diffins}
 - [24.5]{.pnum} [`reference_constructs_from_temporary_v<T@<sub>1</sub>@, const U2&>` is `false`]{.diffins}.
 
@@ -430,12 +430,12 @@ template<class U1, class U2> constexpr explicit(@_see below_@) tuple(pair<U1, U2
 [27]{.pnum} _Constraints:_
 
 - [27.1]{.pnum} `sizeof...(Types)` is 2,
-- [27.2]{.pnum} `is_­constructible_­v<T@<sub>0</sub>@, U1>` is `true`, [and]{.diffdel}
-- [27.3]{.pnum} `is_­constructible_­v<T@<sub>1</sub>@, U2>` is `true`[,]{.diffins}
+- [27.2]{.pnum} `is_constructible_v<T@<sub>0</sub>@, U1>` is `true`, [and]{.diffdel}
+- [27.3]{.pnum} `is_constructible_v<T@<sub>1</sub>@, U2>` is `true`[,]{.diffins}
 - [27.4]{.pnum} [`reference_constructs_from_temporary_v<T@<sub>0</sub>@, U1&&>` is `false`, and]{.diffins}
 - [27.5]{.pnum} [`reference_constructs_from_temporary_v<T@<sub>1</sub>@, U2&&>` is `false`]{.diffins}.
 
-[28]{.pnum} _Effects:_ Initializes the first element with `std​::​forward<U1>(u.first)` and the second element with `std​::​forward<U2>(u.second)`.
+[28]{.pnum} _Effects:_ Initializes the first element with `std::forward<U1>(u.first)` and the second element with `std::forward<U2>(u.second)`.
 
 [29]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!is_convertible_v<U1, T@<sub>0</sub>@> || !is_convertible_v<U2, T@<sub>1</sub>@>`

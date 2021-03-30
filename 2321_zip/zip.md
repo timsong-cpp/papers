@@ -340,8 +340,8 @@ template<class... UTypes> constexpr explicit(@_see below_@) tuple(const tuple<UT
 - [?.1]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes)`, and
 - [?.1]{.pnum} `(is_constructible_v<Types, decltype(get<I>(FWD(u)))> && ...)` is `true`, and
 - either `sizeof...(Types)` is not `1`, or (when `Types...` expands to `T` and
-  `UTypes...` expands to `U`) `is_­convertible_­v<decltype(u), T>`,
-   `is_­constructible_­v<T, decltype(u)>`, and `is_­same_­v<T, U>` are all false.
+  `UTypes...` expands to `U`) `is_convertible_v<decltype(u), T>`,
+   `is_constructible_v<T, decltype(u)>`, and `is_same_v<T, U>` are all false.
 
 [?]{.pnum} _Effects:_ For all _i_, initializes the _i_<sup>th</sup> element of `*this` with `get<@_i_@>(FWD(u))`.
 
@@ -383,9 +383,9 @@ template<class... UTypes> constexpr explicit(@_see below_@) tuple(const tuple<UT
 [18]{.pnum} _Constraints:_
 
 - [18.1]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes`)[,]{.diffins} and
-- [18.2]{.pnum}`is_­constructible_­v<T@_<sub>i</sub>_@, const U@_<sub>i</sub>_@&>` is `true` for all _i_, and
+- [18.2]{.pnum}`is_constructible_v<T@_<sub>i</sub>_@, const U@_<sub>i</sub>_@&>` is `true` for all _i_, and
 - [18.3]{.pnum} either `sizeof...(Types)` is not 1, or (when `Types...` expands to `T` and `UTypes...` expands to `U`)
-  `is_­convertible_­v<const tuple<U>&, T>`, `is_­constructible_­v<T, const tuple<U>&>`, and `is_­same_­v<T, U>` are all `false`.
+  `is_convertible_v<const tuple<U>&, T>`, `is_constructible_v<T, const tuple<U>&>`, and `is_same_v<T, U>` are all `false`.
 
 [19]{.pnum} _Effects:_ Initializes each element of `*this` with the corresponding element of `u`.
 
@@ -398,9 +398,9 @@ template<class... UTypes> constexpr explicit(@_see below_@) tuple(tuple<UTypes..
 [21]{.pnum} _Constraints:_
 
 - [21.1]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes`), and
-- [21.2]{.pnum}`is_­constructible_­v<T@_<sub>i</sub>_@, U@_<sub>i</sub>_@>` is `true` for all _i_, and
+- [21.2]{.pnum}`is_constructible_v<T@_<sub>i</sub>_@, U@_<sub>i</sub>_@>` is `true` for all _i_, and
 - [21.3]{.pnum} either `sizeof...(Types)` is not 1, or (when `Types...` expands to `T` and `UTypes...` expands to `U`)
-  `is_­convertible_­v<tuple<U>, T>`, `is_­constructible_­v<T, tuple<U>>`, and `is_­same_­v<T, U>` are all `false`.
+  `is_convertible_v<tuple<U>, T>`, `is_constructible_v<T, tuple<U>>`, and `is_same_v<T, U>` are all `false`.
 
 [22]{.pnum} _Effects:_ For all _i_, initializes the _i_<sup>th</sup> element of `*this` with `std::forward<U@_<sub>i</sub>_@>(get<@_i_@>(u))`.
 
@@ -414,8 +414,8 @@ template<class U1, class U2> constexpr explicit(@_see below_@) tuple(const pair<
 [24]{.pnum} _Constraints:_
 
 - [24.1]{.pnum} `sizeof...(Types)` is 2,
-- [24.2]{.pnum} `is_­constructible_­v<T@<sub>0</sub>@, const U1&>` is `true`, and
-- [24.3]{.pnum} `is_­constructible_­v<T@<sub>1</sub>@, const U2&>` is `true`
+- [24.2]{.pnum} `is_constructible_v<T@<sub>0</sub>@, const U1&>` is `true`, and
+- [24.3]{.pnum} `is_constructible_v<T@<sub>1</sub>@, const U2&>` is `true`
 
 [25]{.pnum} _Effects:_ Initializes the first element with `u.first` and the second element with `u.second`.
 
@@ -429,10 +429,10 @@ template<class U1, class U2> constexpr explicit(@_see below_@) tuple(pair<U1, U2
 [27]{.pnum} _Constraints:_
 
 - [27.1]{.pnum} `sizeof...(Types)` is 2,
-- [27.2]{.pnum} `is_­constructible_­v<T@<sub>0</sub>@, U1>` is `true`, and
-- [27.3]{.pnum} `is_­constructible_­v<T@<sub>1</sub>@, U2>` is `true`
+- [27.2]{.pnum} `is_constructible_v<T@<sub>0</sub>@, U1>` is `true`, and
+- [27.3]{.pnum} `is_constructible_v<T@<sub>1</sub>@, U2>` is `true`
 
-[28]{.pnum} _Effects:_ Initializes the first element with `std​::​forward<U1>(u.first)` and the second element with `std​::​forward<U2>(u.second)`.
+[28]{.pnum} _Effects:_ Initializes the first element with `std::forward<U1>(u.first)` and the second element with `std::forward<U2>(u.second)`.
 
 [29]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!is_convertible_v<U1, T@<sub>0</sub>@> || !is_convertible_v<U2, T@<sub>1</sub>@>`
@@ -497,7 +497,7 @@ template<class U1, class U2> constexpr explicit(@_see below_@) tuple(pair<U1, U2
 constexpr const tuple& operator=(const tuple& u) const;
 ```
 
-[?]{.pnum} _Constraints_: `(is_­copy_­assignable_­v<const Types> && ...)` is `true`.
+[?]{.pnum} _Constraints_: `(is_copy_assignable_v<const Types> && ...)` is `true`.
 
 [?]{.pnum} _Effects_: Assigns each element of `u` to the corresponding element of `*this`.
 
@@ -522,7 +522,7 @@ template<class... UTypes> constexpr const tuple& operator=(const tuple<UTypes...
 [?]{.pnum} Constraints:
 
 - [?.1]{.pnum} `sizeof...(Types)` equals ` sizeof...(UTypes)` and
-- [?.2]{.pnum} `(is_­assignable_­v<const Types&, const UTypes&> && ...)` is `true`.
+- [?.2]{.pnum} `(is_assignable_v<const Types&, const UTypes&> && ...)` is `true`.
 
 [?]{.pnum} _Effects_: Assigns each element of `u` to the corresponding element of `*this`.
 
@@ -535,7 +535,7 @@ template<class... UTypes> constexpr const tuple& operator=(tuple<UTypes...>&& u)
 [?]{.pnum} Constraints:
 
 - [?.1]{.pnum} `sizeof...(Types)` equals ` sizeof...(UTypes)` and
-- [?.2]{.pnum} `(is_­assignable_­v<const Types&, UTypes> && ...)` is `true`.
+- [?.2]{.pnum} `(is_assignable_v<const Types&, UTypes> && ...)` is `true`.
 
 [?]{.pnum} _Effects_: For all _i_, assigns `std::forward<U@_<sub>i</sub>_@>(get<@_i_@>(u))` to `get<@_i_@>(*this)`.
 
@@ -548,8 +548,8 @@ template<class U1, class U2> constexpr const tuple& operator=(const pair<U1, U2>
 [?]{.pnum} _Constraints:_
 
 - [?.1]{.pnum} `sizeof...(Types)` is 2,
-- [?.2]{.pnum} `is_­assignable_­v<const T@<sub>0</sub>@&, const U1&>` is `true`, and
-- [?.3]{.pnum} `is_­assignable_­v<const T@<sub>1</sub>@&, const U2&>` is `true`
+- [?.2]{.pnum} `is_assignable_v<const T@<sub>0</sub>@&, const U1&>` is `true`, and
+- [?.3]{.pnum} `is_assignable_v<const T@<sub>1</sub>@&, const U2&>` is `true`
 
 [?]{.pnum} _Effects:_ Assigns `u.first` to the first element and `u.second` to the second element.
 
@@ -562,8 +562,8 @@ template<class U1, class U2> constexpr const tuple& operator=(pair<U1, U2>&& u) 
 [?]{.pnum} _Constraints:_
 
 - [?.1]{.pnum} `sizeof...(Types)` is 2,
-- [?.2]{.pnum} `is_­assignable_­v<const T@<sub>0</sub>@&, U1>` is `true`, and
-- [?.3]{.pnum} `is_­assignable_­v<const T@<sub>1</sub>@&, U2>` is `true`
+- [?.2]{.pnum} `is_assignable_v<const T@<sub>0</sub>@&, U1>` is `true`, and
+- [?.3]{.pnum} `is_assignable_v<const T@<sub>1</sub>@&, U2>` is `true`
 
 [?]{.pnum} _Effects:_ Assigns `std::forward<U1>(u.first)` to the first element and `std::forward<U2>(u.second)` to the second element.
 
@@ -606,10 +606,10 @@ template<class U1, class U2> constexpr const tuple& operator=(pair<U1, U2>&& u) 
 +   constexpr void swap(const tuple<Types...>& x, const tuple<Types...>& y) noexcept(@_see below_@);
 ```
 
-[1]{.pnum} _Constraints_: [`is_­swappable_­v<T>` is true for every type `T` in `Types`.]{.diffdel}
+[1]{.pnum} _Constraints_: [`is_swappable_v<T>` is true for every type `T` in `Types`.]{.diffdel}
 
-- [1.1]{.pnum} [For the first overload, `(is_­swappable_­v<Types> && ...)` is `true`.]{.diffins}
-- [1.2]{.pnum} [For the second overload, `(is_­swappable_­v<const Types> && ...)` is `true`.]{.diffins}
+- [1.1]{.pnum} [For the first overload, `(is_swappable_v<Types> && ...)` is `true`.]{.diffins}
+- [1.2]{.pnum} [For the second overload, `(is_swappable_v<const Types> && ...)` is `true`.]{.diffins}
 
 [2]{.pnum} _Effects_: As if by `x.swap(y)`.
 
@@ -736,8 +736,8 @@ template<class U1, class U2> constexpr explicit(@_see below_@) pair(const pair<U
 
 [?]{.pnum} _Constraints_:
 
-- [17.1]{.pnum} `is_­constructible_­v<first_­type, decltype(get<0>(FWD(p)))>` is `true` and
-- [17.2]{.pnum} `is_­constructible_­v<second_­type, decltype(get<1>(FWD(p)))>` is `true`.
+- [17.1]{.pnum} `is_constructible_v<first_type, decltype(get<0>(FWD(p)))>` is `true` and
+- [17.2]{.pnum} `is_constructible_v<second_type, decltype(get<1>(FWD(p)))>` is `true`.
 
 [?]{.pnum} _Effects:_  Initializes `first` with `get<0>(FWD(p))` and `second` with `get<1>(FWD(p))`.
 
@@ -757,8 +757,8 @@ template<class U1, class U2> constexpr explicit(@_see below_@) pair(const pair<U
 ```
 [14]{.pnum} _Constraints:_
 
-- [14.1]{.pnum} `is_­constructible_­v<first_­type, const U1&>` is `true` and
-- [14.2]{.pnum} `is_­constructible_­v<second_­type, const U2&>` is `true`.
+- [14.1]{.pnum} `is_constructible_v<first_type, const U1&>` is `true` and
+- [14.2]{.pnum} `is_constructible_v<second_type, const U2&>` is `true`.
 
 [15]{.pnum} _Effects:_  Initializes members from the corresponding members of the argument.
 
@@ -772,10 +772,10 @@ template<class U1, class U2> constexpr explicit(@_see below_@) pair(pair<U1, U2>
 
 [17]{.pnum} _Constraints:_
 
-- [17.1]{.pnum} `is_­constructible_­v<first_­type, U1>` is `true` and
-- [17.2]{.pnum} `is_­constructible_­v<second_­type, U2>` is `true`.
+- [17.1]{.pnum} `is_constructible_v<first_type, U1>` is `true` and
+- [17.2]{.pnum} `is_constructible_v<second_type, U2>` is `true`.
 
-[18]{.pnum} _Effects:_ Initializes `first` with `std​::​forward<U1>(p.first)` and `second` with `std​::​forward<U2>(​p.second)`.
+[18]{.pnum} _Effects:_ Initializes `first` with `std::forward<U1>(p.first)` and `second` with `std::forward<U2>(p.second)`.
 
 [19]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!is_convertible_v<U1, first_type> || !is_convertible_v<U2, second_type>`
@@ -807,8 +807,8 @@ template<class U1, class U2> constexpr const pair& operator=(const pair<U1, U2>&
 
 [?]{.pnum} _Constraints:_
 
-- [?.1]{.pnum} `is_­assignable_­v<const first_type&, const U1&>` is `true`, and
-- [?.2]{.pnum} `is_­assignable_­v<const second_type&, const U2&>` is `true`
+- [?.1]{.pnum} `is_assignable_v<const first_type&, const U1&>` is `true`, and
+- [?.2]{.pnum} `is_assignable_v<const second_type&, const U2&>` is `true`
 
 [?]{.pnum} _Effects:_ Assigns `p.first` to `first` and `p.second` to `second`.
 
@@ -823,7 +823,7 @@ constexpr const pair& operator=(pair&& p) const;
 - [?.1]{.pnum} `is_assignable<const first_type&, first_type>` is `true` and
 - [?.2]{.pnum} `is_assignable<const second_type&, second_type>` is `true`.
 
-[?]{.pnum} _Effects_: Assigns `std​::​forward<first_­type>(p.first)` to `first` and `std​::​forward<second_­type>(p.second)` to `second`.
+[?]{.pnum} _Effects_: Assigns `std::forward<first_type>(p.first)` to `first` and `std::forward<second_type>(p.second)` to `second`.
 
 [?]{.pnum} _Returns_: `*this`.
 
@@ -833,8 +833,8 @@ template<class U1, class U2> constexpr const pair& operator=(pair<U1, U2>&& p) c
 
 [?]{.pnum} _Constraints:_
 
-- [?.1]{.pnum} `is_­assignable_­v<const first_type&, U1>` is `true`, and
-- [?.2]{.pnum} `is_­assignable_­v<const second_type&, U2>` is `true`
+- [?.1]{.pnum} `is_assignable_v<const first_type&, U1>` is `true`, and
+- [?.2]{.pnum} `is_assignable_v<const second_type&, U2>` is `true`
 
 [?]{.pnum} _Effects:_ Assigns `std::forward<U1>(p.first)` to `first` and `std::forward<U2>(u.second)` to `second`.
 
@@ -874,8 +874,8 @@ template<class U1, class U2> constexpr const pair& operator=(pair<U1, U2>&& p) c
 
 [3]{.pnum} _Constraints_:
 
-- [3.1]{.pnum} [For the first overload,]{.diffins} `is_­swappable_­v<T1>` is `true` and `is_­swappable_­v<T2>` is `true`.
-- [3.2]{.pnum} [For the second overload, `is_­swappable_­v<const T1>` is `true` and `is_­swappable_­v<const T2>` is `true`.]{.diffins}
+- [3.1]{.pnum} [For the first overload,]{.diffins} `is_swappable_v<T1>` is `true` and `is_swappable_v<T2>` is `true`.
+- [3.2]{.pnum} [For the second overload, `is_swappable_v<const T1>` is `true` and `is_swappable_v<const T2>` is `true`.]{.diffins}
 
 [3]{.pnum} _Effects_: Equivalent to `x.swap(y)`.
 
@@ -1212,34 +1212,34 @@ namespace std::ranges {
     constexpr @_iterator_@ operator--(int) requires (bidirectional_range<@_maybe-const_@<Const, Views>> && ...);
 
     constexpr @_iterator_@& operator+=(difference_type x)
-      requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+      requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
     constexpr @_iterator_@& operator-=(difference_type x)
-      requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+      requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
 
     constexpr auto operator[](difference_type n) const
-      requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+      requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
 
     friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y)
-      requires (equality_­comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+      requires (equality_comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
 
     friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-      requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+      requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
     friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-      requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+      requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
     friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-      requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+      requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
     friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-      requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+      requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
     friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-      requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...) &&
-               (three_­way_­comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+      requires (random_access_range<@_maybe-const_@<Const, Views>> && ...) &&
+               (three_way_comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
 
     friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-      requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+      requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
     friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-      requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+      requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
     friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
-      requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+      requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
     friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
       requires (sized_sentinel_for<iterator_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<Const, Views>>> && ...);
 
@@ -1256,7 +1256,7 @@ namespace std::ranges {
 [1]{.pnum} `@_iterator_@::iterator_concept` is defined as follows:
 
 - [1.1]{.pnum} If every type in `Views` models `random_access_range`, then `iterator_concept` denotes `random_access_iterator_tag`.
-- [1.2]{.pnum} Otherwise, if every type in `Views` models `bidirectional_­range`, then `iterator_concept` denotes `bidirectional_­iterator_­tag`.
+- [1.2]{.pnum} Otherwise, if every type in `Views` models `bidirectional_range`, then `iterator_concept` denotes `bidirectional_iterator_tag`.
 - [1.3]{.pnum} Otherwise, if every type in `Views` models `forward_range`, then `iterator_concept` denotes `forward_iterator_tag`.
 - [1.4]{.pnum} Otherwise, `iterator_concept` denotes `input_iterator_tag`.
 
@@ -1351,7 +1351,7 @@ constexpr @_iterator_@ operator--(int) requires (bidirectional_range<@_maybe-con
 
 ```cpp
 constexpr @_iterator_@& operator+=(difference_type x)
-  requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+  requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
 ```
 [11]{.pnum} _Effects_: Equivalent to:
 
@@ -1364,7 +1364,7 @@ constexpr @_iterator_@& operator+=(difference_type x)
 
 ```cpp
   constexpr @_iterator_@& operator-=(difference_type x)
-    requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+    requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
 ```
 [12]{.pnum} _Effects_: Equivalent to:
 
@@ -1377,7 +1377,7 @@ constexpr @_iterator_@& operator+=(difference_type x)
 
 ```cpp
 constexpr auto operator[](difference_type n) const
-  requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+  requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
 ```
 [13]{.pnum} _Effects_: Equivalent to:
 
@@ -1389,7 +1389,7 @@ constexpr auto operator[](difference_type n) const
 
 ```cpp
 friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y)
-  requires (equality_­comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+  requires (equality_comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
 ```
 [14]{.pnum} _Returns_:
 
@@ -1404,19 +1404,19 @@ model `common_range`.]{.note}
 
 ```cpp
 friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-  requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+  requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
 ```
 [16]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@ < y.@_current\__@; `
 
 ```cpp
 friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-  requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+  requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
 ```
 [17]{.pnum} _Effects_: Equivalent to: `return y < x; `
 
 ```cpp
 friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-  requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+  requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
 ```
 
 [18]{.pnum} _Effects_: Equivalent to: `return !(y < x); `
@@ -1424,15 +1424,15 @@ friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
 
 ```cpp
 friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-  requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+  requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
 ```
 
 [19]{.pnum} _Effects_: Equivalent to: `return !(x < y); `
 
 ```cpp
 friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-  requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...) &&
-            (three_­way_­comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+  requires (random_access_range<@_maybe-const_@<Const, Views>> && ...) &&
+            (three_way_comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
 ```
 
 [20]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@ <=> y.@_current\__@; `
@@ -1440,9 +1440,9 @@ friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
 
 ```cpp
 friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-  requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+  requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
 friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-  requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+  requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
 ```
 
 [21]{.pnum} _Effects_: Equivalent to:
@@ -1455,7 +1455,7 @@ friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i
 
 ```cpp
 friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
-  requires (random_­access_­range<@_maybe-const_@<Const, Views>> && ...);
+  requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
 ```
 
 [22]{.pnum} _Effects_: Equivalent to:
@@ -1533,16 +1533,16 @@ namespace std::ranges {
       requires Const && (convertible_to<sentinel_t<Views>, sentinel_t<@_maybe-const_@<Const, Views>>> && ...);
 
     template<bool OtherConst>
-      requires (sentinel_­for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
+      requires (sentinel_for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
     friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 
     template<bool OtherConst>
-      requires (sized_­sentinel_­for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
+      requires (sized_sentinel_for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
     friend constexpr common_type_t<range_difference_t<@_maybe-const_@<OtherConst, Views>>...>
       operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 
     template<bool OtherConst>
-      requires (sized_­sentinel_­for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
+      requires (sized_sentinel_for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
     friend constexpr common_type_t<range_difference_t<@_maybe-const_@<OtherConst, Views>>...>
       operator-(const @_sentinel_@& y, const @_iterator_@<OtherConst>& x);
   };
@@ -1565,7 +1565,7 @@ constexpr @_sentinel_@(@_sentinel_@<!Const> i)
 
 ```cpp
 template<bool OtherConst>
-  requires (sentinel_­for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
+  requires (sentinel_for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
 friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 ```
 
@@ -1575,7 +1575,7 @@ such that `bool(get<@_i_@>(x.@_current\__@) == get<@_i_@>(y.@_end\__@))` is `tru
 
 ```cpp
 template<bool OtherConst>
-  requires (sized_­sentinel_­for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
+  requires (sized_sentinel_for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
 friend constexpr common_type_t<range_difference_t<@_maybe-const_@<OtherConst, Views>>...>
   operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 ```
@@ -1585,7 +1585,7 @@ friend constexpr common_type_t<range_difference_t<@_maybe-const_@<OtherConst, Vi
 
 ```cpp
 template<bool OtherConst>
-  requires (sized_­sentinel_­for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
+  requires (sized_sentinel_for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
 friend constexpr common_type_t<range_difference_t<@_maybe-const_@<OtherConst, Views>>...>
   operator-(const @_sentinel_@& y, const @_iterator_@<OtherConst>& x);
 ```
@@ -1729,10 +1729,10 @@ namespace std::ranges {
     constexpr @_iterator_@& operator+=(difference_type x) requires random_access_range<@_Base_@>;
     constexpr @_iterator_@& operator-=(difference_type x) requires random_access_range<@_Base_@>;
 
-    constexpr auto operator[](difference_type n) const requires random_access_range<@_Base_@>;
+    constexpr decltype(auto) operator[](difference_type n) const requires random_access_range<@_Base_@>;
 
     friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y)
-      requires equality_­comparable<@_ziperator_@<Const>>;
+      requires equality_comparable<@_ziperator_@<Const>>;
 
     friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
       requires random_access_range<@_Base_@>;
@@ -1743,7 +1743,7 @@ namespace std::ranges {
     friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
       requires random_access_range<@_Base_@>;
     friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@> && three_­way_­comparable<@_ziperator_@<Const>>;
+      requires random_access_range<@_Base_@> && three_way_comparable<@_ziperator_@<Const>>;
 
     friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
       requires random_access_range<@_Base_@>;
@@ -1864,7 +1864,7 @@ constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
 
 ```cpp
 constexpr @_iterator_@& operator+=(difference_type x)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 [11]{.pnum} _Effects_: Equivalent to:
 
@@ -1877,7 +1877,7 @@ constexpr @_iterator_@& operator+=(difference_type x)
 
 ```cpp
 constexpr @_iterator_@& operator-=(difference_type x)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 [12]{.pnum} _Effects_: Equivalent to:
 
@@ -1890,7 +1890,7 @@ constexpr @_iterator_@& operator-=(difference_type x)
 
 ```cpp
 constexpr decltype(auto) operator[](difference_type n) const
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 [13]{.pnum} _Effects_: Equivalent to:
 
@@ -1904,17 +1904,17 @@ constexpr decltype(auto) operator[](difference_type n) const
 
 ```cpp
 friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y)
-  requires equality_­comparable<@_ziperator_@<Const>>;
+  requires equality_comparable<@_ziperator_@<Const>>;
 friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@> && three_­way_­comparable<@_ziperator_@<Const>>;
+  requires random_access_range<@_Base_@> && three_way_comparable<@_ziperator_@<Const>>;
 ```
 [14]{.pnum} Let _`op`_ be the operator.
 
@@ -1923,16 +1923,16 @@ friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
 
 ```cpp
 friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 
 [16]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*i.@_parent\__@, i.@_inner\__@ + n);`
 
 ```cpp
 friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 
 [17]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*x.@_parent\__@, x.@_inner\__@ - y);`
@@ -1964,16 +1964,16 @@ namespace std::ranges {
       requires Const && convertible_to<@_zentinel_@<false>, @_zentinel_@<Const>>;
 
     template<bool OtherConst>
-      requires sentinel_­for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
+      requires sentinel_for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
     friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 
     template<bool OtherConst>
-      requires sized_­sentinel_­for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
+      requires sized_sentinel_for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
     friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
       operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 
     template<bool OtherConst>
-      requires sized_­sentinel_­for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
+      requires sized_sentinel_for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
     friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
       operator-(const @_sentinel_@& x, const @_iterator_@<OtherConst>& y);
   };
@@ -1996,7 +1996,7 @@ constexpr @_sentinel_@(@_sentinel_@<!Const> i)
 
 ```cpp
 template<bool OtherConst>
-  requires sentinel_­for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
+  requires sentinel_for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
 friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 ```
 
@@ -2005,12 +2005,12 @@ friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sent
 
 ```cpp
 template<bool OtherConst>
-  requires sized_­sentinel_­for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
+  requires sized_sentinel_for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
 friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
   operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 
 template<bool OtherConst>
-  requires sized_­sentinel_­for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
+  requires sized_sentinel_for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
 friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
   operator-(const @_sentinel_@& x, const @_iterator_@<OtherConst>& y);
 ```
@@ -2130,33 +2130,33 @@ namespace std::ranges {
     constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
 
     constexpr @_iterator_@& operator+=(difference_type x)
-      requires random_­access_­range<@_Base_@>;
+      requires random_access_range<@_Base_@>;
     constexpr @_iterator_@& operator-=(difference_type x)
-      requires random_­access_­range<@_Base_@>;
+      requires random_access_range<@_Base_@>;
 
     constexpr auto operator[](difference_type n) const
-      requires random_­access_­range<@_Base_@>;
+      requires random_access_range<@_Base_@>;
 
     friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y);
 
     friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_­access_­range<@_Base_@>;
+      requires random_access_range<@_Base_@>;
     friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_­access_­range<@_Base_@>;
+      requires random_access_range<@_Base_@>;
     friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_­access_­range<@_Base_@>;
+      requires random_access_range<@_Base_@>;
     friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_­access_­range<@_Base_@>;
+      requires random_access_range<@_Base_@>;
     friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_­access_­range<@_Base_@> &&
-               three_­way_­comparable<iterator_t<@_Base_@>>;
+      requires random_access_range<@_Base_@> &&
+               three_way_comparable<iterator_t<@_Base_@>>;
 
     friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-      requires random_­access_­range<@_Base_@>;
+      requires random_access_range<@_Base_@>;
     friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-      requires random_­access_­range<@_Base_@>;
+      requires random_access_range<@_Base_@>;
     friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
-      requires random_­access_­range<@_Base_@>;
+      requires random_access_range<@_Base_@>;
     friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
       requires sized_sentinel_for<iterator_t<@_Base_@>, iterator_t<@_Base_@>>;
 
@@ -2172,7 +2172,7 @@ namespace std::ranges {
 [1]{.pnum} `@_iterator_@::iterator_concept` is defined as follows:
 
 - [1.1]{.pnum} If `V` models `random_access_range`, then `iterator_concept` denotes `random_access_iterator_tag`.
-- [1.2]{.pnum} Otherwise, if `V` models `bidirectional_­range`, then `iterator_concept` denotes `bidirectional_­iterator_­tag`.
+- [1.2]{.pnum} Otherwise, if `V` models `bidirectional_range`, then `iterator_concept` denotes `bidirectional_iterator_tag`.
 - [1.3]{.pnum} Otherwise, `iterator_concept` denotes `forward_iterator_tag`.
 
 
@@ -2272,7 +2272,7 @@ constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
 
 ```cpp
 constexpr @_iterator_@& operator+=(difference_type x)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 [10]{.pnum} _Effects_: Equivalent to:
 
@@ -2285,7 +2285,7 @@ constexpr @_iterator_@& operator+=(difference_type x)
 
 ```cpp
   constexpr @_iterator_@& operator-=(difference_type x)
-    requires random_­access_­range<@_Base_@>;
+    requires random_access_range<@_Base_@>;
 ```
 [11]{.pnum} _Effects_: Equivalent to:
 
@@ -2298,7 +2298,7 @@ constexpr @_iterator_@& operator+=(difference_type x)
 
 ```cpp
 constexpr auto operator[](difference_type n) const
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 [12]{.pnum} _Effects_: Equivalent to:
 
@@ -2315,19 +2315,19 @@ friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y);
 
 ```cpp
 friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 [14]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@.back() < y.@_current\__@.back(); `
 
 ```cpp
 friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 [15]{.pnum} _Effects_: Equivalent to: `return y < x; `
 
 ```cpp
 friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 
 [16]{.pnum} _Effects_: Equivalent to: `return !(y < x); `
@@ -2335,15 +2335,15 @@ friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
 
 ```cpp
 friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 
 [17]{.pnum} _Effects_: Equivalent to: `return !(x < y); `
 
 ```cpp
 friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_­access_­range<@_Base_@> &&
-           three_­way_­comparable<iterator_t<@_Base_@>>;
+  requires random_access_range<@_Base_@> &&
+           three_way_comparable<iterator_t<@_Base_@>>;
 ```
 
 [18]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@.back() <=> y.@_current\__@.back(); `
@@ -2351,9 +2351,9 @@ friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
 
 ```cpp
 friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 
 [19]{.pnum} _Effects_: Equivalent to:
@@ -2368,7 +2368,7 @@ friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i
 
 ```cpp
 friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 
 [20]{.pnum} _Effects_: Equivalent to:
@@ -2446,16 +2446,16 @@ namespace std::ranges {
       requires Const && convertible_to<sentinel_t<V>, sentinel_t<@_Base_@>>;
 
     template<bool OtherConst>
-      requires sentinel_­for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
+      requires sentinel_for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
     friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 
     template<bool OtherConst>
-      requires sized_­sentinel_­for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
+      requires sized_sentinel_for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
     friend constexpr range_difference_t<@_maybe-const_@<OtherConst, V>>
       operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 
     template<bool OtherConst>
-      requires sized_­sentinel_­for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
+      requires sized_sentinel_for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
     friend constexpr range_difference_t<@_maybe-const_@<OtherConst, V>>
       operator-(const @_sentinel_@& y, const @_iterator_@<OtherConst>& x);
   };
@@ -2478,7 +2478,7 @@ constexpr @_sentinel_@(@_sentinel_@<!Const> i)
 
 ```cpp
 template<bool OtherConst>
-  requires sentinel_­for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
+  requires sentinel_for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
 friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 ```
 
@@ -2487,7 +2487,7 @@ friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sent
 
 ```cpp
 template<bool OtherConst>
-  requires sized_­sentinel_­for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
+  requires sized_sentinel_for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
 friend constexpr range_difference_t<@_maybe-const_@<OtherConst, V>>
   operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 ```
@@ -2495,7 +2495,7 @@ friend constexpr range_difference_t<@_maybe-const_@<OtherConst, V>>
 
 ```cpp
 template<bool OtherConst>
-  requires sized_­sentinel_­for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
+  requires sized_sentinel_for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
 friend constexpr range_difference_t<@_maybe-const_@<OtherConst, V>>
   operator-(const @_sentinel_@& y, const @_iterator_@<OtherConst>& x);
 ```
@@ -2634,7 +2634,7 @@ namespace std::ranges {
     constexpr @_iterator_@& operator+=(difference_type x) requires random_access_range<@_Base_@>;
     constexpr @_iterator_@& operator-=(difference_type x) requires random_access_range<@_Base_@>;
 
-    constexpr auto operator[](difference_type n) const requires random_access_range<@_Base_@>;
+    constexpr decltype(auto) operator[](difference_type n) const requires random_access_range<@_Base_@>;
 
     friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y);
 
@@ -2647,7 +2647,7 @@ namespace std::ranges {
     friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
       requires random_access_range<@_Base_@>;
     friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@> && three_­way_­comparable<@_inner-iterator_@<Const>>;
+      requires random_access_range<@_Base_@> && three_way_comparable<@_inner-iterator_@<Const>>;
 
     friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
       requires random_access_range<@_Base_@>;
@@ -2761,7 +2761,7 @@ constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
 
 ```cpp
 constexpr @_iterator_@& operator+=(difference_type x)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 [10]{.pnum} _Effects_: Equivalent to:
 
@@ -2774,7 +2774,7 @@ constexpr @_iterator_@& operator+=(difference_type x)
 
 ```cpp
 constexpr @_iterator_@& operator-=(difference_type x)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 [11]{.pnum} _Effects_: Equivalent to:
 
@@ -2787,7 +2787,7 @@ constexpr @_iterator_@& operator-=(difference_type x)
 
 ```cpp
 constexpr decltype(auto) operator[](difference_type n) const
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 [12]{.pnum} _Effects_: Equivalent to:
 
@@ -2802,15 +2802,15 @@ constexpr decltype(auto) operator[](difference_type n) const
 ```cpp
 friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y);
 friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@> && three_­way_­comparable<@_inner-iterator_@<Const>>;
+  requires random_access_range<@_Base_@> && three_way_comparable<@_inner-iterator_@<Const>>;
 ```
 [13]{.pnum} Let _`op`_ be the operator.
 
@@ -2819,16 +2819,16 @@ friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
 
 ```cpp
 friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 
 [15]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*i.@_parent\__@, i.@_inner\__@ + n);`
 
 ```cpp
 friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
-  requires random_­access_­range<@_Base_@>;
+  requires random_access_range<@_Base_@>;
 ```
 
 [16]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*x.@_parent\__@, x.@_inner\__@ - y);`
@@ -2860,16 +2860,16 @@ namespace std::ranges {
       requires Const && convertible_to<@_inner-sentinel_@<false>, @_inner-sentinel_@<Const>>;
 
     template<bool OtherConst>
-      requires sentinel_­for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
+      requires sentinel_for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
     friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 
     template<bool OtherConst>
-      requires sized_­sentinel_­for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
+      requires sized_sentinel_for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
     friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
       operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 
     template<bool OtherConst>
-      requires sized_­sentinel_­for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
+      requires sized_sentinel_for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
     friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
       operator-(const @_sentinel_@& x, const @_iterator_@<OtherConst>& y);
   };
@@ -2892,7 +2892,7 @@ constexpr @_sentinel_@(@_sentinel_@<!Const> i)
 
 ```cpp
 template<bool OtherConst>
-  requires sentinel_­for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
+  requires sentinel_for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
 friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 ```
 
@@ -2901,12 +2901,12 @@ friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sent
 
 ```cpp
 template<bool OtherConst>
-  requires sized_­sentinel_­for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
+  requires sized_sentinel_for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
 friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
   operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 
 template<bool OtherConst>
-  requires sized_­sentinel_­for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
+  requires sized_sentinel_for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
 friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
   operator-(const @_sentinel_@& x, const @_iterator_@<OtherConst>& y);
 ```

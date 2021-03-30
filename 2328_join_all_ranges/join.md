@@ -130,9 +130,9 @@ the writing of this paper, and only as experimental.
    [...]
 
    // [range.join], join view
-   template<input_­range V>
--    requires view<V> && input_­range<range_reference_t<V>> @[&&]{.diffdel}@
-+    requires view<V> && input_­range<range_reference_t<V>>
+   template<input_range V>
+-    requires view<V> && input_range<range_reference_t<V>> @[&&]{.diffdel}@
++    requires view<V> && input_range<range_reference_t<V>>
 -             (is_reference_v<range_reference_t<V>> ||
 -              view<range_value_t<V>>)
    class join_view;
@@ -208,31 +208,31 @@ values as it is iterated over.]{.note1}
 
 ```diff
  namespace std::ranges {
-   template<input_­range V>
--    requires view<V> && input_­range<range_reference_t<V>> @[&&]{.diffdel}@
-+    requires view<V> && input_­range<range_reference_t<V>>
+   template<input_range V>
+-    requires view<V> && input_range<range_reference_t<V>> @[&&]{.diffdel}@
++    requires view<V> && input_range<range_reference_t<V>>
 -             (is_reference_v<range_reference_t<V>> ||
 -              view<range_value_t<V>>)
    class join_view : public view_interface<join_view<V>> {
    private:
      using @_InnerRng_@ =                    // exposition only
        range_reference_t<V>;
-     // [range.join.iterator], class template join_­view​::​iterator
+     // [range.join.iterator], class template join_view::iterator
      template<bool Const>
        struct @_iterator_@;                  // exposition only
-     // [range.join.sentinel], class template join_­view​::​sentinel
+     // [range.join.sentinel], class template join_view::sentinel
      template<bool Const>
        struct @_sentinel_@;                  // exposition only
 
      V @_base\__@ = V();                      // exposition only
--    views::all_t<@_InnerRng_@> @_inner\__@ =     // exposition only, present only when !is_­reference_­v<@_InnerRng_@>
+-    views::all_t<@_InnerRng_@> @_inner\__@ =     // exposition only, present only when !is_reference_v<@_InnerRng_@>
 -      views::all_t<@_InnerRng_@>();
-+    @_non-propagating-cache_@<remove_cv_t<@_InnerRng_@>> @_inner\__@;  // exposition only, present only when !is_­reference_­v<@_InnerRng_@>
++    @_non-propagating-cache_@<remove_cv_t<@_InnerRng_@>> @_inner\__@;  // exposition only, present only when !is_reference_v<@_InnerRng_@>
    public:
      join_view() = default;
      constexpr explicit join_view(V base);
 
-     constexpr V base() const& requires copy_­constructible<V> { return base_; }
+     constexpr V base() const& requires copy_constructible<V> { return base_; }
      constexpr V base() && { return std::move(base_); }
 
      [...]
@@ -246,9 +246,9 @@ values as it is iterated over.]{.note1}
 
 ```diff
 namespace std::ranges {
-  template<input_­range V>
--    requires view<V> && input_­range<range_reference_t<V>> @[&&]{.diffdel}@
-+    requires view<V> && input_­range<range_reference_t<V>>
+  template<input_range V>
+-    requires view<V> && input_range<range_reference_t<V>> @[&&]{.diffdel}@
++    requires view<V> && input_range<range_reference_t<V>>
 -             (is_reference_v<range_reference_t<V>> ||
 -              view<range_value_t<V>>)
   template<bool Const>
@@ -310,8 +310,8 @@ constexpr @_iterator_@& operator++();
 
 [9]{.pnum} Let _`inner-range`_ be:
 
-- [9.1]{.pnum} If _`ref-is-glvalue`_ is true, _`*outer_­`_.
-- [9.2]{.pnum} Otherwise, `@[*]{.diffins}_parent\__@­->@_inner\_­_@`.
+- [9.1]{.pnum} If _`ref-is-glvalue`_ is true, _`*outer_`_.
+- [9.2]{.pnum} Otherwise, `@[*]{.diffins}_parent\__@->@_inner\__@`.
 
 [10]{.pnum} _Effects:_ Equivalent to:
 
@@ -332,9 +332,9 @@ return *this;
 
 ```diff
 namespace std::ranges {
-  template<input_­range V>
--    requires view<V> && input_­range<range_reference_t<V>> @[&&]{.diffdel}@
-+    requires view<V> && input_­range<range_reference_t<V>>
+  template<input_range V>
+-    requires view<V> && input_range<range_reference_t<V>> @[&&]{.diffdel}@
++    requires view<V> && input_range<range_reference_t<V>>
 -             (is_reference_v<range_reference_t<V>> ||
 -              view<range_value_t<V>>)
   template<bool Const>
