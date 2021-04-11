@@ -1,9 +1,10 @@
 ---
 title: "`zip`"
-document: P2321R0
+document: P2321R1
 date: today
 audience:
   - LEWG
+  - LWG
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
@@ -18,6 +19,26 @@ This paper proposes
 - changes to `vector<bool>::reference` to make it usable as a proxy reference for writing,
 
 all as described in section 3.2 of [@P2214R0].
+
+# Revision history
+
+- R1: Added feature test macro. Expanded discussion regarding 1) `operator==` for
+  forward-or-weaker `zip` iterators and 2) `adjacent` on input ranges.
+  Miscellaneous wording fixes (thanks to Barry Revzin and Tomasz Kamiński).
+  Added a short example.
+
+# Examples
+
+```cpp
+std::vector v1 = {1, 2};
+std::vector v2 = {'a', 'b', 'c'};
+std::vector v3 = {3, 4, 5};
+
+fmt::print("{}\n", std::views::zip(v1, v2));                               // {(1, 'a'), (2, 'b')}
+fmt::print("{}\n", std::views::zip_transform(std::multiplies(), v1, v3));  // {3, 8}
+fmt::print("{}\n", v2 | std::views::pairwise);                             // {('a', 'b'), ('b', 'c')}
+fmt::print("{}\n", v3 | std::views::pairwise_transform(std::plus()));      // {7, 9}
+```
 
 # Discussion
 
@@ -91,9 +112,13 @@ Obviously, when zipping a single range, the `zip_view` can be a `common_range`
 if the underlying range is.
 
 When the `zip_view` is not bidirectional, it can be a `common_range` when every
-underlying view is a `common_range`; note that to handle differently-sized ranges,
+underlying view is a `common_range`. To handle differently-sized ranges,
 iterator `==` is a logical OR: two iterators compare equal if one of the
-sub-iterators compare equal.
+sub-iterators compare equal. Note that the domain of `==` only extends to
+iterators over the same underlying sequence; the use of logical OR is valid
+within that domain because the only valid operands to `==` are
+iterators obtained from incrementing `begin()` zero or more times and
+the iterator returned by `end()`.
 
 When the `zip_view` is bidirectional (or stronger), however, it is now possible
 to iterate backwards from the end iterator (if it is indeed an iterator). As a
@@ -160,6 +185,37 @@ it requires forward ranges. It is true that the `N == 1` case could theoreticall
 support input ranges, but that adds extra complexity and seems entirely pointless.
 Besides, someone desperate to wrap their input range in a single element `tuple`
 can just use `zip` instead.
+
+During LEWG review of R0 of this paper it was suggested that `adjacent<N>` could
+support input views by caching the elements referred to by the last `N` iterators.
+Such a view would have significant differences from what is being proposed in
+this paper. For instance, because the reference obtained from an input iterator
+is invalidated on increment, the range will have to cache by value type, and so
+the reference type will have to be something like `tuple<range_value_t<V>&...>`
+(or perhaps even `tuple<range_value_t<V>...>&`?) instead of
+`tuple<range_reference_t<V>...>`. To be able to construct and update
+the cached values, the view would have to require underlying range's value type
+to be constructible and assignable from its reference type. And because we don't
+know what elements the user may desire to access, iterating through the view
+necessarily requires copying every element of the underlying view into the cache,
+which can be wasteful if not all elements need to be accessed. By comparison,
+iterating through the proposed `adjacent` copies exactly zero of the underlying
+range's elements.
+
+Additionally, because input views provide much fewer operations and guarantees,
+they can often be implemented more efficiently than forward views. There has
+been an open range-v3 issue [@range-v3.704] since 2017 (see also
+[this comment](https://old.reddit.com/r/cpp/comments/8ytrnb/what_i_dont_like_about_ranges/e82rk5a/)
+from Eric Niebler on /r/cpp) to provide an API that downgrades a
+forward-or-stronger range to input for efficiency when the forward
+range's guarantees are not needed. Having a view adaptor that is significantly more
+expensive when given an input range would significantly damage the usability
+and teachability of such a design.
+
+The author believes that the behavioral and performance characteristics of such
+a view is different enough from the `adjacent` proposed in this paper
+that it would be inappropriate to put them under the same name. It can be
+proposed separately if desired.
 
 ### `iter_swap`
 
@@ -1090,14 +1146,7 @@ concept @_zip-is-common_@ =             // exposition only
   ((random_access_range<Rs> && ...) && (sized_range<Rs> && ...));
 
 template<class... Ts>
-using @_tuple-or-pair_@ = decltype([]{            // exposition only
-  if constexpr (sizeof...(Ts) == 2) {
-    return type_identity<pair<Ts...>>{};
-  }
-  else {
-    return type_identity<tuple<Ts...>>{};
-  }
-}())::type;
+using @_tuple-or-pair_@ = @_see below_@;  // exposition only
 
 template<class F, class Tuple>
 constexpr auto @_tuple-transform_@(F&& f, Tuple&& tuple) // exposition only
@@ -1127,7 +1176,7 @@ class zip_view : public view_interface<zip_view<Views...>>{
 
 public:
   constexpr zip_view() = default;
-  constexpr explicit zip_view(Views... views) : @_views\__@(std::move(views)...) {}
+  constexpr explicit zip_view(Views... views);
 
   constexpr auto begin() requires (!(@_simple-view_@<Views> && ...)){
     return @_iterator_@<false>(@_tuple-transform_@(ranges::begin, @_views\__@));
@@ -1160,21 +1209,8 @@ public:
     }
   }
 
-  constexpr auto size() requires (sized_range<Views> && ...){
-    return apply([](auto... sizes){
-      return ranges::min({
-        common_type_t<decltype(sizes)...>(sizes)...
-      });
-    }, @_tuple-transform_@(ranges::size, @_views\__@));
-  }
-
-  constexpr auto size() const requires (sized_range<const Views> && ...){
-    return apply([](auto... sizes){
-      return ranges::min({
-        common_type_t<decltype(sizes)...>(sizes)...
-      });
-    }, @_tuple-transform_@(ranges::size, @_views\__@));
-  }
+  constexpr auto size() requires (sized_range<Views> && ...);
+  constexpr auto size() const requires (sized_range<const Views> && ...);
 };
 
 template<class... Rs>
@@ -1182,6 +1218,45 @@ template<class... Rs>
 
 }
 ```
+
+[1]{.pnum} Given some pack of types `Ts`, the alias template `@_tuple-or-pair_@` is defined as follows:
+
+- [1.1]{.pnum} If `sizeof...(Ts)` is 2, `@_tuple-or-pair_@<Ts...>` denotes `pair<Ts...>`.
+- [1.2]{.pnum} Otherwise, `@_tuple-or-pair_@<Ts...>` denotes `tuple<Ts...>`.
+
+[2]{.pnum} Two `zip_view` objects have the same underlying sequence only if
+and only if the corresponding elements of `@_views\__@` are equal
+([concepts.equality]{.sref}) and have the same underlying sequence. [In particular,
+comparison of iterators obtained from `zip_view` objects that do not have
+the same underlying sequence is not required to produce meaningful results
+([iterator.concept.forward]{.sref}).]{.note}
+
+::: itemdecl
+
+```cpp
+constexpr explicit zip_view(Views... views);
+```
+
+[3]{.pnum} _Effects_: Initializes `@_views\__@` with `std::move(views)...`.
+
+```cpp
+constexpr auto size() requires (sized_range<Views> && ...);
+constexpr auto size() const requires (sized_range<const Views> && ...);
+```
+
+[4]{.pnum} _Effects_: Equivalent to:
+
+::: bq
+
+```cpp
+return apply([](auto... sizes){
+  return ranges::min({
+    common_type_t<decltype(sizes)...>(sizes)...
+  });
+}, @_tuple-transform_@(ranges::size, @_views\__@));
+```
+:::
+:::
 
 #### 24.7.?.3 Class template `zip_view::@_iterator_@` [range.zip.iterator] {-}
 
@@ -1191,7 +1266,7 @@ namespace std::ranges {
     requires (view<Views> && ...) && (sizeof...(Views) > 0)
   template<bool Const>
   class zip_view<Views...>::@_iterator_@ {
-    @_tuple-or-pair_@<iterator_t<@_maybe-const_@<Const, Views>>...> @_current\__@;
+    @_tuple-or-pair_@<iterator_t<@_maybe-const_@<Const, Views>>...> @_current\__@;                             // exposition only
     constexpr explicit @_iterator_@(@_tuple-or-pair_@<iterator_t<@_maybe-const_@<Const, Views>>...> current); // exposition only
   public:
     using iterator_category = input_iterator_tag; // not always present
@@ -1238,7 +1313,7 @@ namespace std::ranges {
       requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
     friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
       requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
-    friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
+    friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
       requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
     friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
       requires (sized_sentinel_for<iterator_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<Const, Views>>> && ...);
@@ -1246,7 +1321,7 @@ namespace std::ranges {
     friend constexpr auto iter_move(const @_iterator_@& i)
       noexcept(@_see below_@);
 
-    friend constexpr auto iter_swap(const @_iterator_@& l, const @_iterator_@& r)
+    friend constexpr void iter_swap(const @_iterator_@& l, const @_iterator_@& r)
       noexcept(@_see below_@)
       requires (indirectly_swappable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
   };
@@ -1454,7 +1529,7 @@ friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i
 :::
 
 ```cpp
-friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
+friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
   requires (random_access_range<@_maybe-const_@<Const, Views>> && ...);
 ```
 
@@ -1462,7 +1537,7 @@ friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y
 
 ::: bq
 ```cpp
-  return @_iterator_@(@_tuple-transform_@([&](auto& it) { return it - y; }, x.@_current\__@));
+  return @_iterator_@(@_tuple-transform_@([&](auto& it) { return it - n; }, i.@_current\__@));
 ```
 :::
 
@@ -1497,7 +1572,7 @@ friend constexpr auto iter_move(const @_iterator_@& i)
 :::
 
 ```cpp
-friend constexpr auto iter_swap(const @_iterator_@& l, const @_iterator_@& r)
+friend constexpr void iter_swap(const @_iterator_@& l, const @_iterator_@& r)
   noexcept(@_see below_@)
   requires (indirectly_swappable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
 ```
@@ -1627,7 +1702,7 @@ class zip_transform_view : public view_interface<zip_transform_view<F, Views...>
   @_semiregular-box_@<F> @_fun\__@;               // exposition only
   zip_view<Views...> @_zip\__@;               // exposition only
 
-  using @_InnerView_@ = zip_view<Views...>;    // exposition only
+  using @_InnerView_@ = zip_view<Views...>;  // exposition only
   template<bool Const>
   using @_ziperator_@ = iterator_t<@_maybe-const_@<Const, @_InnerView_@>>;  // exposition only
   template<bool Const>
@@ -1639,8 +1714,7 @@ class zip_transform_view : public view_interface<zip_transform_view<F, Views...>
 public:
   constexpr zip_transform_view() = default;
 
-  constexpr explicit zip_transform_view(F fun, Views... views)
-    : @_fun\__@(std::move(fun)), @_zip\__@(std::move(views)...) {}
+  constexpr explicit zip_transform_view(F fun, Views... views);
 
   constexpr auto begin() {
     return @_iterator_@<false>(*this, @_zip\__@.begin());
@@ -1690,6 +1764,17 @@ template<class F, class... Rs>
 }
 ```
 
+::: itemdecl
+
+```cpp
+constexpr explicit zip_transform_view(F fun, Views... views);
+```
+
+[1]{.pnum} _Effects_: Initializes `@_fun\__@` with `std::move(fun)` and
+`@_zip\__@` with `std::move(views)...`.
+
+:::
+
 #### 24.7.?.3 Class template `zip_transform_view::@_iterator_@` [range.zip.transform.iterator] {-}
 
 ```cpp
@@ -1702,13 +1787,13 @@ namespace std::ranges {
   class zip_transform_view<F, Views...>::@_iterator_@ {
     using @_Parent_@ = @_maybe-const_@<Const, zip_transform_view>;      // exposition only
     using @_Base_@ = @_maybe-const_@<Const, @_InnerView_@>;                 // exposition only
-    @_Parent_@* parent = nullptr;                                   // exposition only
-    @_ziperator_@<Const> @_inner\__@;                                    // exposition only
+    @_Parent_@* @_parent\__@ = nullptr;                                  // exposition only
+    @_ziperator_@<Const> @_inner\__@ = @_ziperator_@<Const>();               // exposition only
 
     constexpr @_iterator_@(@_Parent_@& parent, @_ziperator_@<Const> inner); // exposition only
 
   public:
-    using iterator_category = @_see below_@;                         // not always present
+    using iterator_category = @_see below_@;                        // not always present
     using iterator_concept  = typename @_ziperator_@<Const>::iterator_concept;
     using value_type =
       remove_cvref_t<invoke_result_t<@_maybe-const_@<Const, F>&, range_reference_t<@_maybe-const_@<Const, Views>>...>>;
@@ -1749,7 +1834,7 @@ namespace std::ranges {
       requires random_access_range<@_Base_@>;
     friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
       requires random_access_range<@_Base_@>;
-    friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
+    friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
       requires random_access_range<@_Base_@>;
     friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
       requires sized_sentinel_for<@_ziperator_@<Const>, @_ziperator_@<Const>>;
@@ -1931,11 +2016,11 @@ friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i
 [16]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*i.@_parent\__@, i.@_inner\__@ + n);`
 
 ```cpp
-friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
+friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
   requires random_access_range<@_Base_@>;
 ```
 
-[17]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*x.@_parent\__@, x.@_inner\__@ - y);`
+[17]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*i.@_parent\__@, i.@_inner\__@ - n);`
 
 ```cpp
 friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
@@ -2058,7 +2143,7 @@ class adjacent_view : public view_interface<adjacent_view<V, N>>{
 
 public:
   constexpr adjacent_view() = default;
-  constexpr explicit adjacent_view(V base) : @_base\__@(std::move(base)) {}
+  constexpr explicit adjacent_view(V base);
 
   constexpr auto begin() requires (!@_simple-view_@<V>) {
     return @_iterator_@<false>(ranges::begin(@_base\__@), ranges::end(@_base\__@));
@@ -2084,21 +2169,36 @@ public:
     return @_iterator_@<true>(@_as\_sentinel_@{}, ranges::begin(@_base\__@), ranges::end(@_base\__@));
   }
 
-  constexpr auto size() requires sized_range<V> {
-    auto sz = ranges::size(@_base\__@);
-    sz -= ranges::min<decltype(sz)>(sz, N-1);
-    return sz;
-  }
-
-  constexpr auto size() const requires sized_range<const V> {
-    auto sz = ranges::size(@_base\__@);
-    sz -= ranges::min<decltype(sz)>(sz, N-1);
-    return sz;
-  }
+  constexpr auto size() requires sized_range<V>;
+  constexpr auto size() const requires sized_range<const V>;
 };
 
 }
 ```
+
+::: itemdecl
+
+```cpp
+constexpr explicit adjacent_view(V base);
+```
+
+[1]{.pnum} _Effects_: Initializes `@_base\__@` with `std::move(base)`.
+
+```cpp
+constexpr auto size() requires sized_range<V>;
+constexpr auto size() const requires sized_range<const V>;
+```
+
+[2]{.pnum} _Effects_: Equivalent to:
+
+::: bq
+```cpp
+auto sz = ranges::size(@_base\__@);
+sz -= std::min<decltype(sz)>(sz, N-1);
+return sz;
+```
+:::
+:::
 
 #### 24.7.?.3 Class template `adjacent_view::@_iterator_@` [range.adjacent.iterator] {-}
 
@@ -2155,14 +2255,14 @@ namespace std::ranges {
       requires random_access_range<@_Base_@>;
     friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
       requires random_access_range<@_Base_@>;
-    friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
+    friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
       requires random_access_range<@_Base_@>;
     friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
       requires sized_sentinel_for<iterator_t<@_Base_@>, iterator_t<@_Base_@>>;
 
     friend constexpr auto iter_move(const @_iterator_@& i) noexcept(@_see below_@);
 
-    friend constexpr auto iter_swap(const @_iterator_@& l, const @_iterator_@& r)
+    friend constexpr void iter_swap(const @_iterator_@& l, const @_iterator_@& r)
       noexcept(@_see below_@)
       requires indirectly_swappable<iterator_t<@_Base_@>>;
   };
@@ -2367,7 +2467,7 @@ friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i
 :::
 
 ```cpp
-friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
+friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
   requires random_access_range<@_Base_@>;
 ```
 
@@ -2375,8 +2475,8 @@ friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y
 
 ::: bq
 ```cpp
-  auto r = x;
-  r -= y;
+  auto r = i;
+  r -= n;
   return r;
 ```
 :::
@@ -2409,7 +2509,7 @@ friend constexpr auto iter_move(const @_iterator_@& i) noexcept(@_see below_@);
 :::
 
 ```cpp
-friend constexpr auto iter_swap(const @_iterator_@& l, const @_iterator_@& r)
+friend constexpr void iter_swap(const @_iterator_@& l, const @_iterator_@& r)
   noexcept(@_see below_@)
   requires indirectly_swappable<iterator_t<@_Base_@>>;
 ```
@@ -2438,7 +2538,7 @@ namespace std::ranges {
   template<bool Const>
   class adjacent_view<V, N>::@_sentinel_@ {
     using @_Base_@ = @_maybe-const_@<Const, V>;                     // exposition only
-    sentinel_t<@_Base_@> @_end\__@ = sentinel_t<@_Base_@>();            // exposition only
+    sentinel_t<@_Base_@> @_end\__@ = sentinel_t<@_Base_@>();             // exposition only
     constexpr explicit @_sentinel_@(sentinel_t<@_Base_@> end);      // exposition only
   public:
     @_sentinel_@() = default;
@@ -2548,8 +2648,7 @@ namespace std::ranges {
 public:
   constexpr adjacent_transform_view() = default;
 
-  constexpr explicit adjacent_transform_view(V base, F fun)
-    : @_fun\__@(std::move(fun)), @_inner\__@(std::move(base)) {}
+  constexpr explicit adjacent_transform_view(V base, F fun);
 
   constexpr auto begin() {
     return @_iterator_@<false>(*this, @_inner\__@.begin());
@@ -2596,6 +2695,17 @@ public:
 }
 ```
 
+::: itemdecl
+
+```cpp
+constexpr explicit adjacent_transform_view(V base, F fun);
+```
+
+[1]{.pnum} _Effects_: Initializes `@_fun\__@` with `std::move(fun)` and
+`@_inner_\__@` with `std::move(base)`.
+
+:::
+
 #### 24.7.?.3 Class template `adjacent_transform_view::@_iterator_@` [range.adjacent.transform.iterator] {-}
 
 ```cpp
@@ -2607,9 +2717,9 @@ namespace std::ranges {
   template<bool Const>
   class adjacent_transform_view<F, V...>::@_iterator_@ {
     using @_Parent_@ = @_maybe-const_@<Const, adjacent_transform_view>;      // exposition only
-    using @_Base_@ = @_maybe-const_@<Const, V>;                 // exposition only
-    @_Parent_@* parent = nullptr;                                   // exposition only
-    @_inner-iterator_@<Const> @_inner\__@;                                    // exposition only
+    using @_Base_@ = @_maybe-const_@<Const, V>;                              // exposition only
+    @_Parent_@* @_parent\__@ = nullptr;                                       // exposition only
+    @_inner-iterator_@<Const> @_inner\__@ = @_inner-iterator_@<Const>();          // exposition only
 
     constexpr @_iterator_@(@_Parent_@& parent, @_inner-iterator_@<Const> inner); // exposition only
 
@@ -2653,7 +2763,7 @@ namespace std::ranges {
       requires random_access_range<@_Base_@>;
     friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
       requires random_access_range<@_Base_@>;
-    friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
+    friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
       requires random_access_range<@_Base_@>;
     friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
       requires sized_sentinel_for<@_inner-iterator_@<Const>, @_inner-iterator_@<Const>>;
@@ -2665,7 +2775,7 @@ namespace std::ranges {
 
 - If `invoke_result_t<@_maybe-const_@<Const, F>&, @_REPEAT_@(range_reference_t<@_Base_@>, N)...>` is not an lvalue reference,
   `iterator_category` denotes `input_iterator_tag`.
-- Otherwise, let `C` denote the type `iterator_traits<@_Base_@>::iterator_category`.
+- Otherwise, let `C` denote the type `iterator_traits<iterator_t<@_Base_@>>::iterator_category`.
   - If `derived_from<C, random_access_iterator_tag>` is `true`, `iterator_category` denotes `random_access_iterator_tag`;
   - Otherwise, if `derived_from<C, bidirectional_iterator_tag>` is `true`, `iterator_category` denotes `bidirectional_iterator_tag`;
   - Otherwise, if `derived_from<C, forward_iterator_tag>` is `true`, `iterator_category` denotes `forward_iterator_tag`;
@@ -2827,11 +2937,11 @@ friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i
 [15]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*i.@_parent\__@, i.@_inner\__@ + n);`
 
 ```cpp
-friend constexpr @_iterator_@ operator-(const @_iterator_@& x, difference_type y)
+friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
   requires random_access_range<@_Base_@>;
 ```
 
-[16]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*x.@_parent\__@, x.@_inner\__@ - y);`
+[16]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*i.@_parent\__@, i.@_inner\__@ - n);`
 
 ```cpp
 friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
@@ -2852,7 +2962,7 @@ namespace std::ranges {
              @_can-reference_@<invoke_result_t<F&, @_REPEAT_@(range_reference_t<V>, N)...>>
   template<bool Const>
   class adjacent_transform_view<V, F, N>::@_sentinel_@ {
-    @_inner-sentinel_@<Const> @_inner\__@;                             // exposition only
+    @_inner-sentinel_@<Const> @_inner\__@;                              // exposition only
     constexpr explicit @_sentinel_@(@_inner-sentinel_@<Const> inner);  // exposition only
   public:
     @_sentinel_@() = default;
@@ -2914,6 +3024,21 @@ friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
 
 :::
 
+## Feature-test macro
+
+Add the following macro definition to [version.syn]{.sref}, header `<version>`
+synopsis, with the value selected by the editor to reflect the date of adoption
+of this paper:
+
+```cpp
+#define __cpp_lib_ranges_zip 20XXXXL // also in <ranges>, <tuple>, <utility>
+```
+
+# Acknowledgements
+
+Thanks to Barry Revzin for implementing this entire paper from spec and finding
+several wording issues in the process.
+
 ---
 references:
     - id: range-v3.1592
@@ -2924,4 +3049,12 @@ references:
       issued:
         year: 2020
       URL: https://github.com/ericniebler/range-v3/issues/1592
+    - id: range-v3.704
+      citation-label: range-v3.704
+      title: "Demand-driven view strength weakening"
+      author:
+        - family: Eric Niebler
+      issued:
+        year: 2017
+      URL: https://github.com/ericniebler/range-v3/issues/704
 ---
