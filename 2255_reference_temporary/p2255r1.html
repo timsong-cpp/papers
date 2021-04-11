@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2021-03-30" />
+  <meta name="dcterms.date" content="2021-04-11" />
   <title>A type trait to detect reference binding to temporary</title>
   <style>
       code{white-space: pre-wrap;}
@@ -529,11 +529,11 @@ blockquote { background-color: #f6f8fa; }
 <table style="border:none;float:right">
   <tr>
     <td>Document #:</td>
-    <td>D2255R1</td>
+    <td>P2255R1</td>
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2021-03-30</td>
+    <td>2021-04-11</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -556,6 +556,29 @@ blockquote { background-color: #f6f8fa; }
 
 </header>
 <div style="clear:both">
+<div id="TOC" role="doc-toc">
+<h1 id="toctitle">Contents</h1>
+<ul>
+<li><a href="#abstract"><span class="toc-section-number">1</span> Abstract<span></span></a></li>
+<li><a href="#revision-history"><span class="toc-section-number">2</span> Revision history<span></span></a></li>
+<li><a href="#in-brief"><span class="toc-section-number">3</span> In brief<span></span></a></li>
+<li><a href="#motivation"><span class="toc-section-number">4</span> Motivation<span></span></a>
+<ul>
+<li><a href="#related-work"><span class="toc-section-number">4.1</span> Related work<span></span></a></li>
+</ul></li>
+<li><a href="#design-decisions"><span class="toc-section-number">5</span> Design decisions<span></span></a>
+<ul>
+<li><a href="#alternative-approaches"><span class="toc-section-number">5.1</span> Alternative approaches<span></span></a></li>
+<li><a href="#two-type-traits"><span class="toc-section-number">5.2</span> Two type traits<span></span></a></li>
+<li><a href="#treat-prvalues-as-distinct-from-xvalues"><span class="toc-section-number">5.3</span> Treat prvalues as distinct from xvalues<span></span></a></li>
+<li><a href="#changing-invoker-and-is_invocable_r"><span class="toc-section-number">5.4</span> Changing <em><code class="sourceCode cpp">INVOKE<span class="op">&lt;</span>R<span class="op">&gt;</span></code></em> and <code class="sourceCode cpp">is_invocable_r</code><span></span></a></li>
+<li><a href="#tuplepair-constructors-deletion-vs.-constraints"><span class="toc-section-number">5.5</span> <code class="sourceCode cpp">tuple</code>/<code class="sourceCode cpp">pair</code> constructors: deletion vs. constraints<span></span></a></li>
+</ul></li>
+<li><a href="#implementation-experience"><span class="toc-section-number">6</span> Implementation experience<span></span></a></li>
+<li><a href="#wording"><span class="toc-section-number">7</span> Wording<span></span></a></li>
+<li><a href="#bibliography"><span class="toc-section-number">8</span> References<span></span></a></li>
+</ul>
+</div>
 <h1 data-number="1" style="border-bottom:1px solid #cccccc" id="abstract"><span class="header-section-number">1</span> Abstract<a href="#abstract" class="self-link"></a></h1>
 <p>This paper proposes adding two new type traits with compiler support to detect when the initialization of a reference would bind it to a lifetime-extended temporary, and changing several standard library components to make such binding ill-formed when it would inevitably produce a dangling reference. This would resolve <span class="citation" data-cites="LWG2813">[<a href="#ref-LWG2813" role="doc-biblioref">LWG2813</a>]</span>.</p>
 <h1 data-number="2" style="border-bottom:1px solid #cccccc" id="revision-history"><span class="header-section-number">2</span> Revision history<a href="#revision-history" class="self-link"></a></h1>
@@ -596,7 +619,7 @@ blockquote { background-color: #f6f8fa; }
 <p><span class="citation" data-cites="CWG1696">[<a href="#ref-CWG1696" role="doc-biblioref">CWG1696</a>]</span> changed the core language rules so that initialization of a reference data member in a <em>mem-initializer</em> is ill-formed if the initialization would bind it to a temporary expression, which is exactly the condition these traits seek to detect. However, the ill-formedness occurs outside a SFINAE context, so it is not usable in constraints, nor suitable as a <code class="sourceCode cpp"><span class="kw">static_assert</span></code> condition. Moreover, this requires having a class with a data member of reference type, which may not be suitable for user-defined types that want to represent references differently (to facilitate rebinding, for instance).</p>
 <h1 data-number="5" style="border-bottom:1px solid #cccccc" id="design-decisions"><span class="header-section-number">5</span> Design decisions<a href="#design-decisions" class="self-link"></a></h1>
 <h2 data-number="5.1" id="alternative-approaches"><span class="header-section-number">5.1</span> Alternative approaches<a href="#alternative-approaches" class="self-link"></a></h2>
-<p>Similar to <span class="citation" data-cites="CWG1696">[<a href="#ref-CWG1696" role="doc-biblioref">CWG1696</a>]</span>, we can make returning a reference from a function ill-formed if it would be bound to a temporary. Just like <span class="citation" data-cites="CWG1696">[<a href="#ref-CWG1696" role="doc-biblioref">CWG1696</a>]</span>, this cannot be used as the basis of a constraint or as a <code class="sourceCode cpp"><span class="kw">static_assert</span></code> condition. Additionally, such a change requires library wording to react, as <code class="sourceCode cpp">is_convertible</code> is currently defined in terms of such a return statement. While such a language change may be desirable, it is neither necessary nor sufficiently to accomplish the goals of this paper. It can be proposed separately if desired.</p>
+<p>Similar to <span class="citation" data-cites="CWG1696">[<a href="#ref-CWG1696" role="doc-biblioref">CWG1696</a>]</span>, we can make returning a reference from a function ill-formed if it would be bound to a temporary. Just like <span class="citation" data-cites="CWG1696">[<a href="#ref-CWG1696" role="doc-biblioref">CWG1696</a>]</span>, this cannot be used as the basis of a constraint or as a <code class="sourceCode cpp"><span class="kw">static_assert</span></code> condition. Additionally, such a change requires library wording to react, as <code class="sourceCode cpp">is_convertible</code> is currently defined in terms of such a return statement. While such a language change may be desirable, it is neither necessary nor sufficient to accomplish the goals of this paper. It can be proposed separately if desired.</p>
 <p>During a previous EWG telecon discussion, some have suggested inventing some sort of new initialization rules, perhaps with new keywords like <code class="sourceCode cpp">direct_cast</code>. The author of this paper is unwilling to spare a kidney for any new keyword in this area, and such a construct can easily be implemented in the library if the traits are available. Moreover, changing initialization rules is a risky endeavor; such changes frequently come with unintended consequences (for recent examples, see <span class="citation" data-cites="gcc-pr95153">[<a href="#ref-gcc-pr95153" role="doc-biblioref">gcc-pr95153</a>]</span> and <span class="citation" data-cites="LWG3440">[<a href="#ref-LWG3440" role="doc-biblioref">LWG3440</a>]</span>). It’s not at all clear that the marginal benefit from such changes (relative to the trait-based approach) justifies the risk.</p>
 <h2 data-number="5.2" id="two-type-traits"><span class="header-section-number">5.2</span> Two type traits<a href="#two-type-traits" class="self-link"></a></h2>
 <p>This paper proposes two traits, <code class="sourceCode cpp">reference_constructs_from_temporary</code> and <code class="sourceCode cpp">reference_converts_from_temporary</code>, to cover both (non-list) direct-initialization and copy-initialization. The former is useful in classes like <code class="sourceCode cpp">std<span class="op">::</span>tuple</code> and <code class="sourceCode cpp">std<span class="op">::</span>pair</code> where <code class="sourceCode cpp"><span class="kw">explicit</span></code> constructors and conversion functions may be used; the latter is useful for <em><code class="sourceCode cpp">INVOKE<span class="op">&lt;</span>R<span class="op">&gt;</span></code></em> (e.g., <code class="sourceCode cpp">std<span class="op">::</span>function</code>) where only implicit conversions are considered.</p>

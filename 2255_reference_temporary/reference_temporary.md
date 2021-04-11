@@ -1,6 +1,6 @@
 ---
 title: A type trait to detect reference binding to temporary
-document: D2255R1
+document: P2255R1
 date: today
 audience:
   - EWG
@@ -8,7 +8,7 @@ audience:
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
-toc: false
+toc: true
 ---
 
 # Abstract
@@ -94,7 +94,7 @@ ill-formed if it would be bound to a temporary. Just like [@CWG1696], this canno
 be used as the basis of a constraint or as a `static_assert` condition.
 Additionally, such a change requires library wording to react, as
 `is_convertible` is currently defined in terms of such a return statement. While
-such a language change may be desirable, it is neither necessary nor sufficiently
+such a language change may be desirable, it is neither necessary nor sufficient
 to accomplish the goals of this paper. It can be proposed separately if desired.
 
 During a previous EWG telecon discussion, some have suggested inventing some
