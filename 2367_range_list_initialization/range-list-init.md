@@ -1,6 +1,6 @@
 ---
 title: "Remove misuses of list-initialization from Clause 24"
-document: D2367R0
+document: P2367R0
 date: today
 audience:
   - LWG
@@ -112,12 +112,12 @@ to `iota_view@[\{]{.diffdel}[\(]{.diffins}@E@[\}]{.diffdel}[\)]{.diffins}@` and
 
 [2]{.pnum} The name `views::take` denotes a range adaptor object ([range.adaptor.object]{.sref}).
 Let `E` and `F` be expressions, let `T` be `remove_cvref_t<decltype((E))>`,
-and let `D` be` range_difference_t<decltype((E))>`. If` decltype((F))` does not
+and let `D` be `range_difference_t<decltype((E))>`. If `decltype((F))` does not
 model `convertible_to<D>`, `views::take(E, F)` is ill-formed. Otherwise, the
 expression `views::take(E, F)` is expression-equivalent to:
 
 - [2.1]{.pnum} If T is a specialization of `ranges::empty_view` ([range.empty.view]),
-  then `((void) F, @_decay-copy_@(E))`[, except that the evaluation of `E` and `F`
+  then `((void) F, @_decay-copy_@(E))`[, except that the evaluations of `E` and `F`
   are indeterminately sequenced]{.diffins}.
 - [2.2]{.pnum} Otherwise, if `T` models `random_access_range` and `sized_range` and is
   - [2.2.1]{.pnum} [...]
@@ -183,12 +183,12 @@ namespace std::ranges {
 
 [2]{.pnum} The name `views::drop` denotes a range adaptor object ([range.adaptor.object]{.sref}).
 Let `E` and `F` be expressions, let `T` be `remove_cvref_t<decltype((E))>`,
-and let `D` be` range_difference_t<decltype((E))>`. If` decltype((F))` does not
+and let `D` be `range_difference_t<decltype((E))>`. If `decltype((F))` does not
 model `convertible_to<D>`, `views::drop(E, F)` is ill-formed. Otherwise, the
 expression `views::drop(E, F)` is expression-equivalent to:
 
 - [2.1]{.pnum} If T is a specialization of `ranges::empty_view` ([range.empty.view]),
-  then `((void) F, @_decay-copy_@(E))`[, except that the evaluation of `E` and `F`
+  then `((void) F, @_decay-copy_@(E))`[, except that the evaluations of `E` and `F`
   are indeterminately sequenced]{.diffins}.
 - [2.2]{.pnum} Otherwise, if `T` models `random_access_range` and `sized_range` and is
   - [2.2.1]{.pnum} [...]
@@ -234,7 +234,7 @@ and _`pattern_`_ with [`single_view{std::move(e)}`]{.diffdel} [`views::single(st
 
 [2]{.pnum} The name `views::counted` denotes a customization point object ([customization.point.object]{.sref}).
 Let `E` and `F` be expressions, let `T` be `decay_t<decltype((E))>`,
-and let `D` be` iter_difference_t<T>`. If` decltype((F))` does not
+and let `D` be `iter_difference_t<T>`. If `decltype((F))` does not
 model `convertible_to<D>`, `views::counted(E, F)` is ill-formed.
 
 [This case can result in substitution failure when `views::counted(E, F)` appears in the immediate context of a template instantiation.]{.note1}
