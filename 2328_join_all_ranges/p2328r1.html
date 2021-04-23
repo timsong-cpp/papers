@@ -640,14 +640,14 @@ blockquote { background-color: #f6f8fa; }
 <ul>
 <li><p><span class="marginalizedparent"><a class="marginalized">(1.1)</a></span> <code class="sourceCode default"><em>non-propagating-cache</em>&lt;T&gt;</code> constrains its type parameter <code class="sourceCode default">T</code> with <code class="sourceCode default">is_object_v&lt;T&gt;</code>.</p></li>
 <li><p><span class="marginalizedparent"><a class="marginalized">(1.2)</a></span> The copy constructor is equivalent to:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1"></a>    constexpr <em>non-propagating-cache</em>(<em>non-propagating-cache</em> const&amp;) noexcept { }</span></code></pre></div></li>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1"></a>    constexpr <em>non-propagating-cache</em>(const <em>non-propagating-cache</em>&amp;) noexcept { }</span></code></pre></div></li>
 <li><p><span class="marginalizedparent"><a class="marginalized">(1.3)</a></span> The move constructor is equivalent to:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1"></a>    constexpr <em>non-propagating-cache</em>(<em>non-propagating-cache</em>&amp;&amp; other) noexcept</span>
 <span id="cb3-2"><a href="#cb3-2"></a>    {</span>
 <span id="cb3-3"><a href="#cb3-3"></a>      other.reset();</span>
 <span id="cb3-4"><a href="#cb3-4"></a>    }</span></code></pre></div></li>
 <li><p><span class="marginalizedparent"><a class="marginalized">(1.4)</a></span> The copy assignment operator is equivalent to:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1"></a>    constexpr <em>non-propagating-cache</em>&amp; operator=(<em>non-propagating-cache</em> const&amp; other) noexcept</span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1"></a>    constexpr <em>non-propagating-cache</em>&amp; operator=(const <em>non-propagating-cache</em>&amp; other) noexcept</span>
 <span id="cb4-2"><a href="#cb4-2"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3"></a>      if (addressof(other) != this)</span>
 <span id="cb4-4"><a href="#cb4-4"></a>        reset();</span>

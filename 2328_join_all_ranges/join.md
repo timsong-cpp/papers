@@ -158,7 +158,7 @@ exactly like `optional<T>` with the following differences:
 - [1.1]{.pnum} `@_non-propagating-cache_@<T>` constrains its type parameter `T` with `is_object_v<T>`.
 - [1.2]{.pnum} The copy constructor is equivalent to:
   ```cpp
-      constexpr @_non-propagating-cache_@(@_non-propagating-cache_@ const&) noexcept { }
+      constexpr @_non-propagating-cache_@(const @_non-propagating-cache_@&) noexcept { }
   ```
 - [1.3]{.pnum} The move constructor is equivalent to:
   ```cpp
@@ -169,7 +169,7 @@ exactly like `optional<T>` with the following differences:
   ```
 - [1.4]{.pnum} The copy assignment operator is equivalent to:
   ```cpp
-      constexpr @_non-propagating-cache_@& operator=(@_non-propagating-cache_@ const& other) noexcept
+      constexpr @_non-propagating-cache_@& operator=(const @_non-propagating-cache_@& other) noexcept
       {
         if (addressof(other) != this)
           reset();
