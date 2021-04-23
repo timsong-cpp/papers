@@ -1,9 +1,9 @@
 ---
 title: "`join_view` should join all views of ranges"
-document: P2328R0
+document: P2328R1
 date: today
 audience:
-  - LEWG
+  - LWG
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
@@ -13,6 +13,9 @@ toc: true
 # Abstract
 This paper proposes relaxing the constraint on `join_view` to support
 joining ranges of prvalue non-view ranges.
+
+# Revision history
+- R1: Incorporate LWG review feedback.
 
 # Motivation
 Currently, `join_view` supports joining
@@ -191,10 +194,14 @@ exactly like `optional<T>` with the following differences:
   ::: bq
   _Mandates:_ The declaration `T t(*i);` is well-formed for some invented variable `t`.
 
-  _Effects:_ Calls `reset();`. Then initializes the contained value as if direct-non-list-initializing
+  _Effects:_ Calls `reset()`. Then initializes the contained value as if direct-non-list-initializing
   an object of type `T` with the argument `*i`.
 
+  _Postconditions:_ `*this` contains a value.
+
   _Returns:_ A reference to the new contained value.
+
+  _Throws:_ Any exception thrown by the initialization of the contained value.
 
   _Remarks:_ If an exception is thrown during the initialization of `T`, `*this` does not contain a value, and the previous value (if any) has been destroyed.
   :::
@@ -281,9 +288,8 @@ auto update_inner = [this](range_reference_t<@_Base_@> x) -> auto& {
 :::add
 ```cpp
 auto update_inner = [this](const iterator_t<@_Base_@>& x) -> auto&& {
-  if constexpr (@_ref-is-glvalue_@){ // *x is a reference
+  if constexpr (@_ref-is-glvalue_@) // *x is a reference
     return *x;
-  }
   else
     return @_parent\__@->@_inner\__@.@_emplace-deref_@(x);
 };
