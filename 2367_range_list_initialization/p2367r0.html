@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2021-04-23" />
+  <meta name="dcterms.date" content="2021-04-29" />
   <title>Remove misuses of list-initialization from Clause 24</title>
   <style>
       code{white-space: pre-wrap;}
@@ -533,7 +533,7 @@ blockquote { background-color: #f6f8fa; }
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2021-04-23</td>
+    <td>2021-04-29</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -637,7 +637,7 @@ blockquote { background-color: #f6f8fa; }
 <div class="dummy">
 <p><span class="marginalizedparent"><a class="marginalized">2</a></span> The name <code class="sourceCode cpp">views<span class="op">::</span>take</code> denotes a range adaptor object (<span>24.7.2 <a href="https://wg21.link/range.adaptor.object">[range.adaptor.object]</a></span>). Let <code class="sourceCode cpp">E</code> and <code class="sourceCode cpp">F</code> be expressions, let <code class="sourceCode cpp">T</code> be <code class="sourceCode cpp">remove_cvref_t<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">((</span>E<span class="op">))&gt;</span></code>, and let <code class="sourceCode cpp">D</code> be <code class="sourceCode cpp">range_difference_t<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">((</span>E<span class="op">))&gt;</span></code>. If <code class="sourceCode cpp"><span class="kw">decltype</span><span class="op">((</span>F<span class="op">))</span></code> does not model <code class="sourceCode cpp">convertible_to<span class="op">&lt;</span>D<span class="op">&gt;</span></code>, <code class="sourceCode cpp">views<span class="op">::</span>take<span class="op">(</span>E, F<span class="op">)</span></code> is ill-formed. Otherwise, the expression <code class="sourceCode cpp">views<span class="op">::</span>take<span class="op">(</span>E, F<span class="op">)</span></code> is expression-equivalent to:</p>
 <ul>
-<li><p><span class="marginalizedparent"><a class="marginalized">(2.1)</a></span> If T is a specialization of <code class="sourceCode cpp">ranges<span class="op">::</span>empty_view</code> ([range.empty.view]), then <code class="sourceCode cpp"><span class="op">((</span><span class="dt">void</span><span class="op">)</span> F, <em>decay-copy</em><span class="op">(</span>E<span class="op">))</span></code><span class="diffins">, except that the evaluations of <code class="sourceCode cpp">E</code> and <code class="sourceCode cpp">F</code> are indeterminately sequenced</span>.</p></li>
+<li><p><span class="marginalizedparent"><a class="marginalized">(2.1)</a></span> If T is a specialization of <code class="sourceCode cpp">ranges<span class="op">::</span>empty_view</code> (<span>24.6.2.2 <a href="https://wg21.link/range.empty.view">[range.empty.view]</a></span>), then <code class="sourceCode cpp"><span class="op">((</span><span class="dt">void</span><span class="op">)</span> F, <em>decay-copy</em><span class="op">(</span>E<span class="op">))</span></code><span class="diffins">, except that the evaluations of <code class="sourceCode cpp">E</code> and <code class="sourceCode cpp">F</code> are indeterminately sequenced</span>.</p></li>
 <li><p><span class="marginalizedparent"><a class="marginalized">(2.2)</a></span> Otherwise, if <code class="sourceCode cpp">T</code> models <code class="sourceCode cpp">random_access_range</code> and <code class="sourceCode cpp">sized_range</code> and is</p>
 <ul>
 <li><span class="marginalizedparent"><a class="marginalized">(2.2.1)</a></span> […]</li>
@@ -702,7 +702,7 @@ blockquote { background-color: #f6f8fa; }
 <div class="dummy">
 <p><span class="marginalizedparent"><a class="marginalized">2</a></span> The name <code class="sourceCode cpp">views<span class="op">::</span>drop</code> denotes a range adaptor object (<span>24.7.2 <a href="https://wg21.link/range.adaptor.object">[range.adaptor.object]</a></span>). Let <code class="sourceCode cpp">E</code> and <code class="sourceCode cpp">F</code> be expressions, let <code class="sourceCode cpp">T</code> be <code class="sourceCode cpp">remove_cvref_t<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">((</span>E<span class="op">))&gt;</span></code>, and let <code class="sourceCode cpp">D</code> be <code class="sourceCode cpp">range_difference_t<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">((</span>E<span class="op">))&gt;</span></code>. If <code class="sourceCode cpp"><span class="kw">decltype</span><span class="op">((</span>F<span class="op">))</span></code> does not model <code class="sourceCode cpp">convertible_to<span class="op">&lt;</span>D<span class="op">&gt;</span></code>, <code class="sourceCode cpp">views<span class="op">::</span>drop<span class="op">(</span>E, F<span class="op">)</span></code> is ill-formed. Otherwise, the expression <code class="sourceCode cpp">views<span class="op">::</span>drop<span class="op">(</span>E, F<span class="op">)</span></code> is expression-equivalent to:</p>
 <ul>
-<li><p><span class="marginalizedparent"><a class="marginalized">(2.1)</a></span> If T is a specialization of <code class="sourceCode cpp">ranges<span class="op">::</span>empty_view</code> ([range.empty.view]), then <code class="sourceCode cpp"><span class="op">((</span><span class="dt">void</span><span class="op">)</span> F, <em>decay-copy</em><span class="op">(</span>E<span class="op">))</span></code><span class="diffins">, except that the evaluations of <code class="sourceCode cpp">E</code> and <code class="sourceCode cpp">F</code> are indeterminately sequenced</span>.</p></li>
+<li><p><span class="marginalizedparent"><a class="marginalized">(2.1)</a></span> If T is a specialization of <code class="sourceCode cpp">ranges<span class="op">::</span>empty_view</code> (<span>24.6.2.2 <a href="https://wg21.link/range.empty.view">[range.empty.view]</a></span>), then <code class="sourceCode cpp"><span class="op">((</span><span class="dt">void</span><span class="op">)</span> F, <em>decay-copy</em><span class="op">(</span>E<span class="op">))</span></code><span class="diffins">, except that the evaluations of <code class="sourceCode cpp">E</code> and <code class="sourceCode cpp">F</code> are indeterminately sequenced</span>.</p></li>
 <li><p><span class="marginalizedparent"><a class="marginalized">(2.2)</a></span> Otherwise, if <code class="sourceCode cpp">T</code> models <code class="sourceCode cpp">random_access_range</code> and <code class="sourceCode cpp">sized_range</code> and is</p>
 <ul>
 <li><span class="marginalizedparent"><a class="marginalized">(2.2.1)</a></span> […]</li>

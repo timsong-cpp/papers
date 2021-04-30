@@ -116,7 +116,7 @@ and let `D` be `range_difference_t<decltype((E))>`. If `decltype((F))` does not
 model `convertible_to<D>`, `views::take(E, F)` is ill-formed. Otherwise, the
 expression `views::take(E, F)` is expression-equivalent to:
 
-- [2.1]{.pnum} If T is a specialization of `ranges::empty_view` ([range.empty.view]),
+- [2.1]{.pnum} If T is a specialization of `ranges::empty_view` ([range.empty.view]{.sref}),
   then `((void) F, @_decay-copy_@(E))`[, except that the evaluations of `E` and `F`
   are indeterminately sequenced]{.diffins}.
 - [2.2]{.pnum} Otherwise, if `T` models `random_access_range` and `sized_range` and is
@@ -187,7 +187,7 @@ and let `D` be `range_difference_t<decltype((E))>`. If `decltype((F))` does not
 model `convertible_to<D>`, `views::drop(E, F)` is ill-formed. Otherwise, the
 expression `views::drop(E, F)` is expression-equivalent to:
 
-- [2.1]{.pnum} If T is a specialization of `ranges::empty_view` ([range.empty.view]),
+- [2.1]{.pnum} If T is a specialization of `ranges::empty_view` ([range.empty.view]{.sref}),
   then `((void) F, @_decay-copy_@(E))`[, except that the evaluations of `E` and `F`
   are indeterminately sequenced]{.diffins}.
 - [2.2]{.pnum} Otherwise, if `T` models `random_access_range` and `sized_range` and is

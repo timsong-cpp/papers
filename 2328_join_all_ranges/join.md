@@ -117,7 +117,7 @@ This paper recommends that the proposed changes, or at least those changes that
 modify the handling of ranges of prvalue views, be applied retroactively to
 C++20 to simplify both specification and implementation. The use of `join_view`
 in the wild is likely rare because it is only shipped by libstdc++ as of
-the writing of this paper, and only as experimental.
+the writing of R0 of this paper, and only as experimental.
 
 # Wording
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2021-04-23" />
+  <meta name="dcterms.date" content="2021-04-29" />
   <title>join_view should join all views of ranges</title>
   <style>
       code{white-space: pre-wrap;}
@@ -533,7 +533,7 @@ blockquote { background-color: #f6f8fa; }
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2021-04-23</td>
+    <td>2021-04-29</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -603,7 +603,7 @@ blockquote { background-color: #f6f8fa; }
 </ol>
 <p>Both changes appear to be desirable. The first means that we don’t pay the cost of default constructing an inner view when the resulting view will just be overwritten later. It also avoids tying <code class="sourceCode cpp">join_view</code>’s copyability with that of the cached view when the latter is an implementation detail.</p>
 <p>The second change means that instead of move assignment to the existing view followed by destruction of a temporary, we destroy the existing view and constructs the return value of <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">*</span></code> directly into its place. This is potentially more efficient.</p>
-<p>This paper recommends that the proposed changes, or at least those changes that modify the handling of ranges of prvalue views, be applied retroactively to C++20 to simplify both specification and implementation. The use of <code class="sourceCode cpp">join_view</code> in the wild is likely rare because it is only shipped by libstdc++ as of the writing of this paper, and only as experimental.</p>
+<p>This paper recommends that the proposed changes, or at least those changes that modify the handling of ranges of prvalue views, be applied retroactively to C++20 to simplify both specification and implementation. The use of <code class="sourceCode cpp">join_view</code> in the wild is likely rare because it is only shipped by libstdc++ as of the writing of R0 of this paper, and only as experimental.</p>
 <h1 data-number="5" style="border-bottom:1px solid #cccccc" id="wording"><span class="header-section-number">5</span> Wording<a href="#wording" class="self-link"></a></h1>
 <div>
 <ol type="1">
