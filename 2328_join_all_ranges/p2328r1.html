@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2021-04-29" />
+  <meta name="dcterms.date" content="2021-05-06" />
   <title>join_view should join all views of ranges</title>
   <style>
       code{white-space: pre-wrap;}
@@ -533,7 +533,7 @@ blockquote { background-color: #f6f8fa; }
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2021-04-29</td>
+    <td>2021-05-06</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -575,7 +575,7 @@ blockquote { background-color: #f6f8fa; }
 <p>This paper proposes relaxing the constraint on <code class="sourceCode cpp">join_view</code> to support joining ranges of prvalue non-view ranges.</p>
 <h1 data-number="2" style="border-bottom:1px solid #cccccc" id="revision-history"><span class="header-section-number">2</span> Revision history<a href="#revision-history" class="self-link"></a></h1>
 <ul>
-<li>R1: Incorporate LWG review feedback.</li>
+<li>R1: Incorporate LWG review feedback. Add a missing <code class="sourceCode cpp"><span class="kw">constexpr</span></code> to <em><code class="sourceCode cpp">non<span class="op">-</span>propagating<span class="op">-</span>cache<span class="op">::</span>emplace<span class="op">-</span>deref</code></em>. Cross-reference <span class="citation" data-cites="P2231R1">[<a href="#ref-P2231R1" role="doc-biblioref">P2231R1</a>]</span>.</li>
 </ul>
 <h1 data-number="3" style="border-bottom:1px solid #cccccc" id="motivation"><span class="header-section-number">3</span> Motivation<a href="#motivation" class="self-link"></a></h1>
 <p>Currently, <code class="sourceCode cpp">join_view</code> supports joining</p>
@@ -633,6 +633,7 @@ blockquote { background-color: #f6f8fa; }
 <li>Add the following subclause under <span>24.7 <a href="https://wg21.link/range.adaptors">[range.adaptors]</a></span>, immediately after <span>24.7.3 <a href="https://wg21.link/range.semi.wrap">[range.semi.wrap]</a></span>:</li>
 </ol>
 <blockquote>
+<p><span class="ednote" style="color: #0000ff">[ Editor&#39;s note: The <code class="sourceCode default">constexpr</code> in the specification of the member functions of <em><code class="sourceCode default">non-propagating-cache</code></em> (other than the copy constructor) assumes the application of <span class="citation" data-cites="P2231R1">[<a href="#ref-P2231R1" role="doc-biblioref">P2231R1</a>]</span>. ]</span></p>
 <div class="add" style="color: #006e28">
 
 <h3 id="non-propagating-cache-range.nonprop.cache" class="unnumbered">24.7.? Non-propagating cache [range.nonprop.cache]<a href="#non-propagating-cache-range.nonprop.cache" class="self-link"></a></h3>
@@ -662,7 +663,7 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb5-6"><a href="#cb5-6"></a>    }</span></code></pre></div></li>
 <li><p><span class="marginalizedparent"><a class="marginalized">(1.6)</a></span> <code class="sourceCode default"><em>non-propagating-cache</em>&lt;T&gt;</code> has an additional member function template specified as follows:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1"></a>template&lt;class I&gt;</span>
-<span id="cb6-2"><a href="#cb6-2"></a>T&amp; <em>emplace-deref</em>(const I&amp; i);    // exposition only</span></code></pre></div>
+<span id="cb6-2"><a href="#cb6-2"></a>constexpr T&amp; <em>emplace-deref</em>(const I&amp; i);    // exposition only</span></code></pre></div>
 <blockquote>
 <p><em>Mandates:</em> The declaration <code class="sourceCode default">T t(*i);</code> is well-formed for some invented variable <code class="sourceCode default">t</code>.</p>
 <p><em>Effects:</em> Calls <code class="sourceCode default">reset()</code>. Then initializes the contained value as if direct-non-list-initializing an object of type <code class="sourceCode default">T</code> with the argument <code class="sourceCode default">*i</code>.</p>
@@ -812,6 +813,10 @@ blockquote { background-color: #f6f8fa; }
 <div id="ref-P2214R0">
 <p>[P2214R0] Barry Revzin, Conor Hoekstra, Tim Song. 2020-10-15. A Plan for C++23 Ranges. <br />
 <a href="https://wg21.link/p2214r0">https://wg21.link/p2214r0</a></p>
+</div>
+<div id="ref-P2231R1">
+<p>[P2231R1] Barry Revzin. 2021-02-12. Add further constexpr support for optional/variant. <br />
+<a href="https://wg21.link/p2231r1">https://wg21.link/p2231r1</a></p>
 </div>
 </div>
 </div>

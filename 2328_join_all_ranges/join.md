@@ -15,7 +15,8 @@ This paper proposes relaxing the constraint on `join_view` to support
 joining ranges of prvalue non-view ranges.
 
 # Revision history
-- R1: Incorporate LWG review feedback.
+- R1: Incorporate LWG review feedback. Add a missing `constexpr` to
+  _`non-propagating-cache::emplace-deref`_. Cross-reference [@P2231R1].
 
 # Motivation
 Currently, `join_view` supports joining
@@ -147,6 +148,10 @@ the writing of R0 of this paper, and only as experimental.
 - Add the following subclause under [range.adaptors]{.sref}, immediately after
   [range.semi.wrap]{.sref}:
 
+[The `constexpr` in the specification of the member functions of
+ _`non-propagating-cache`_ (other than the copy constructor)
+ assumes the application of [@P2231R1].]{.ednote}
+
 :::add
 
 ### 24.7.? Non-propagating cache [range.nonprop.cache] {-}
@@ -189,7 +194,7 @@ exactly like `optional<T>` with the following differences:
 
   ```cpp
   template<class I>
-  T& @_emplace-deref_@(const I& i);    // exposition only
+  constexpr T& @_emplace-deref_@(const I& i);    // exposition only
   ```
   ::: bq
   _Mandates:_ The declaration `T t(*i);` is well-formed for some invented variable `t`.
