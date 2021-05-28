@@ -1188,6 +1188,11 @@ the expression `views::zip(Es...)` is expression-equivalent to
 - [2.1]{.pnum} `@_decay-copy_@(views::empty<tuple<>>)` if `Es` is an empty pack,
 - [2.2]{.pnum} otherwise, `zip_view<views::all_t<decltype((Es))>...>(Es...)`.
 
+::: example
+
+[3]{.pnum} FIXME: TODO
+
+:::
 #### 24.7.?.2 Class template `zip_view` [range.zip.view] {-}
 
 ```cpp
@@ -1397,6 +1402,8 @@ namespace std::ranges {
 
 [2]{.pnum} `@_iterator_@::iterator_category` is present if and only if `@_all-forward_@<Const, Views...>` is modeled.
 
+[3]{.pnum} If the invocation of any non-const member function of _`iterator`_ exits via an exception,
+the iterator acquires a singular value.
 
 ::: itemdecl
 
@@ -1404,20 +1411,20 @@ namespace std::ranges {
 constexpr explicit @_iterator_@(@_tuple-or-pair_@<iterator_t<@_maybe-const_@<Const, Views>>...> current);
 ```
 
-[3]{.pnum} _Effects_: Initializes `@_current\__@` with `std::move(current)`.
+[4]{.pnum} _Effects_: Initializes `@_current\__@` with `std::move(current)`.
 
 ```cpp
 constexpr @_iterator_@(@_iterator_@<!Const> i)
   requires Const && (convertible_to<iterator_t<Views>, iterator_t<@_maybe-const_@<Const, Views>>> && ...);
 ```
 
-[4]{.pnum} _Effects_: Initializes `@_current\__@` with `std::move(i.@_current\__@)`.
+[5]{.pnum} _Effects_: Initializes `@_current\__@` with `std::move(i.@_current\__@)`.
 
 ```cpp
-  constexpr auto operator*() const;
+constexpr auto operator*() const;
 ```
 
-[5]{.pnum} _Effects_: Equivalent to:
+[6]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -1428,7 +1435,7 @@ constexpr @_iterator_@(@_iterator_@<!Const> i)
 ```cpp
 constexpr @_iterator_@& operator++();
 ```
-[6]{.pnum} _Effects_: Equivalent to:
+[7]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -1441,13 +1448,13 @@ constexpr @_iterator_@& operator++();
 constexpr void operator++(int);
 ```
 
-[7]{.pnum} _Effects_: Equivalent to `++*this`.
+[8]{.pnum} _Effects_: Equivalent to `++*this`.
 
 ```cpp
 constexpr @_iterator_@ operator++(int) requires @_all-forward_@<Const, Views...>;
 ```
 
-[8]{.pnum} _Effects_: Equivalent to:
+[9]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -1461,7 +1468,7 @@ constexpr @_iterator_@ operator++(int) requires @_all-forward_@<Const, Views...>
 ```cpp
 constexpr @_iterator_@& operator--() requires @_all-bidirectional_@<Const, Views...>;
 ```
-[9]{.pnum} _Effects_: Equivalent to:
+[10]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -1474,7 +1481,7 @@ constexpr @_iterator_@& operator--() requires @_all-bidirectional_@<Const, Views
 ```cpp
 constexpr @_iterator_@ operator--(int) requires @_all-bidirectional_@<Const, Views...>;
 ```
-[10]{.pnum} _Effects_: Equivalent to:
+[11]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -1488,7 +1495,7 @@ constexpr @_iterator_@ operator--(int) requires @_all-bidirectional_@<Const, Vie
 constexpr @_iterator_@& operator+=(difference_type x)
   requires @_all-random-access_@<Const, Views...>;
 ```
-[11]{.pnum} _Effects_: Equivalent to:
+[12]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -1501,7 +1508,7 @@ constexpr @_iterator_@& operator+=(difference_type x)
   constexpr @_iterator_@& operator-=(difference_type x)
     requires @_all-random-access_@<Const, Views...>;
 ```
-[12]{.pnum} _Effects_: Equivalent to:
+[13]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -1514,7 +1521,7 @@ constexpr @_iterator_@& operator+=(difference_type x)
 constexpr auto operator[](difference_type n) const
   requires @_all-random-access_@<Const, Views...>;
 ```
-[13]{.pnum} _Effects_: Equivalent to:
+[14]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -1528,22 +1535,20 @@ constexpr auto operator[](difference_type n) const
 friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y)
   requires (equality_comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
 ```
-[14]{.pnum} _Returns_:
+[15]{.pnum} _Returns_:
 
-- [14.1]{.pnum} `x.@_current\__@ == y.@_current\__@` if `@_all-bidirectional_@<Const, Views...>` is `true`.
-- [14.2]{.pnum} Otherwise, `true` if there exists an integer 0 &le; _i_ &lt; `sizeof...(Views)`
+- [15.1]{.pnum} `x.@_current\__@ == y.@_current\__@` if `@_all-bidirectional_@<Const, Views...>` is `true`.
+- [15.2]{.pnum} Otherwise, `true` if there exists an integer 0 &le; _i_ &lt; `sizeof...(Views)`
   such that `bool(std::get<@_i_@>(x.@_current\__@) == std::get<@_i_@>(y.@_current\__@))` is `true`.
-- [14.3]{.pnum} Otherwise, `false`.
+  [This allows `zip_view` to model `common_range` when all constituent views model `common_range`.]{.note}
+- [15.3]{.pnum} Otherwise, `false`.
 
-[15]{.pnum} [For non-bidirectional views, the use of logical OR on the result of
-individual comparisons allows `zip_view` to model `common_range` when all constituent views
-model `common_range`.]{.note}
 
 ```cpp
 friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
   requires @_all-random-access_@<Const, Views...>;
 ```
-[16]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@ < y.@_current\__@; `
+[16]{.pnum} _Returns_: `x.@_current\__@ < y.@_current\__@`.
 
 ```cpp
 friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
@@ -1572,7 +1577,7 @@ friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
             (three_way_comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
 ```
 
-[20]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@ <=> y.@_current\__@; `
+[20]{.pnum} _Returns_: `x.@_current\__@ <=> y.@_current\__@`.
 
 
 ```cpp
@@ -1586,9 +1591,9 @@ friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i
 
 ::: bq
 ```cpp
-  return @_iterator_@(@_tuple-transform_@([&]<class I>(const I& it) {
-    return it + iter_difference_t<I>(n);
-  }, i.@_current\__@));
+  auto r = i;
+  r += n;
+  return r;
 ```
 :::
 
@@ -1601,9 +1606,9 @@ friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n
 
 ::: bq
 ```cpp
-  return @_iterator_@(@_tuple-transform_@([&]<class I>(const I& it) {
-    return it - iter_difference_t<I>(n);
-  }, i.@_current\__@));
+  auto r = i;
+  r -= n;
+  return r;
 ```
 :::
 
@@ -1643,18 +1648,18 @@ friend constexpr void iter_swap(const @_iterator_@& l, const @_iterator_@& r)
   requires (indirectly_swappable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
 ```
 
-[27]{.pnum} _Effects_: For every integer _i_ in `[0, sizeof...(Views))`,
-performs `ranges::iter_swap(get<@_i_@>(l.@_current\__@), get<@_i_@>(r.@_current\__@))`.
+[27]{.pnum} _Effects_: For every integer 0 &le; _i_ &lt; `sizeof...(Views)`,
+performs `ranges::iter_swap(std::get<@_i_@>(l.@_current\__@), std::get<@_i_@>(r.@_current\__@))`.
 
 [28]{.pnum} _Remarks:_ The expression within `noexcept` is equivalent to the logical AND of the following expressions:
 
 ::: bq
 ```cpp
-  noexcept(ranges::iter_swap(get<@_i_@>(l.@_current\__@), get<@_i_@>(r.@_current\__@)))
+  noexcept(ranges::iter_swap(std::get<@_i_@>(l.@_current\__@), std::get<@_i_@>(r.@_current\__@)))
 ```
 :::
 
-for every integer _i_ in `[0, sizeof...(Views))`.
+for every integer 0 &le; _i_ &lt; `sizeof...(Views)`.
 
 :::
 
@@ -2180,7 +2185,7 @@ Add the following subclause to [range.adaptors]{.sref}.
 #### 24.7.?.1 Overview [range.adjacent.overview] {-}
 
 [1]{.pnum} `adjacent_view` takes a `view` and produces a `view` whose
-_M_ <sup>th</sup> element is a `tuple` or `pair` of the M <sup>th</sup> through
+_M_ <sup>th</sup> element is a tuple of references to the M <sup>th</sup> through
 (_M_ + _N_ - 1)<sup>th</sup> elements of the original view. If the original
 view has fewer than _N_ elements, the resulting view is empty.
 
@@ -2206,7 +2211,7 @@ class adjacent_view : public view_interface<adjacent_view<V, N>>{
   template<bool> class @_iterator_@;     // exposition only
   template<bool> class @_sentinel_@;     // exposition only
 
-  struct @_as\_sentinel_@{};              // exposition only
+  struct @_as-sentinel_@{};              // exposition only
 
 public:
   constexpr adjacent_view() = default;
@@ -2225,7 +2230,7 @@ public:
   }
 
   constexpr auto end() requires (!@_simple-view_@<V> && common_range<V>){
-    return @_iterator_@<false>(@_as\_sentinel_@{}, ranges::begin(@_base\__@), ranges::end(@_base\__@));
+    return @_iterator_@<false>(@_as-sentinel_@{}, ranges::begin(@_base\__@), ranges::end(@_base\__@));
   }
 
   constexpr auto end() const requires range<const V> {
@@ -2233,7 +2238,7 @@ public:
   }
 
   constexpr auto end() const requires common_range<const V> {
-    return @_iterator_@<true>(@_as\_sentinel_@{}, ranges::begin(@_base\__@), ranges::end(@_base\__@));
+    return @_iterator_@<true>(@_as-sentinel_@{}, ranges::begin(@_base\__@), ranges::end(@_base\__@));
   }
 
   constexpr auto size() requires sized_range<V>;
@@ -2278,7 +2283,7 @@ namespace std::ranges {
     using @_Base_@ = @_maybe-const_@<Const, V>;                                             // exposition only
     array<iterator_t<@_Base_@>, N> @_current\__@ = array<iterator_t<@_Base_@>, N>();             // exposition only
     constexpr @_iterator_@(iterator_t<@_Base_@> first, sentinel_t<@_Base_@> last);              // exposition only
-    constexpr @_iterator_@(as_sentinel, iterator_t<@_Base_@> first, iterator_t<@_Base_@> last); // exposition only
+    constexpr @_iterator_@(@_as-sentinel_@, iterator_t<@_Base_@> first, iterator_t<@_Base_@> last); // exposition only
   public:
     using iterator_category = input_iterator_tag;
     using iterator_concept  = @_see below_@;
@@ -2342,6 +2347,8 @@ namespace std::ranges {
 - [1.2]{.pnum} Otherwise, if `@_Base_@` models `bidirectional_range`, then `iterator_concept` denotes `bidirectional_iterator_tag`.
 - [1.3]{.pnum} Otherwise, `iterator_concept` denotes `forward_iterator_tag`.
 
+[2]{.pnum} If the invocation of any non-const member function of _`iterator`_ exits via an exception,
+the iterator acquires a singular value.
 
 ::: itemdecl
 
@@ -2349,18 +2356,18 @@ namespace std::ranges {
 constexpr @_iterator_@(iterator_t<@_Base_@> first, sentinel_t<@_Base_@> last);
 ```
 
-[2]{.pnum} _Postconditions_: `@_current\__[0]@ == first` is `true`, and
-for every integer _i_ in `[1, N)`,
+[3]{.pnum} _Postconditions_: `@_current\__[0]@ == first` is `true`, and
+for every integer 1 &le; _i_ &lt; `N`,
 `@_current\__@[@_i_@] == ranges::next(@_current\__@[@_i_@-1], 1, last)` is `true`.
 
 ```cpp
-constexpr @_iterator_@(as_sentinel, iterator_t<@_Base_@> first, iterator_t<@_Base_@> last);
+constexpr @_iterator_@(@_as-sentinel_@, iterator_t<@_Base_@> first, iterator_t<@_Base_@> last);
 ```
 
-[3]{.pnum} _Postconditions_: If `@_Base_@` does not model `bidirectional_range`,
+[4]{.pnum} _Postconditions_: If `@_Base_@` does not model `bidirectional_range`,
 each element of `@_current\__@` is equal to `last`.
 Otherwise, `@_current\__[N-1]@ == last` is `true`, and
-for every integer _i_ in `[0, N-1)`,
+for every integer 0 &le; _i_ &lt; `(N - 1)`,
 `@_current\__@[@_i_@] == ranges::prev(@_current\__@[@_i_@+1], 1, first)` is `true`.
 
 ```cpp
@@ -2368,13 +2375,13 @@ constexpr @_iterator_@(@_iterator_@<!Const> i)
   requires Const && (convertible_to<iterator_t<V>, iterator_t<@_Base_@>>;
 ```
 
-[4]{.pnum} _Effects_: Initializes each element of `@_current\__@` with the corresponding element of `i.@_current\__@` as an xvalue.
+[5]{.pnum} _Effects_: Initializes each element of `@_current\__@` with the corresponding element of `i.@_current\__@` as an xvalue.
 
 ```cpp
   constexpr auto operator*() const;
 ```
 
-[5]{.pnum} _Effects_: Equivalent to:
+[6]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -2385,7 +2392,7 @@ constexpr @_iterator_@(@_iterator_@<!Const> i)
 ```cpp
 constexpr @_iterator_@& operator++();
 ```
-[6]{.pnum} _Effects_: Equivalent to:
+[7]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -2399,7 +2406,7 @@ constexpr @_iterator_@& operator++();
 constexpr @_iterator_@ operator++(int);
 ```
 
-[7]{.pnum} _Effects_: Equivalent to:
+[8]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -2413,7 +2420,7 @@ constexpr @_iterator_@ operator++(int);
 ```cpp
 constexpr @_iterator_@& operator--() requires bidirectional_range<@_Base_@>;
 ```
-[8]{.pnum} _Effects_: Equivalent to:
+[9]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -2427,7 +2434,7 @@ constexpr @_iterator_@& operator--() requires bidirectional_range<@_Base_@>;
 ```cpp
 constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
 ```
-[9]{.pnum} _Effects_: Equivalent to:
+[10]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -2441,7 +2448,7 @@ constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
 constexpr @_iterator_@& operator+=(difference_type x)
   requires random_access_range<@_Base_@>;
 ```
-[10]{.pnum} _Effects_: Equivalent to:
+[11]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -2454,7 +2461,7 @@ constexpr @_iterator_@& operator+=(difference_type x)
   constexpr @_iterator_@& operator-=(difference_type x)
     requires random_access_range<@_Base_@>;
 ```
-[11]{.pnum} _Effects_: Equivalent to:
+[12]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -2467,7 +2474,7 @@ constexpr @_iterator_@& operator+=(difference_type x)
 constexpr auto operator[](difference_type n) const
   requires random_access_range<@_Base_@>;
 ```
-[12]{.pnum} _Effects_: Equivalent to:
+[13]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -2478,26 +2485,26 @@ constexpr auto operator[](difference_type n) const
 ```cpp
 friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y);
 ```
-[13]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@.back() == y.@_current\__@.back()`.
+[14]{.pnum} _Returns:_ `x.@_current\__@.back() == y.@_current\__@.back()`.
 
 ```cpp
 friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
   requires random_access_range<@_Base_@>;
 ```
-[14]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@.back() < y.@_current\__@.back(); `
+[15]{.pnum} _Returns_: `x.@_current\__@.back() < y.@_current\__@.back()`
 
 ```cpp
 friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
   requires random_access_range<@_Base_@>;
 ```
-[15]{.pnum} _Effects_: Equivalent to: `return y < x; `
+[16]{.pnum} _Effects_: Equivalent to: `return y < x; `
 
 ```cpp
 friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
   requires random_access_range<@_Base_@>;
 ```
 
-[16]{.pnum} _Effects_: Equivalent to: `return !(y < x); `
+[17]{.pnum} _Effects_: Equivalent to: `return !(y < x); `
 
 
 ```cpp
@@ -2505,7 +2512,7 @@ friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
   requires random_access_range<@_Base_@>;
 ```
 
-[17]{.pnum} _Effects_: Equivalent to: `return !(x < y); `
+[18]{.pnum} _Effects_: Equivalent to: `return !(x < y); `
 
 ```cpp
 friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
@@ -2513,7 +2520,7 @@ friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
            three_way_comparable<iterator_t<@_Base_@>>;
 ```
 
-[18]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@.back() <=> y.@_current\__@.back(); `
+[19]{.pnum} _Returns_: `x.@_current\__@.back() <=> y.@_current\__@.back()`
 
 
 ```cpp
@@ -2523,7 +2530,7 @@ friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i
   requires random_access_range<@_Base_@>;
 ```
 
-[19]{.pnum} _Effects_: Equivalent to:
+[20]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -2538,7 +2545,7 @@ friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n
   requires random_access_range<@_Base_@>;
 ```
 
-[20]{.pnum} _Effects_: Equivalent to:
+[21]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -2552,13 +2559,13 @@ friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n
 friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
   requires sized_sentinel_for<iterator_t<@_Base_@>, iterator_t<@_Base_@>>;
 ```
-[21]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@.back() - y.@_current\__@.back()`.
+[22]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@.back() - y.@_current\__@.back()`.
 
 ```cpp
 friend constexpr auto iter_move(const @_iterator_@& i) noexcept(@_see below_@);
 ```
 
-[22]{.pnum} _Effects_: Equivalent to:
+[23]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
@@ -2566,7 +2573,7 @@ friend constexpr auto iter_move(const @_iterator_@& i) noexcept(@_see below_@);
 ```
 :::
 
-[23]{.pnum} _Remarks:_ The expression within `noexcept` is equivalent to
+[24]{.pnum} _Remarks:_ The expression within `noexcept` is equivalent to
 
 ::: bq
 ```cpp
@@ -2580,12 +2587,12 @@ friend constexpr void iter_swap(const @_iterator_@& l, const @_iterator_@& r)
   noexcept(@_see below_@)
   requires indirectly_swappable<iterator_t<@_Base_@>>;
 ```
-[24]{.pnum} _Preconditions:_ None of the iterators in `l.@_current\__@` is equal to an iterator in `r.@_current\__@`.
+[25]{.pnum} _Preconditions:_ None of the iterators in `l.@_current\__@` is equal to an iterator in `r.@_current\__@`.
 
-[25]{.pnum} _Effects_: For every integer _i_ in `[0, N)`,
+[26]{.pnum} _Effects_: For every integer 0 &le; _i_ &lt; `N`,
 performs `ranges::iter_swap(l.@_current\__@[@_i_@], r.@_current\__@[@_i_@])`.
 
-[26]{.pnum} _Remarks:_ The expression within `noexcept` is equivalent to:
+[27]{.pnum} _Remarks:_ The expression within `noexcept` is equivalent to:
 
 ::: bq
 ```cpp
