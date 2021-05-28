@@ -1207,8 +1207,8 @@ blockquote { background-color: #f6f8fa; }
 <p><span class="marginalizedparent"><a class="marginalized">?</a></span> Let <code class="sourceCode default">FWD(u)</code> be <code class="sourceCode default">static_cast&lt;decltype(u)&gt;(u)</code>.</p>
 <p><span class="marginalizedparent"><a class="marginalized">?</a></span> <em>Constraints</em>:</p>
 <ul>
-<li><span class="marginalizedparent"><a class="marginalized">(17.1)</a></span> <code class="sourceCode default">is_constructible_v&lt;first_type, decltype(get&lt;0&gt;(FWD(p)))&gt;</code> is <code class="sourceCode default">true</code> and</li>
-<li><span class="marginalizedparent"><a class="marginalized">(17.2)</a></span> <code class="sourceCode default">is_constructible_v&lt;second_type, decltype(get&lt;1&gt;(FWD(p)))&gt;</code> is <code class="sourceCode default">true</code>.</li>
+<li><span class="marginalizedparent"><a class="marginalized">(?.1)</a></span> <code class="sourceCode default">is_constructible_v&lt;first_type, decltype(get&lt;0&gt;(FWD(p)))&gt;</code> is <code class="sourceCode default">true</code> and</li>
+<li><span class="marginalizedparent"><a class="marginalized">(?.2)</a></span> <code class="sourceCode default">is_constructible_v&lt;second_type, decltype(get&lt;1&gt;(FWD(p)))&gt;</code> is <code class="sourceCode default">true</code>.</li>
 </ul>
 <p><span class="marginalizedparent"><a class="marginalized">?</a></span> <em>Effects:</em> Initializes <code class="sourceCode default">first</code> with <code class="sourceCode default">get&lt;0&gt;(FWD(p))</code> and <code class="sourceCode default">second</code> with <code class="sourceCode default">get&lt;1&gt;(FWD(p))</code>.</p>
 <p><span class="marginalizedparent"><a class="marginalized">?</a></span> <em>Remarks:</em> The expression inside <code class="sourceCode default">explicit</code> is equivalent to: <code class="sourceCode default">!is_convertible_v&lt;decltype(get&lt;0&gt;(FWD(p))), first_type&gt; || !is_convertible_v&lt;decltype(get&lt;1&gt;(FWD(p))), second_type&gt;</code>.</p>
@@ -1515,7 +1515,7 @@ blockquote { background-color: #f6f8fa; }
 <li><span class="marginalizedparent"><a class="marginalized">(2.2)</a></span> otherwise, <code class="sourceCode cpp">zip_view<span class="op">&lt;</span>views<span class="op">::</span>all_t<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">((</span>Es<span class="op">))&gt;...&gt;(</span>Es<span class="op">...)</span></code>.</li>
 </ul>
 <div class="example">
-<p><span>[ <em>Example ?:</em> </span><span class="marginalizedparent"><a class="marginalized">3</a></span> FIXME: TODO<span> — <em>end example</em> ]</span></p>
+<p><span>[ <em>Example ?:</em> </span>FIXME: TODO<span> — <em>end example</em> ]</span></p>
 </div>
 <h4 class="unnumbered" data-number id="class-template-zip_view-range.zip.view">24.7.?.2 Class template <code class="sourceCode cpp">zip_view</code> [range.zip.view]<a href="#class-template-zip_view-range.zip.view" class="self-link"></a></h4>
 <div class="sourceCode" id="cb38"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb38-1"><a href="#cb38-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
