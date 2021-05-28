@@ -22,6 +22,7 @@ all as described in section 3.2 of [@P2214R0].
 # Revision history
 
 - R2: Typo fixes. Incorporated LWG review feedback on 2021-05-21.
+  Account for integer-class types in the handling of `difference_type` and `size_type`.
 - R1: Added feature test macro. Expanded discussion regarding 1) `operator==` for
   forward-or-weaker `zip` iterators and 2) `adjacent` on input ranges.
   Miscellaneous wording fixes (thanks to Barry Revzin and Tomasz Kamiński).
@@ -155,6 +156,15 @@ possible for it to be a `common_range` in the following two cases:
 The standard, however, generally does not recognize infinite ranges (despite
 providing `unreachable_sentinel`). It goes without saying that a complete design
 for infinite ranges support is outside the scope of this paper.
+
+### `difference_type`
+
+The `difference_type` of `zip_view` is the common type of the difference types
+of its constituent views. During LWG wording review, Casey Carter pointed out
+that we don't currently require integer-class types to have such a common type,
+or to be convertible to other integer-class types, which appears to be a defect
+in the specification of those types. This paper therefore adds wording to
+address the issue.
 
 ## `adjacent` and `adjacent_transform`
 
@@ -1069,6 +1079,39 @@ Edit [vector.bool]{.sref}, class template partial specialization `vector<bool, A
  }
 ```
 
+## Conversion and common type for integer-class types
+
+Edit [iterator.concept.winc]{.sref} as indicated:
+
+::: bq
+
+[6]{.pnum} Expressions of integer-class type are explicitly convertible to
+any integral type [as well as any integer-class type]{.diffins}. Expressions of integral
+type are both implicitly and explicitly convertible to any integer-class type.
+Conversions between integral and integer-class types
+[and between two integer class types]{.diffins}
+do not exit via an exception.
+
+[&hellip;]
+
+[11]{.pnum} A type `I` other than _cv_ `bool` is _integer-like_ if it models `integral<I>`
+or if it is an integer-class type. An integer-like type `I` is _signed-integer-like_
+if it models `signed_­integral<I>` or if it is a signed-integer-class type.
+An integer-like type `I` is _unsigned-integer-like_ if it models
+`unsigned_­integral<I>` or if it is an unsigned-integer-class type.
+
+::: add
+
+[?]{.pnum} For any two integer-like types `I1` and `I2`, at least one of which is
+an integer-class type, `common_type_t<I1, I2>` denotes an integer-like
+type whose width is not less than that of `I1` or `I2`. If both `I1` and `I2` are
+signed-integer-like types, then `common_type_t<I1, I2>` is also a
+signed-integer-like type.
+
+:::
+
+:::
+
 ## Addition to `<ranges>`
 
 Add the following to [ranges.syn]{.sref}, header `<ranges>` synopsis:
@@ -1201,7 +1244,7 @@ public:
       return @_sentinel_@<false>(@_tuple-transform_@(ranges::end, @_views\__@));
     }
     else if constexpr ((random_access_range<Views> && ...)) {
-      return begin() + size();
+      return begin() + iter_difference_t<@_iterator_@<false>>(size());
     }
     else {
       return @_iterator_@<false>(@_tuple-transform_@(ranges::end, @_views\__@));
@@ -1213,7 +1256,7 @@ public:
       return @_sentinel_@<true>(@_tuple-transform_@(ranges::end, @_views\__@));
     }
     else if constexpr ((random_access_range<const Views> && ...)) {
-      return begin() + size();
+      return begin() + iter_difference_t<@_iterator_@<true>>(size());
     }
     else {
       return @_iterator_@<true>(@_tuple-transform_@(ranges::end, @_views\__@));
@@ -1261,7 +1304,7 @@ constexpr auto size() const requires (sized_range<const Views> && ...);
 
 ```cpp
 return apply([](auto... sizes){
-  using CT = common_type_t<decltype(sizes)...>;
+  using CT = @_make-unsigned-like-t_@<common_type_t<decltype(sizes)...>>;
   return ranges::min({CT(sizes)...});
 }, @_tuple-transform_@(ranges::size, @_views\__@));
 ```
@@ -1398,7 +1441,7 @@ constexpr @_iterator_@& operator++();
 constexpr void operator++(int);
 ```
 
-[7]{.pnum} _Effects_: Equivalent to `++*this;`.
+[7]{.pnum} _Effects_: Equivalent to `++*this`.
 
 ```cpp
 constexpr @_iterator_@ operator++(int) requires @_all-forward_@<Const, Views...>;
@@ -1449,7 +1492,7 @@ constexpr @_iterator_@& operator+=(difference_type x)
 
 ::: bq
 ```cpp
-  @_tuple-for-each_@([](auto& i) { i += x; }, @_current\__@);
+  @_tuple-for-each_@([&]<class I>(I& i) { i += iter_difference_t<I>(x); }, @_current\__@);
   return *this;
 ```
 :::
@@ -1462,7 +1505,7 @@ constexpr @_iterator_@& operator+=(difference_type x)
 
 ::: bq
 ```cpp
-  @_tuple-for-each_@([](auto& i) { i -= x; }, @_current\__@);
+  @_tuple-for-each_@([&]<class I>(I& i) { i -= iter_difference_t<I>(x); }, @_current\__@);
   return *this;
 ```
 :::
@@ -1475,7 +1518,9 @@ constexpr auto operator[](difference_type n) const
 
 ::: bq
 ```cpp
-  return @_tuple-transform_@([&](auto& i) -> decltype(auto) { return i[n]; }, @_current\__@);
+  return @_tuple-transform_@([&]<class I>(I& i) -> decltype(auto) {
+    return i[iter_difference_t<I>(n)];
+  }, @_current\__@);
 ```
 :::
 
@@ -1487,7 +1532,7 @@ friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y)
 
 - [14.1]{.pnum} `x.@_current\__@ == y.@_current\__@` if `@_all-bidirectional_@<Const, Views...>` is `true`.
 - [14.2]{.pnum} Otherwise, `true` if there exists an integer 0 &le; _i_ &lt; `sizeof...(Views)`
-  such that `bool(get<@_i_@>(x.@_current\__@) == get<@_i_@>(y.@_current\__@))` is `true`.
+  such that `bool(std::get<@_i_@>(x.@_current\__@) == std::get<@_i_@>(y.@_current\__@))` is `true`.
 - [14.3]{.pnum} Otherwise, `false`.
 
 [15]{.pnum} [For non-bidirectional views, the use of logical OR on the result of
@@ -1541,7 +1586,9 @@ friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i
 
 ::: bq
 ```cpp
-  return @_iterator_@(@_tuple-transform_@([&](auto& it) { return it + n; }, i.@_current\__@));
+  return @_iterator_@(@_tuple-transform_@([&]<class I>(const I& it) {
+    return it + iter_difference_t<I>(n);
+  }, i.@_current\__@));
 ```
 :::
 
@@ -1554,7 +1601,9 @@ friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n
 
 ::: bq
 ```cpp
-  return @_iterator_@(@_tuple-transform_@([&](auto& it) { return it - n; }, i.@_current\__@));
+  return @_iterator_@(@_tuple-transform_@([&]<class I>(const I& it) {
+    return it - iter_difference_t<I>(n);
+  }, i.@_current\__@));
 ```
 :::
 
@@ -1562,9 +1611,9 @@ friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n
 friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
   requires (sized_sentinel_for<iterator_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<Const, Views>>> && ...);
 ```
-[23]{.pnum} Let _DIST(i)_ be `get<@_i_@>(x.@_current\__@) - get<@_i_@>(y.@_current\__@)`.
+[23]{.pnum} Let _DIST(i)_ be `difference_type(std::get<@_i_@>(x.@_current\__@) - std::get<@_i_@>(y.@_current\__@))`.
 
-[24]{.pnum} _Returns:_ The value with the smallest absolute value among _DIST(n)_ for all integers 0 &le; _n_ &lt; `sizeof...(Views)`,
+[24]{.pnum} _Returns:_ The value with the smallest absolute value among _DIST(n)_ for all integers 0 &le; _n_ &lt; `sizeof...(Views)`.
 
 ```cpp
 friend constexpr auto iter_move(const @_iterator_@& i)
@@ -1662,7 +1711,7 @@ friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sent
 ```
 
 [3]{.pnum} _Returns_: `true` if there exists an integer 0 &le; _i_ &lt; `sizeof...(Views)`
-such that `bool(get<@_i_@>(x.@_current\__@) == get<@_i_@>(y.@_end\__@))` is `true`. Otherwise, `false`.
+such that `bool(std::get<@_i_@>(x.@_current\__@) == std::get<@_i_@>(y.@_end\__@))` is `true`. Otherwise, `false`.
 
 
 ```cpp
@@ -1671,7 +1720,8 @@ template<bool OtherConst>
 friend constexpr common_type_t<range_difference_t<@_maybe-const_@<OtherConst, Views>>...>
   operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
 ```
-[4]{.pnum} Let _DIST(i)_ be `get<@_i_@>(x.@_current\__@) - get<@_i_@>(y.@_end\__@)`.
+
+[4]{.pnum} Let `D` be the return type. Let _DIST(i)_ be `D(std::get<@_i_@>(x.@_current\__@) - std::get<@_i_@>(y.@_end\__@))`.
 
 [5]{.pnum} _Returns:_ The value with the smallest absolute value among _DIST(n)_ for all integers 0 &le; _n_ &lt; `sizeof...(Views)`,
 
@@ -1903,7 +1953,7 @@ constexpr decltype(auto) operator*() const noexcept(@_see below_@);
 [5]{.pnum} _Remarks:_
 Let `Is` be the pack `0, 1, ..., (sizeof...(Views)-1)`.
 The expression within `noexcept` is equivalent to
-`noexcept(invoke(*@_parent\__@->@_fun\__@, *get<Is>(@_inner\__@.@_current\__@)...))`.
+`noexcept(invoke(*@_parent\__@->@_fun\__@, *std::get<Is>(@_inner\__@.@_current\__@)...))`.
 
 ```cpp
 constexpr @_iterator_@& operator++();
@@ -1998,8 +2048,8 @@ constexpr decltype(auto) operator[](difference_type n) const
 
 ::: bq
 ```cpp
-  return apply([&](const auto&... iters) -> decltype(auto) {
-    return invoke(*@_parent\__@->@_fun\__@, iters[n]...);
+  return apply([&]<class...Is>(const Is&... iters) -> decltype(auto) {
+    return invoke(*@_parent\__@->@_fun\__@, iters[iter_difference_t<Is>(n)]...);
   }, @_inner\__@.@_current\__@);
 ```
 :::
@@ -2831,7 +2881,7 @@ constexpr decltype(auto) operator*() const noexcept(@_see below_@);
 [5]{.pnum} _Remarks:_
 Let `Is` be the pack `0, 1, ..., (N-1)`.
 The expression within `noexcept` is equivalent to
-`noexcept(invoke(*@_parent\__@->@_fun\__@, *get<Is>(@_inner\__@.@_current\__@)...))`.
+`noexcept(invoke(*@_parent\__@->@_fun\__@, *std::get<Is>(@_inner\__@.@_current\__@)...))`.
 
 ```cpp
 constexpr @_iterator_@& operator++();
