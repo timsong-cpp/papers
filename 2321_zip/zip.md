@@ -1195,7 +1195,7 @@ vector v = {1, 2};
 list l = {'a', 'b', 'c'};
 
 auto z = views::zip(v, l);
-auto f = z.front();    // f is a pair<int&, char&> that refers to the first element of v and l
+range_reference_t<decltype(z)> f = z.front();    // f is a pair<int&, char&> that refers to the first element of v and l
 
 for (auto&& [x, y] : z) {
   cout << '(' << x << ", " << y << ") "; // prints: (1, a) (2, b)
