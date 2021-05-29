@@ -21,7 +21,7 @@ all as described in section 3.2 of [@P2214R0].
 
 # Revision history
 
-- R2: Typo fixes. Incorporated LWG review feedback on 2021-05-21.
+- R2: Typo fixes. Incorporated LWG review feedback on 2021-05-21 and 2021-05-28.
   Account for integer-class types in the handling of `difference_type` and `size_type`.
 - R1: Added feature test macro. Expanded discussion regarding 1) `operator==` for
   forward-or-weaker `zip` iterators and 2) `adjacent` on input ranges.
@@ -1190,9 +1190,20 @@ the expression `views::zip(Es...)` is expression-equivalent to
 
 ::: example
 
-FIXME: TODO
+```cpp
+vector v = {1, 2};
+list l = {'a', 'b', 'c'};
 
+auto z = views::zip(v, l);
+auto f = z.front();    // f is a pair<int&, char&> that refers to the first element of v and l
+
+for (auto&& [x, y] : z) {
+  cout << '(' << x << ", " << y << ") "; // prints: (1, a) (2, b)
+}
+
+```
 :::
+
 #### 24.7.?.2 Class template `zip_view` [range.zip.view] {-}
 
 ```cpp
@@ -1761,6 +1772,19 @@ the invocable object to the _M <sup>th</sup>_ elements of all views.
   - [#.#.#]{.pnum} Otherwise, the expression `views::zip_transform(F, Es...)` is expression-equivalent to `(void)F, @_decay-copy_@(views::empty<decay_t<invoke_result_t<FD&>>>)`.
 - [#.#]{.pnum} Otherwise, the expression `views::zip_transform(F, Es...)` is expression-equivalent to `zip_transform_view(F, Es...)`.
 
+::: example
+
+```cpp
+vector v1 = {1, 2};
+vector v2 = {4, 5, 6};
+
+for (auto i : views::zip_transform(plus(), v1, v2)) {
+  cout << i << ' '; // prints: 5 7
+}
+
+```
+:::
+
 #### 24.7.?.2 Class template `zip_transform_view` [range.zip.transform.view] {-}
 
 ```cpp
@@ -2195,6 +2219,18 @@ the expression `views::adjacent<N>(E)` is expression-equivalent to
 
 - [#.#]{.pnum} `(void)E, @_decay-copy_@(views::empty<tuple<>>)` if `N` is equal to `0`,
 - [#.#]{.pnum} otherwise, `adjacent_view<views::all_t<decltype((E))>, N>(E)`.
+
+::: example
+
+```cpp
+vector v = {1, 2, 3, 4};
+
+for (auto i : v | views::adjacent<2>) {
+  cout << '(' << i.first << ', ' << i.second << ") "; // prints: (1, 2) (2, 3) (3, 4)
+}
+
+```
+:::
 
 [#]{.pnum} Define `@_REPEAT_@(T, N)` as a pack of _N_ types, each of which denotes the same type as `T`.
 
@@ -2697,6 +2733,18 @@ the resulting view is empty.
 
 - [#.#]{.pnum} if `N` is equal to 0, `views::adjacent_transform<N>(E, F)` is expression-equivalent to `(void)E, views::zip_transform(F)`, except that the evaluations of `E` and `F` are indeterminately sequenced.
 - [#.#]{.pnum} Otherwise, the expression `views::adjacent_transform<N>(E, F)` is expression-equivalent to `adjacent_transform_view<views::all_t<decltype((E))>, decay_t<F>, N>(E, F)`.
+
+::: example
+
+```cpp
+vector v = {1, 2, 3, 4};
+
+for (auto i : v | views::adjacent_transform<2>(std::multiplies())) {
+  cout << i << ' '; // prints: 2 6 12
+}
+
+```
+:::
 
 #### 24.7.?.2 Class template `adjacent_transform_view` [range.adjacent.transform.view] {-}
 
