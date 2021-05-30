@@ -29,6 +29,7 @@ h3:target { background-color: transparent; }
 h4:target { background-color: transparent; }
 h5:target { background-color: transparent; }
 h6:target { background-color: transparent; }
+.marginalized:target { background-color: transparent; }
 
 code span.co { font-family: monospace; }
 
