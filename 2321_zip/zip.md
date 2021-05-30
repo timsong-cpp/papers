@@ -273,9 +273,9 @@ This wording is relative to [@N4878].
 
    // [tuple.special], specialized algorithms
    template<class... Types>
-     constexpr void swap(tuple<Types...>& x, tuple<Types...>& y) noexcept(@_see below_@);
+     constexpr void swap(tuple<Types...>& x, tuple<Types...>& y) noexcept($see below$);
 +  template<class... Types>
-+    constexpr void swap(const tuple<Types...>& x, const tuple<Types...>& y) noexcept(@_see below_@);
++    constexpr void swap(const tuple<Types...>& x, const tuple<Types...>& y) noexcept($see below$);
  }
 
 ```
@@ -288,75 +288,75 @@ This wording is relative to [@N4878].
    class tuple {
    public:
      // [tuple.cnstr], tuple construction
-     constexpr explicit(@_see below_@) tuple();
-     constexpr explicit(@_see below_@) tuple(const Types&...);         // only if sizeof...(Types) >= 1
+     constexpr explicit($see below$) tuple();
+     constexpr explicit($see below$) tuple(const Types&...);         // only if sizeof...(Types) >= 1
      template<class... UTypes>
-       constexpr explicit(@_see below_@) tuple(UTypes&&...);           // only if sizeof...(Types) >= 1
+       constexpr explicit($see below$) tuple(UTypes&&...);           // only if sizeof...(Types) >= 1
 
      tuple(const tuple&) = default;
      tuple(tuple&&) = default;
 
 +    template<class... UTypes>
-+      constexpr explicit(@_see below_@) tuple(tuple<UTypes...>&);
++      constexpr explicit($see below$) tuple(tuple<UTypes...>&);
      template<class... UTypes>
-       constexpr explicit(@_see below_@) tuple(const tuple<UTypes...>&);
+       constexpr explicit($see below$) tuple(const tuple<UTypes...>&);
      template<class... UTypes>
-       constexpr explicit(@_see below_@) tuple(tuple<UTypes...>&&);
+       constexpr explicit($see below$) tuple(tuple<UTypes...>&&);
 +    template<class... UTypes>
-+      constexpr explicit(@_see below_@) tuple(const tuple<UTypes...>&&);
++      constexpr explicit($see below$) tuple(const tuple<UTypes...>&&);
 
 +    template<class U1, class U2>
-+      constexpr explicit(@_see below_@) tuple(pair<U1, U2>&);         // only if sizeof...(Types) == 2
++      constexpr explicit($see below$) tuple(pair<U1, U2>&);         // only if sizeof...(Types) == 2
      template<class U1, class U2>
-       constexpr explicit(@_see below_@) tuple(const pair<U1, U2>&);   // only if sizeof...(Types) == 2
+       constexpr explicit($see below$) tuple(const pair<U1, U2>&);   // only if sizeof...(Types) == 2
      template<class U1, class U2>
-       constexpr explicit(@_see below_@) tuple(pair<U1, U2>&&);        // only if sizeof...(Types) == 2
+       constexpr explicit($see below$) tuple(pair<U1, U2>&&);        // only if sizeof...(Types) == 2
 +    template<class U1, class U2>
-+      constexpr explicit(@_see below_@) tuple(const pair<U1, U2>&&);  // only if sizeof...(Types) == 2
++      constexpr explicit($see below$) tuple(const pair<U1, U2>&&);  // only if sizeof...(Types) == 2
 
      // allocator-extended constructors
      template<class Alloc>
-       constexpr explicit(@_see below_@)
+       constexpr explicit($see below$)
          tuple(allocator_arg_t, const Alloc& a);
      template<class Alloc>
-       constexpr explicit(@_see below_@)
+       constexpr explicit($see below$)
          tuple(allocator_arg_t, const Alloc& a, const Types&...);
      template<class Alloc, class... UTypes>
-       constexpr explicit(@_see below_@)
+       constexpr explicit($see below$)
          tuple(allocator_arg_t, const Alloc& a, UTypes&&...);
      template<class Alloc>
        constexpr tuple(allocator_arg_t, const Alloc& a, const tuple&);
      template<class Alloc>
        constexpr tuple(allocator_arg_t, const Alloc& a, tuple&&);
 +    template<class Alloc, class... UTypes>
-+      constexpr explicit(@_see below_@)
++      constexpr explicit($see below$)
 +        tuple(allocator_arg_t, const Alloc& a, tuple<UTypes...>&);
      template<class Alloc, class... UTypes>
-       constexpr explicit(@_see below_@)
+       constexpr explicit($see below$)
          tuple(allocator_arg_t, const Alloc& a, const tuple<UTypes...>&);
      template<class Alloc, class... UTypes>
-       constexpr explicit(@_see below_@)
+       constexpr explicit($see below$)
          tuple(allocator_arg_t, const Alloc& a, tuple<UTypes...>&&);
 +    template<class Alloc, class... UTypes>
-+      constexpr explicit(@_see below_@)
++      constexpr explicit($see below$)
 +        tuple(allocator_arg_t, const Alloc& a, const tuple<UTypes...>&&);
 +    template<class Alloc, class U1, class U2>
-+      constexpr explicit(@_see below_@)
++      constexpr explicit($see below$)
 +        tuple(allocator_arg_t, const Alloc& a, pair<U1, U2>&);
      template<class Alloc, class U1, class U2>
-       constexpr explicit(@_see below_@)
+       constexpr explicit($see below$)
          tuple(allocator_arg_t, const Alloc& a, const pair<U1, U2>&);
      template<class Alloc, class U1, class U2>
-       constexpr explicit(@_see below_@)
+       constexpr explicit($see below$)
          tuple(allocator_arg_t, const Alloc& a, pair<U1, U2>&&);
 +    template<class Alloc, class U1, class U2>
-+      constexpr explicit(@_see below_@)
++      constexpr explicit($see below$)
 +        tuple(allocator_arg_t, const Alloc& a, const pair<U1, U2>&&);
 
      // [tuple.assign], tuple assignment
      constexpr tuple& operator=(const tuple&);
 +    constexpr const tuple& operator=(const tuple&) const;
-     constexpr tuple& operator=(tuple&&) noexcept(@_see below_@);
+     constexpr tuple& operator=(tuple&&) noexcept($see below$);
 +    constexpr const tuple& operator=(tuple&&) const;
 
      template<class... UTypes>
@@ -378,8 +378,8 @@ This wording is relative to [@N4878].
 +      constexpr const tuple& operator=(pair<U1, U2>&&) const;         // only if sizeof...(Types) == 2
 
      // [tuple.swap], tuple swap
-     constexpr void swap(tuple&) noexcept(@_see below_@);
-+    constexpr void swap(const tuple&) const noexcept(@_see below_@);
+     constexpr void swap(tuple&) noexcept($see below$);
++    constexpr void swap(const tuple&) const noexcept($see below$);
    };
 
    // [...]
@@ -393,10 +393,10 @@ This wording is relative to [@N4878].
 ::: itemdecl
 
 ```c++
-template<class... UTypes> constexpr explicit(@_see below_@) tuple(tuple<UTypes...>& u);
-template<class... UTypes> constexpr explicit(@_see below_@) tuple(const tuple<UTypes...>& u);
-template<class... UTypes> constexpr explicit(@_see below_@) tuple(tuple<UTypes...>&& u);
-template<class... UTypes> constexpr explicit(@_see below_@) tuple(const tuple<UTypes...>&& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(tuple<UTypes...>& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(const tuple<UTypes...>& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(tuple<UTypes...>&& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(const tuple<UTypes...>&& u);
 ```
 
 [?]{.pnum} Let `I` be the pack `0, 1, ..., (sizeof...(Types) - 1)`. Let `FWD(u)` be `static_cast<decltype(u)>(u)`.
@@ -409,16 +409,16 @@ template<class... UTypes> constexpr explicit(@_see below_@) tuple(const tuple<UT
   `UTypes...` expands to `U`) `is_convertible_v<decltype(u), T>`,
    `is_constructible_v<T, decltype(u)>`, and `is_same_v<T, U>` are all `false`.
 
-[?]{.pnum} _Effects:_ For all _i_, initializes the _i_<sup>th</sup> element of `*this` with `get<@_i_@>(FWD(u))`.
+[?]{.pnum} _Effects:_ For all _i_, initializes the _i_<sup>th</sup> element of `*this` with `get<$i$>(FWD(u))`.
 
 [?]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!(is_convertible_v<decltype(get<I>(FWD(u))), Types> && ...)`
 
 ```c++
-template<class... UTypes> constexpr explicit(@_see below_@) tuple(pair<U1, U2>& u);
-template<class... UTypes> constexpr explicit(@_see below_@) tuple(const pair<U1, U2>& u);
-template<class... UTypes> constexpr explicit(@_see below_@) tuple(pair<U1, U2>&& u);
-template<class... UTypes> constexpr explicit(@_see below_@) tuple(const pair<U1, U2>&& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(pair<U1, U2>& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(const pair<U1, U2>& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(pair<U1, U2>&& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(const pair<U1, U2>&& u);
 ```
 
 [?]{.pnum} Let `FWD(u)` be `static_cast<decltype(u)>(u)`.
@@ -443,7 +443,7 @@ template<class... UTypes> constexpr explicit(@_see below_@) tuple(const pair<U1,
 ::: itemdecl
 
 ```c++
-template<class... UTypes> constexpr explicit(@_see below_@) tuple(const tuple<UTypes...>& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(const tuple<UTypes...>& u);
 ```
 
 [18]{.pnum} _Constraints:_
@@ -459,7 +459,7 @@ template<class... UTypes> constexpr explicit(@_see below_@) tuple(const tuple<UT
 `!conjunction_v<is_convertible<const UTypes&, Types>...>`
 
 ```c++
-template<class... UTypes> constexpr explicit(@_see below_@) tuple(tuple<UTypes...>&& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(tuple<UTypes...>&& u);
 ```
 [21]{.pnum} _Constraints:_
 
@@ -468,13 +468,13 @@ template<class... UTypes> constexpr explicit(@_see below_@) tuple(tuple<UTypes..
 - [21.3]{.pnum} either `sizeof...(Types)` is not 1, or (when `Types...` expands to `T` and `UTypes...` expands to `U`)
   `is_convertible_v<tuple<U>, T>`, `is_constructible_v<T, tuple<U>>`, and `is_same_v<T, U>` are all `false`.
 
-[22]{.pnum} _Effects:_ For all _i_, initializes the _i_<sup>th</sup> element of `*this` with `std::forward<U@_<sub>i</sub>_@>(get<@_i_@>(u))`.
+[22]{.pnum} _Effects:_ For all _i_, initializes the _i_<sup>th</sup> element of `*this` with `std::forward<U@_<sub>i</sub>_@>(get<$i$>(u))`.
 
 [23]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!conjunction_v<is_convertible<UTypes, Types>...>`
 
 ```c++
-template<class U1, class U2> constexpr explicit(@_see below_@) tuple(const pair<U1, U2>& u);
+template<class U1, class U2> constexpr explicit($see below$) tuple(const pair<U1, U2>& u);
 ```
 
 [24]{.pnum} _Constraints:_
@@ -489,7 +489,7 @@ template<class U1, class U2> constexpr explicit(@_see below_@) tuple(const pair<
 `!is_convertible_v<const U1&, T@<sub>0</sub>@> || !is_convertible_v<const U2&, T@<sub>1</sub>@>`
 
 ```c++
-template<class U1, class U2> constexpr explicit(@_see below_@) tuple(pair<U1, U2>&& u);
+template<class U1, class U2> constexpr explicit($see below$) tuple(pair<U1, U2>&& u);
 ```
 
 [27]{.pnum} _Constraints:_
@@ -511,41 +511,41 @@ template<class U1, class U2> constexpr explicit(@_see below_@) tuple(pair<U1, U2
 
 ```diff
   template<class Alloc>
-    constexpr explicit(@_see below_@)
+    constexpr explicit($see below$)
       tuple(allocator_arg_t, const Alloc& a);
   template<class Alloc>
-    constexpr explicit(@_see below_@)
+    constexpr explicit($see below$)
       tuple(allocator_arg_t, const Alloc& a, const Types&...);
   template<class Alloc, class... UTypes>
-    constexpr explicit(@_see below_@)
+    constexpr explicit($see below$)
       tuple(allocator_arg_t, const Alloc& a, UTypes&&...);
   template<class Alloc>
     constexpr tuple(allocator_arg_t, const Alloc& a, const tuple&);
   template<class Alloc>
     constexpr tuple(allocator_arg_t, const Alloc& a, tuple&&);
 + template<class Alloc, class... UTypes>
-+   constexpr explicit(@_see below_@)
++   constexpr explicit($see below$)
 +     tuple(allocator_arg_t, const Alloc& a, tuple<UTypes...>&);
   template<class Alloc, class... UTypes>
-    constexpr explicit(@_see below_@)
+    constexpr explicit($see below$)
       tuple(allocator_arg_t, const Alloc& a, const tuple<UTypes...>&);
   template<class Alloc, class... UTypes>
-    constexpr explicit(@_see below_@)
+    constexpr explicit($see below$)
       tuple(allocator_arg_t, const Alloc& a, tuple<UTypes...>&&);
 + template<class Alloc, class... UTypes>
-+   constexpr explicit(@_see below_@)
++   constexpr explicit($see below$)
 +     tuple(allocator_arg_t, const Alloc& a, const tuple<UTypes...>&&);
 + template<class Alloc, class U1, class U2>
-+   constexpr explicit(@_see below_@)
++   constexpr explicit($see below$)
 +     tuple(allocator_arg_t, const Alloc& a, pair<U1, U2>&);
   template<class Alloc, class U1, class U2>
-    constexpr explicit(@_see below_@)
+    constexpr explicit($see below$)
       tuple(allocator_arg_t, const Alloc& a, const pair<U1, U2>&);
   template<class Alloc, class U1, class U2>
-    constexpr explicit(@_see below_@)
+    constexpr explicit($see below$)
       tuple(allocator_arg_t, const Alloc& a, pair<U1, U2>&&);
 + template<class Alloc, class U1, class U2>
-+   constexpr explicit(@_see below_@)
++   constexpr explicit($see below$)
 +     tuple(allocator_arg_t, const Alloc& a, const pair<U1, U2>&&);
 ```
 
@@ -576,7 +576,7 @@ constexpr const tuple& operator=(tuple&& u) const;
 
 [?]{.pnum} _Constraints_: `(is_assignable_v<const Types&, Types> && ...)` is `true`.
 
-[?]{.pnum} _Effects_: For all _i_, assigns `std::forward<T@_<sub>i</sub>_@>(get<@_i_@>(u))` to `get<@_i_@>(*this)`.
+[?]{.pnum} _Effects_: For all _i_, assigns `std::forward<T@_<sub>i</sub>_@>(get<$i$>(u))` to `get<$i$>(*this)`.
 
 [?]{.pnum} _Returns_: `*this`.
 
@@ -603,7 +603,7 @@ template<class... UTypes> constexpr const tuple& operator=(tuple<UTypes...>&& u)
 - [?.#]{.pnum} `sizeof...(Types)` equals ` sizeof...(UTypes)` and
 - [?.#]{.pnum} `(is_assignable_v<const Types&, UTypes> && ...)` is `true`.
 
-[?]{.pnum} _Effects_: For all _i_, assigns `std::forward<U@_<sub>i</sub>_@>(get<@_i_@>(u))` to `get<@_i_@>(*this)`.
+[?]{.pnum} _Effects_: For all _i_, assigns `std::forward<U@_<sub>i</sub>_@>(get<$i$>(u))` to `get<$i$>(*this)`.
 
 [?]{.pnum} _Returns_: `*this`.
 
@@ -643,8 +643,8 @@ template<class U1, class U2> constexpr const tuple& operator=(pair<U1, U2>&& u) 
 
 ::: itemdecl
 ```diff
-  constexpr void swap(tuple& rhs) noexcept(@_see below_@);
-+ constexpr void swap(const tuple& rhs) const noexcept(@_see below_@);
+  constexpr void swap(tuple& rhs) noexcept($see below$);
++ constexpr void swap(const tuple& rhs) const noexcept($see below$);
 ```
 
 [?]{.pnum} [_Mandates:_]{.diffins}
@@ -672,9 +672,9 @@ template<class U1, class U2> constexpr const tuple& operator=(pair<U1, U2>&& u) 
 
 ```diff
   template<class... Types>
-    constexpr void swap(tuple<Types...>& x, tuple<Types...>& y) noexcept(@_see below_@);
+    constexpr void swap(tuple<Types...>& x, tuple<Types...>& y) noexcept($see below$);
 + template<class... Types>
-+   constexpr void swap(const tuple<Types...>& x, const tuple<Types...>& y) noexcept(@_see below_@);
++   constexpr void swap(const tuple<Types...>& x, const tuple<Types...>& y) noexcept($see below$);
 ```
 
 [1]{.pnum} _Constraints_: [`is_swappable_v<T>` is true for every type `T` in `Types`.]{.diffdel}
@@ -726,8 +726,8 @@ template<class U1, class U2> constexpr const tuple& operator=(pair<U1, U2>&& u) 
    template<class T1, class T2>
      constexpr bool operator==(const pair<T1, T2>&, const pair<T1, T2>&);
    template<class T1, class T2>
-     constexpr common_comparison_category_t<@_synth-three-way-result_@<T1>,
-                                            @_synth-three-way-result_@<T2>>
+     constexpr common_comparison_category_t<$synth-three-way-result$<T1>,
+                                            $synth-three-way-result$<T2>>
        operator<=>(const pair<T1, T2>&, const pair<T1, T2>&);
 
    template<class T1, class T2>
@@ -752,18 +752,18 @@ template<class U1, class U2> constexpr const tuple& operator=(pair<U1, U2>&& u) 
 
      pair(const pair&) = default;
      pair(pair&&) = default;
-     constexpr explicit(@_see below_@) pair();
-     constexpr explicit(@_see below_@) pair(const T1& x, const T2& y);
+     constexpr explicit($see below$) pair();
+     constexpr explicit($see below$) pair(const T1& x, const T2& y);
      template<class U1, class U2>
-       constexpr explicit(@_see below_@) pair(U1&& x, U2&& y);
+       constexpr explicit($see below$) pair(U1&& x, U2&& y);
 +    template<class U1, class U2>
-+      constexpr explicit(@_see below_@) pair(pair<U1, U2>& p);
++      constexpr explicit($see below$) pair(pair<U1, U2>& p);
      template<class U1, class U2>
-       constexpr explicit(@_see below_@) pair(const pair<U1, U2>& p);
+       constexpr explicit($see below$) pair(const pair<U1, U2>& p);
      template<class U1, class U2>
-       constexpr explicit(@_see below_@) pair(pair<U1, U2>&& p);
+       constexpr explicit($see below$) pair(pair<U1, U2>&& p);
 +    template<class U1, class U2>
-+      constexpr explicit(@_see below_@) pair(const pair<U1, U2>&& p);
++      constexpr explicit($see below$) pair(const pair<U1, U2>&& p);
      template<class... Args1, class... Args2>
        constexpr pair(piecewise_construct_t,
                       tuple<Args1...> first_args, tuple<Args2...> second_args);
@@ -774,15 +774,15 @@ template<class U1, class U2> constexpr const tuple& operator=(pair<U1, U2>&& u) 
        constexpr pair& operator=(const pair<U1, U2>& p);
 +    template<class U1, class U2>
 +      constexpr const pair& operator=(const pair<U1, U2>& p) const;
-     constexpr pair& operator=(pair&& p) noexcept(@_see below_@);
+     constexpr pair& operator=(pair&& p) noexcept($see below$);
 +    constexpr const pair& operator=(pair&& p) const;
      template<class U1, class U2>
        constexpr pair& operator=(pair<U1, U2>&& p);
 +    template<class U1, class U2>
 +      constexpr const pair& operator=(pair<U1, U2>&& p) const;
 
-     constexpr void swap(pair& p) noexcept(@_see below_@);
-+    constexpr void swap(const pair& p) const noexcept(@_see below_@);
+     constexpr void swap(pair& p) noexcept($see below$);
++    constexpr void swap(const pair& p) const noexcept($see below$);
    };
 
    template<class T1, class T2>
@@ -797,10 +797,10 @@ template<class U1, class U2> constexpr const tuple& operator=(pair<U1, U2>&& u) 
 ::: itemdecl
 
 ```c++
-template<class U1, class U2> constexpr explicit(@_see below_@) pair(pair<U1, U2>& p);
-template<class U1, class U2> constexpr explicit(@_see below_@) pair(const pair<U1, U2>& p);
-template<class U1, class U2> constexpr explicit(@_see below_@) pair(pair<U1, U2>&& p);
-template<class U1, class U2> constexpr explicit(@_see below_@) pair(const pair<U1, U2>&& p);
+template<class U1, class U2> constexpr explicit($see below$) pair(pair<U1, U2>& p);
+template<class U1, class U2> constexpr explicit($see below$) pair(const pair<U1, U2>& p);
+template<class U1, class U2> constexpr explicit($see below$) pair(pair<U1, U2>&& p);
+template<class U1, class U2> constexpr explicit($see below$) pair(const pair<U1, U2>&& p);
 ```
 
 [?]{.pnum} Let `FWD(u)` be `static_cast<decltype(u)>(u)`.
@@ -824,7 +824,7 @@ template<class U1, class U2> constexpr explicit(@_see below_@) pair(const pair<U
 ::: itemdecl
 
 ```c++
-template<class U1, class U2> constexpr explicit(@_see below_@) pair(const pair<U1, U2>& p);
+template<class U1, class U2> constexpr explicit($see below$) pair(const pair<U1, U2>& p);
 ```
 [14]{.pnum} _Constraints:_
 
@@ -838,7 +838,7 @@ template<class U1, class U2> constexpr explicit(@_see below_@) pair(const pair<U
 
 
 ```c++
-template<class U1, class U2> constexpr explicit(@_see below_@) pair(pair<U1, U2>&& p);
+template<class U1, class U2> constexpr explicit($see below$) pair(pair<U1, U2>&& p);
 ```
 
 [17]{.pnum} _Constraints:_
@@ -917,8 +917,8 @@ template<class U1, class U2> constexpr const pair& operator=(pair<U1, U2>&& p) c
 
 ::: itemdecl
 ```diff
-  constexpr void swap(pair& p) noexcept(@_see below_@);
-+ constexpr void swap(const pair& p) const noexcept(@_see below_@);
+  constexpr void swap(pair& p) noexcept($see below$);
++ constexpr void swap(const pair& p) const noexcept($see below$);
 ```
 
 [?]{.pnum} [_Mandates:_]{.diffins}
@@ -968,28 +968,28 @@ template<class U1, class U2> constexpr const pair& operator=(pair<U1, U2>&& p) c
    // [allocator.uses.construction], uses-allocator construction
    template<class T, class Alloc, class... Args>
      constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-                                                     Args&&... args) noexcept -> @_see below_@;
+                                                     Args&&... args) noexcept -> $see below$;
    template<class T, class Alloc, class Tuple1, class Tuple2>
      constexpr auto uses_allocator_construction_args(const Alloc& alloc, piecewise_construct_t,
                                                      Tuple1&& x, Tuple2&& y)
-                                                     noexcept -> @_see below_@;
+                                                     noexcept -> $see below$;
    template<class T, class Alloc>
-     constexpr auto uses_allocator_construction_args(const Alloc& alloc) noexcept -> @_see below_@;
+     constexpr auto uses_allocator_construction_args(const Alloc& alloc) noexcept -> $see below$;
    template<class T, class Alloc, class U, class V>
      constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-                                                     U&& u, V&& v) noexcept -> @_see below_@;
+                                                     U&& u, V&& v) noexcept -> $see below$;
 +  template<class T, class Alloc, class U, class V>
 +    constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-+                                                    pair<U,V>& pr) noexcept -> @_see below_@;
++                                                    pair<U,V>& pr) noexcept -> $see below$;
    template<class T, class Alloc, class U, class V>
      constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-                                                     const pair<U,V>& pr) noexcept -> @_see below_@;
+                                                     const pair<U,V>& pr) noexcept -> $see below$;
    template<class T, class Alloc, class U, class V>
      constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-                                                     pair<U,V>&& pr) noexcept -> @_see below_@;
+                                                     pair<U,V>&& pr) noexcept -> $see below$;
 +  template<class T, class Alloc, class U, class V>
 +    constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-+                                                    const pair<U,V>&& pr) noexcept -> @_see below_@;
++                                                    const pair<U,V>&& pr) noexcept -> $see below$;
    template<class T, class Alloc, class... Args>
      constexpr T make_obj_using_allocator(const Alloc& alloc, Args&&... args);
    template<class T, class Alloc, class... Args>
@@ -1008,10 +1008,10 @@ incorporates the proposed resolution of [@LWG3527]):
 ```diff
 + template<class T, class Alloc, class U, class V>
 +   constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-+                                                   pair<U,V>& pr) noexcept -> @_see below_@;
++                                                   pair<U,V>& pr) noexcept -> $see below$;
   template<class T, class Alloc, class U, class V>
     constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-                                                    const pair<U,V>& pr) noexcept -> @_see below_@;
+                                                    const pair<U,V>& pr) noexcept -> $see below$;
 ```
 
 [12]{.pnum} _Constraints_: `T` is a specialization of `pair`.
@@ -1029,10 +1029,10 @@ return uses_allocator_construction_args<T>(alloc, piecewise_construct,
 ```diff
   template<class T, class Alloc, class U, class V>
     constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-                                                    pair<U,V>&& pr) noexcept -> @_see below_@;
+                                                    pair<U,V>&& pr) noexcept -> $see below$;
 + template<class T, class Alloc, class U, class V>
 +   constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-+                                                   const pair<U,V>&& pr) noexcept -> @_see below_@;
++                                                   const pair<U,V>&& pr) noexcept -> $see below$;
 ```
 
 [14]{.pnum} _Constraints_: `T` is a specialization of `pair`.
@@ -1130,16 +1130,16 @@ namespace std::ranges {
     inline constexpr bool enable_borrowed_range<zip_view<Views...>> =
       (enable_borrowed_range<Views> && ...);
 
-  namespace views { inline constexpr @_unspecified_@ zip = @_unspecified_@; }
+  namespace views { inline constexpr $unspecified$ zip = $unspecified$; }
 
   // [range.zip.transform], zip transform view
   template<copy_constructible F, input_range... Views>
     requires (view<Views> && ...) && (sizeof...(Views) > 0) && is_object_v<F> &&
              regular_invocable<F&, range_reference_t<Views>...> &&
-             @_can-reference_@<invoke_result_t<F&, range_reference_t<Views>...>>
+             $can-reference$<invoke_result_t<F&, range_reference_t<Views>...>>
   class zip_transform_view;
 
-  namespace views { inline constexpr @_unspecified_@ zip_transform = @_unspecified_@; }
+  namespace views { inline constexpr $unspecified$ zip_transform = $unspecified$; }
 
   // [range.adjacent], adjacent view
   template<forward_range V, size_t N>
@@ -1152,18 +1152,18 @@ namespace std::ranges {
 
   namespace views {
     template<size_t N>
-      inline constexpr @_unspecified_@ adjacent = @_unspecified_@;
+      inline constexpr $unspecified$ adjacent = $unspecified$;
     inline constexpr auto pairwise = adjacent<2>;
   }
 
   // [range.adjacent.transform], adjacent transform view
   template<forward_range V, copy_constructible F, size_t N>
-    requires @_see below_@
+    requires $see below$
   class adjacent_transform_view;
 
   namespace views {
     template<size_t N>
-      inline constexpr @_unspecified_@ adjacent_transform = @_unspecified_@;
+      inline constexpr $unspecified$ adjacent_transform = $unspecified$;
     inline constexpr auto pairwise_transform = adjacent_transform<2>;
   }
 }
@@ -1185,7 +1185,7 @@ tuples of references to the corresponding elements of the constituent views.
 ([customization.point.object]{.sref}). Given a pack of subexpressions `Es...`,
 the expression `views::zip(Es...)` is expression-equivalent to
 
-- [#.#]{.pnum} `@_decay-copy_@(views::empty<tuple<>>)` if `Es` is an empty pack,
+- [#.#]{.pnum} `$decay-copy$(views::empty<tuple<>>)` if `Es` is an empty pack,
 - [#.#]{.pnum} otherwise, `zip_view<views::all_t<decltype((Es))>...>(Es...)`.
 
 ::: example
@@ -1210,26 +1210,26 @@ for (auto&& [x, y] : z) {
 namespace std::ranges {
 
 template<class... Rs>
-concept @_zip-is-common_@ =             // exposition only
+concept $zip-is-common$ =             // exposition only
   (sizeof...(Rs) == 1 && (common_range<Rs> && ...)) ||
   (!(bidirectional_range<Rs> && ...) && (common_range<Rs> && ...)) ||
   ((random_access_range<Rs> && ...) && (sized_range<Rs> && ...));
 
 template<class... Ts>
-using @_tuple-or-pair_@ = @_see below_@;  // exposition only
+using $tuple-or-pair$ = $see below$;  // exposition only
 
 template<class F, class Tuple>
-constexpr auto @_tuple-transform_@(F&& f, Tuple&& tuple) // exposition only
+constexpr auto $tuple-transform$(F&& f, Tuple&& tuple) // exposition only
 {
   return apply([&]<class... Ts>(Ts&&... elements){
-    return @_tuple-or-pair_@<invoke_result_t<F&, Ts>...>(
+    return $tuple-or-pair$<invoke_result_t<F&, Ts>...>(
       invoke(f, std::forward<Ts>(elements))...
     );
   }, std::forward<Tuple>(tuple));
 }
 
 template<class F, class Tuple>
-constexpr void @_tuple-for-each_@(F&& f, Tuple&& tuple) // exposition only
+constexpr void $tuple-for-each$(F&& f, Tuple&& tuple) // exposition only
 {
   apply([&]<class... Ts>(Ts&&... elements){
     (invoke(f, std::forward<Ts>(elements)), ...);
@@ -1239,43 +1239,43 @@ constexpr void @_tuple-for-each_@(F&& f, Tuple&& tuple) // exposition only
 template<input_range... Views>
   requires (view<Views> && ...) && (sizeof...(Views) > 0)
 class zip_view : public view_interface<zip_view<Views...>>{
-  tuple<Views...> @_views\__@;                // exposition only
+  tuple<Views...> $views_$;                // exposition only
 
-  template<bool> class @_iterator_@;         // exposition only
-  template<bool> class @_sentinel_@;         // exposition only
+  template<bool> class $iterator$;         // exposition only
+  template<bool> class $sentinel$;         // exposition only
 
 public:
   constexpr zip_view() = default;
   constexpr explicit zip_view(Views... views);
 
-  constexpr auto begin() requires (!(@_simple-view_@<Views> && ...)) {
-    return @_iterator_@<false>(@_tuple-transform_@(ranges::begin, @_views\__@));
+  constexpr auto begin() requires (!($simple-view$<Views> && ...)) {
+    return $iterator$<false>($tuple-transform$(ranges::begin, $views_$));
   }
   constexpr auto begin() const requires (range<const Views> && ...) {
-    return @_iterator_@<true>(@_tuple-transform_@(ranges::begin, @_views\__@));
+    return $iterator$<true>($tuple-transform$(ranges::begin, $views_$));
   }
 
-  constexpr auto end() requires (!(@_simple-view_@<Views> && ...)) {
-    if constexpr (!@_zip-is-common_@<Views...>) {
-      return @_sentinel_@<false>(@_tuple-transform_@(ranges::end, @_views\__@));
+  constexpr auto end() requires (!($simple-view$<Views> && ...)) {
+    if constexpr (!$zip-is-common$<Views...>) {
+      return $sentinel$<false>($tuple-transform$(ranges::end, $views_$));
     }
     else if constexpr ((random_access_range<Views> && ...)) {
-      return begin() + iter_difference_t<@_iterator_@<false>>(size());
+      return begin() + iter_difference_t<$iterator$<false>>(size());
     }
     else {
-      return @_iterator_@<false>(@_tuple-transform_@(ranges::end, @_views\__@));
+      return $iterator$<false>($tuple-transform$(ranges::end, $views_$));
     }
   }
 
   constexpr auto end() const requires (range<const Views> && ...) {
-    if constexpr (!@_zip-is-common_@<const Views...>) {
-      return @_sentinel_@<true>(@_tuple-transform_@(ranges::end, @_views\__@));
+    if constexpr (!$zip-is-common$<const Views...>) {
+      return $sentinel$<true>($tuple-transform$(ranges::end, $views_$));
     }
     else if constexpr ((random_access_range<const Views> && ...)) {
-      return begin() + iter_difference_t<@_iterator_@<true>>(size());
+      return begin() + iter_difference_t<$iterator$<true>>(size());
     }
     else {
-      return @_iterator_@<true>(@_tuple-transform_@(ranges::end, @_views\__@));
+      return $iterator$<true>($tuple-transform$(ranges::end, $views_$));
     }
   }
 
@@ -1289,13 +1289,13 @@ template<class... Rs>
 }
 ```
 
-[#]{.pnum} Given some pack of types `Ts`, the alias template `@_tuple-or-pair_@` is defined as follows:
+[#]{.pnum} Given some pack of types `Ts`, the alias template `$tuple-or-pair$` is defined as follows:
 
-- [#.#]{.pnum} If `sizeof...(Ts)` is 2, `@_tuple-or-pair_@<Ts...>` denotes `pair<Ts...>`.
-- [#.#]{.pnum} Otherwise, `@_tuple-or-pair_@<Ts...>` denotes `tuple<Ts...>`.
+- [#.#]{.pnum} If `sizeof...(Ts)` is 2, `$tuple-or-pair$<Ts...>` denotes `pair<Ts...>`.
+- [#.#]{.pnum} Otherwise, `$tuple-or-pair$<Ts...>` denotes `tuple<Ts...>`.
 
 [#]{.pnum} Two `zip_view` objects have the same underlying sequence if
-and only if the corresponding elements of `@_views\__@` are equal
+and only if the corresponding elements of `$views_$` are equal
 ([concepts.equality]{.sref}) and have the same underlying sequence. [In particular,
 comparison of iterators obtained from `zip_view` objects that do not have
 the same underlying sequence is not required to produce meaningful results
@@ -1307,7 +1307,7 @@ the same underlying sequence is not required to produce meaningful results
 constexpr explicit zip_view(Views... views);
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_views\__@` with `std::move(views)...`.
+[#]{.pnum} _Effects_: Initializes `$views_$` with `std::move(views)...`.
 
 ```cpp
 constexpr auto size() requires (sized_range<Views> && ...);
@@ -1320,98 +1320,98 @@ constexpr auto size() const requires (sized_range<const Views> && ...);
 
 ```cpp
 return apply([](auto... sizes){
-  using CT = @_make-unsigned-like-t_@<common_type_t<decltype(sizes)...>>;
+  using CT = $make-unsigned-like-t$<common_type_t<decltype(sizes)...>>;
   return ranges::min({CT(sizes)...});
-}, @_tuple-transform_@(ranges::size, @_views\__@));
+}, $tuple-transform$(ranges::size, $views_$));
 ```
 :::
 :::
 
-#### 24.7.?.3 Class template `zip_view::@_iterator_@` [range.zip.iterator] {-}
+#### 24.7.?.3 Class template `zip_view::$iterator$` [range.zip.iterator] {-}
 
 ```cpp
 namespace std::ranges {
   template<bool Const, class... Views>
-    concept @_all-random-access_@ = (random_access_range<@_maybe-const_@<Const, Views>> && ...);    // exposition only
+    concept $all-random-access$ = (random_access_range<$maybe-const$<Const, Views>> && ...);    // exposition only
   template<bool Const, class... Views>
-    concept @_all-bidirectional_@ = (bidirectional_range<@_maybe-const_@<Const, Views>> && ...);    // exposition only
+    concept $all-bidirectional$ = (bidirectional_range<$maybe-const$<Const, Views>> && ...);    // exposition only
   template<bool Const, class... Views>
-    concept @_all-forward_@ = (forward_range<@_maybe-const_@<Const, Views>> && ...);                // exposition only
+    concept $all-forward$ = (forward_range<$maybe-const$<Const, Views>> && ...);                // exposition only
 
   template<input_range... Views>
     requires (view<Views> && ...) && (sizeof...(Views) > 0)
   template<bool Const>
-  class zip_view<Views...>::@_iterator_@ {
-    @_tuple-or-pair_@<iterator_t<@_maybe-const_@<Const, Views>>...> @_current\__@;                             // exposition only
-    constexpr explicit @_iterator_@(@_tuple-or-pair_@<iterator_t<@_maybe-const_@<Const, Views>>...> current); // exposition only
+  class zip_view<Views...>::$iterator$ {
+    $tuple-or-pair$<iterator_t<$maybe-const$<Const, Views>>...> $current_$;                             // exposition only
+    constexpr explicit $iterator$($tuple-or-pair$<iterator_t<$maybe-const$<Const, Views>>...> current); // exposition only
   public:
     using iterator_category = input_iterator_tag; // not always present
-    using iterator_concept  = @_see below_@;
-    using value_type = @_tuple-or-pair_@<range_value_t<@_maybe-const_@<Const, Views>>...>;
-    using difference_type = common_type_t<range_difference_t<@_maybe-const_@<Const, Views>>...>;
+    using iterator_concept  = $see below$;
+    using value_type = $tuple-or-pair$<range_value_t<$maybe-const$<Const, Views>>...>;
+    using difference_type = common_type_t<range_difference_t<$maybe-const$<Const, Views>>...>;
 
-    @_iterator_@() = default;
-    constexpr @_iterator_@(@_iterator_@<!Const> i)
-      requires Const && (convertible_to<iterator_t<Views>, iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+    $iterator$() = default;
+    constexpr $iterator$($iterator$<!Const> i)
+      requires Const && (convertible_to<iterator_t<Views>, iterator_t<$maybe-const$<Const, Views>>> && ...);
 
     constexpr auto operator*() const;
-    constexpr @_iterator_@& operator++();
+    constexpr $iterator$& operator++();
     constexpr void operator++(int);
-    constexpr @_iterator_@ operator++(int) requires @_all-forward_@<Const, Views...>;
+    constexpr $iterator$ operator++(int) requires $all-forward$<Const, Views...>;
 
-    constexpr @_iterator_@& operator--() requires @_all-bidirectional_@<Const, Views...>;
-    constexpr @_iterator_@ operator--(int) requires @_all-bidirectional_@<Const, Views...>;
+    constexpr $iterator$& operator--() requires $all-bidirectional$<Const, Views...>;
+    constexpr $iterator$ operator--(int) requires $all-bidirectional$<Const, Views...>;
 
-    constexpr @_iterator_@& operator+=(difference_type x)
-      requires @_all-random-access_@<Const, Views...>;
-    constexpr @_iterator_@& operator-=(difference_type x)
-      requires @_all-random-access_@<Const, Views...>;
+    constexpr $iterator$& operator+=(difference_type x)
+      requires $all-random-access$<Const, Views...>;
+    constexpr $iterator$& operator-=(difference_type x)
+      requires $all-random-access$<Const, Views...>;
 
     constexpr auto operator[](difference_type n) const
-      requires @_all-random-access_@<Const, Views...>;
+      requires $all-random-access$<Const, Views...>;
 
-    friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y)
-      requires (equality_comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+    friend constexpr bool operator==(const $iterator$& x, const $iterator$& y)
+      requires (equality_comparable<iterator_t<$maybe-const$<Const, Views>>> && ...);
 
-    friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-      requires @_all-random-access_@<Const, Views...>;
-    friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-      requires @_all-random-access_@<Const, Views...>;
-    friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-      requires @_all-random-access_@<Const, Views...>;
-    friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-      requires @_all-random-access_@<Const, Views...>;
-    friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-      requires @_all-random-access_@<Const, Views...> &&
-               (three_way_comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+    friend constexpr bool operator<(const $iterator$& x, const $iterator$& y)
+      requires $all-random-access$<Const, Views...>;
+    friend constexpr bool operator>(const $iterator$& x, const $iterator$& y)
+      requires $all-random-access$<Const, Views...>;
+    friend constexpr bool operator<=(const $iterator$& x, const $iterator$& y)
+      requires $all-random-access$<Const, Views...>;
+    friend constexpr bool operator>=(const $iterator$& x, const $iterator$& y)
+      requires $all-random-access$<Const, Views...>;
+    friend constexpr auto operator<=>(const $iterator$& x, const $iterator$& y)
+      requires $all-random-access$<Const, Views...> &&
+               (three_way_comparable<iterator_t<$maybe-const$<Const, Views>>> && ...);
 
-    friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-      requires @_all-random-access_@<Const, Views...>;
-    friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-      requires @_all-random-access_@<Const, Views...>;
-    friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
-      requires @_all-random-access_@<Const, Views...>;
-    friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
-      requires (sized_sentinel_for<iterator_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+    friend constexpr $iterator$ operator+(const $iterator$& i, difference_type n)
+      requires $all-random-access$<Const, Views...>;
+    friend constexpr $iterator$ operator+(difference_type n, const $iterator$& i)
+      requires $all-random-access$<Const, Views...>;
+    friend constexpr $iterator$ operator-(const $iterator$& i, difference_type n)
+      requires $all-random-access$<Const, Views...>;
+    friend constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
+      requires (sized_sentinel_for<iterator_t<$maybe-const$<Const, Views>>, iterator_t<$maybe-const$<Const, Views>>> && ...);
 
-    friend constexpr auto iter_move(const @_iterator_@& i)
-      noexcept(@_see below_@);
+    friend constexpr auto iter_move(const $iterator$& i)
+      noexcept($see below$);
 
-    friend constexpr void iter_swap(const @_iterator_@& l, const @_iterator_@& r)
-      noexcept(@_see below_@)
-      requires (indirectly_swappable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+    friend constexpr void iter_swap(const $iterator$& l, const $iterator$& r)
+      noexcept($see below$)
+      requires (indirectly_swappable<iterator_t<$maybe-const$<Const, Views>>> && ...);
   };
 }
 ```
 
-[#]{.pnum} `@_iterator_@::iterator_concept` is defined as follows:
+[#]{.pnum} `$iterator$::iterator_concept` is defined as follows:
 
-- [#.#]{.pnum} If `@_all-random-access_@<Const, Views...>` is modeled, then `iterator_concept` denotes `random_access_iterator_tag`.
-- [#.#]{.pnum} Otherwise, if `@_all-bidirectional_@<Const, Views...>` is modeled, then `iterator_concept` denotes `bidirectional_iterator_tag`.
-- [#.#]{.pnum} Otherwise, if `@_all-forward_@<Const, Views...>` is modeled, then `iterator_concept` denotes `forward_iterator_tag`.
+- [#.#]{.pnum} If `$all-random-access$<Const, Views...>` is modeled, then `iterator_concept` denotes `random_access_iterator_tag`.
+- [#.#]{.pnum} Otherwise, if `$all-bidirectional$<Const, Views...>` is modeled, then `iterator_concept` denotes `bidirectional_iterator_tag`.
+- [#.#]{.pnum} Otherwise, if `$all-forward$<Const, Views...>` is modeled, then `iterator_concept` denotes `forward_iterator_tag`.
 - [#.#]{.pnum} Otherwise, `iterator_concept` denotes `input_iterator_tag`.
 
-[#]{.pnum} `@_iterator_@::iterator_category` is present if and only if `@_all-forward_@<Const, Views...>` is modeled.
+[#]{.pnum} `$iterator$::iterator_category` is present if and only if `$all-forward$<Const, Views...>` is modeled.
 
 [#]{.pnum} If the invocation of any non-const member function of _`iterator`_ exits via an exception,
 the iterator acquires a singular value.
@@ -1419,17 +1419,17 @@ the iterator acquires a singular value.
 ::: itemdecl
 
 ```cpp
-constexpr explicit @_iterator_@(@_tuple-or-pair_@<iterator_t<@_maybe-const_@<Const, Views>>...> current);
+constexpr explicit $iterator$($tuple-or-pair$<iterator_t<$maybe-const$<Const, Views>>...> current);
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_current\__@` with `std::move(current)`.
+[#]{.pnum} _Effects_: Initializes `$current_$` with `std::move(current)`.
 
 ```cpp
-constexpr @_iterator_@(@_iterator_@<!Const> i)
-  requires Const && (convertible_to<iterator_t<Views>, iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+constexpr $iterator$($iterator$<!Const> i)
+  requires Const && (convertible_to<iterator_t<Views>, iterator_t<$maybe-const$<Const, Views>>> && ...);
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_current\__@` with `std::move(i.@_current\__@)`.
+[#]{.pnum} _Effects_: Initializes `$current_$` with `std::move(i.$current_$)`.
 
 ```cpp
 constexpr auto operator*() const;
@@ -1439,18 +1439,18 @@ constexpr auto operator*() const;
 
 ::: bq
 ```cpp
-  return @_tuple-transform_@([](auto& i) -> decltype(auto) { return *i; }, @_current\__@);
+  return $tuple-transform$([](auto& i) -> decltype(auto) { return *i; }, $current_$);
 ```
 :::
 
 ```cpp
-constexpr @_iterator_@& operator++();
+constexpr $iterator$& operator++();
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  @_tuple-for-each_@([](auto& i) { ++i; }, @_current\__@);
+  $tuple-for-each$([](auto& i) { ++i; }, $current_$);
   return *this;
 ```
 :::
@@ -1462,7 +1462,7 @@ constexpr void operator++(int);
 [#]{.pnum} _Effects_: Equivalent to `++*this`.
 
 ```cpp
-constexpr @_iterator_@ operator++(int) requires @_all-forward_@<Const, Views...>;
+constexpr $iterator$ operator++(int) requires $all-forward$<Const, Views...>;
 ```
 
 [#]{.pnum} _Effects_: Equivalent to:
@@ -1477,20 +1477,20 @@ constexpr @_iterator_@ operator++(int) requires @_all-forward_@<Const, Views...>
 
 
 ```cpp
-constexpr @_iterator_@& operator--() requires @_all-bidirectional_@<Const, Views...>;
+constexpr $iterator$& operator--() requires $all-bidirectional$<Const, Views...>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  @_tuple-for-each_@([](auto& i) { --i; }, @_current\__@);
+  $tuple-for-each$([](auto& i) { --i; }, $current_$);
   return *this;
 ```
 :::
 
 
 ```cpp
-constexpr @_iterator_@ operator--(int) requires @_all-bidirectional_@<Const, Views...>;
+constexpr $iterator$ operator--(int) requires $all-bidirectional$<Const, Views...>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
@@ -1503,99 +1503,99 @@ constexpr @_iterator_@ operator--(int) requires @_all-bidirectional_@<Const, Vie
 :::
 
 ```cpp
-constexpr @_iterator_@& operator+=(difference_type x)
-  requires @_all-random-access_@<Const, Views...>;
+constexpr $iterator$& operator+=(difference_type x)
+  requires $all-random-access$<Const, Views...>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  @_tuple-for-each_@([&]<class I>(I& i) { i += iter_difference_t<I>(x); }, @_current\__@);
+  $tuple-for-each$([&]<class I>(I& i) { i += iter_difference_t<I>(x); }, $current_$);
   return *this;
 ```
 :::
 
 ```cpp
-  constexpr @_iterator_@& operator-=(difference_type x)
-    requires @_all-random-access_@<Const, Views...>;
+  constexpr $iterator$& operator-=(difference_type x)
+    requires $all-random-access$<Const, Views...>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  @_tuple-for-each_@([&]<class I>(I& i) { i -= iter_difference_t<I>(x); }, @_current\__@);
+  $tuple-for-each$([&]<class I>(I& i) { i -= iter_difference_t<I>(x); }, $current_$);
   return *this;
 ```
 :::
 
 ```cpp
 constexpr auto operator[](difference_type n) const
-  requires @_all-random-access_@<Const, Views...>;
+  requires $all-random-access$<Const, Views...>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  return @_tuple-transform_@([&]<class I>(I& i) -> decltype(auto) {
+  return $tuple-transform$([&]<class I>(I& i) -> decltype(auto) {
     return i[iter_difference_t<I>(n)];
-  }, @_current\__@);
+  }, $current_$);
 ```
 :::
 
 ```cpp
-friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y)
-  requires (equality_comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+friend constexpr bool operator==(const $iterator$& x, const $iterator$& y)
+  requires (equality_comparable<iterator_t<$maybe-const$<Const, Views>>> && ...);
 ```
 [#]{.pnum} _Returns_:
 
-- [#.#]{.pnum} `x.@_current\__@ == y.@_current\__@` if `@_all-bidirectional_@<Const, Views...>` is `true`.
+- [#.#]{.pnum} `x.$current_$ == y.$current_$` if `$all-bidirectional$<Const, Views...>` is `true`.
 - [#.#]{.pnum} Otherwise, `true` if there exists an integer 0 &le; _i_ &lt; `sizeof...(Views)`
-  such that `bool(std::get<@_i_@>(x.@_current\__@) == std::get<@_i_@>(y.@_current\__@))` is `true`.
+  such that `bool(std::get<$i$>(x.$current_$) == std::get<$i$>(y.$current_$))` is `true`.
   [This allows `zip_view` to model `common_range` when all constituent views model `common_range`.]{.note}
 - [#.#]{.pnum} Otherwise, `false`.
 
 
 ```cpp
-friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-  requires @_all-random-access_@<Const, Views...>;
+friend constexpr bool operator<(const $iterator$& x, const $iterator$& y)
+  requires $all-random-access$<Const, Views...>;
 ```
-[#]{.pnum} _Returns_: `x.@_current\__@ < y.@_current\__@`.
+[#]{.pnum} _Returns_: `x.$current_$ < y.$current_$`.
 
 ```cpp
-friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-  requires @_all-random-access_@<Const, Views...>;
+friend constexpr bool operator>(const $iterator$& x, const $iterator$& y)
+  requires $all-random-access$<Const, Views...>;
 ```
 [#]{.pnum} _Effects_: Equivalent to: `return y < x; `
 
 ```cpp
-friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-  requires @_all-random-access_@<Const, Views...>;
+friend constexpr bool operator<=(const $iterator$& x, const $iterator$& y)
+  requires $all-random-access$<Const, Views...>;
 ```
 
 [#]{.pnum} _Effects_: Equivalent to: `return !(y < x); `
 
 
 ```cpp
-friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-  requires @_all-random-access_@<Const, Views...>;
+friend constexpr bool operator>=(const $iterator$& x, const $iterator$& y)
+  requires $all-random-access$<Const, Views...>;
 ```
 
 [#]{.pnum} _Effects_: Equivalent to: `return !(x < y); `
 
 ```cpp
-friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-  requires @_all-random-access_@<Const, Views...> &&
-            (three_way_comparable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+friend constexpr auto operator<=>(const $iterator$& x, const $iterator$& y)
+  requires $all-random-access$<Const, Views...> &&
+            (three_way_comparable<iterator_t<$maybe-const$<Const, Views>>> && ...);
 ```
 
-[#]{.pnum} _Returns_: `x.@_current\__@ <=> y.@_current\__@`.
+[#]{.pnum} _Returns_: `x.$current_$ <=> y.$current_$`.
 
 
 ```cpp
-friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-  requires @_all-random-access_@<Const, Views...>;
-friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-  requires @_all-random-access_@<Const, Views...>;
+friend constexpr $iterator$ operator+(const $iterator$& i, difference_type n)
+  requires $all-random-access$<Const, Views...>;
+friend constexpr $iterator$ operator+(difference_type n, const $iterator$& i)
+  requires $all-random-access$<Const, Views...>;
 ```
 
 [#]{.pnum} _Effects_: Equivalent to:
@@ -1609,8 +1609,8 @@ friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i
 :::
 
 ```cpp
-friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
-  requires @_all-random-access_@<Const, Views...>;
+friend constexpr $iterator$ operator-(const $iterator$& i, difference_type n)
+  requires $all-random-access$<Const, Views...>;
 ```
 
 [#]{.pnum} _Effects_: Equivalent to:
@@ -1624,23 +1624,23 @@ friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n
 :::
 
 ```cpp
-friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
-  requires (sized_sentinel_for<iterator_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+friend constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
+  requires (sized_sentinel_for<iterator_t<$maybe-const$<Const, Views>>, iterator_t<$maybe-const$<Const, Views>>> && ...);
 ```
-[#]{.pnum} Let _DIST(i)_ be `difference_type(std::get<@_i_@>(x.@_current\__@) - std::get<@_i_@>(y.@_current\__@))`.
+[#]{.pnum} Let _DIST(i)_ be `difference_type(std::get<$i$>(x.$current_$) - std::get<$i$>(y.$current_$))`.
 
 [#]{.pnum} _Returns:_ The value with the smallest absolute value among _DIST(n)_ for all integers 0 &le; _n_ &lt; `sizeof...(Views)`.
 
 ```cpp
-friend constexpr auto iter_move(const @_iterator_@& i)
-  noexcept(@_see below_@);
+friend constexpr auto iter_move(const $iterator$& i)
+  noexcept($see below$);
 ```
 
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  return @_tuple-transform_@(ranges::iter_move, i.@_current\__@);
+  return $tuple-transform$(ranges::iter_move, i.$current_$);
 ```
 :::
 
@@ -1648,25 +1648,25 @@ friend constexpr auto iter_move(const @_iterator_@& i)
 
 ::: bq
 ```cpp
-  (noexcept(ranges::iter_move(declval<iterator_t<@_maybe-const_@<Const, Views>> const&>())) && ...) &&
-  (is_nothrow_move_constructible_v<range_rvalue_reference_t<@_maybe-const_@<Const, Views>>> && ...)
+  (noexcept(ranges::iter_move(declval<iterator_t<$maybe-const$<Const, Views>> const&>())) && ...) &&
+  (is_nothrow_move_constructible_v<range_rvalue_reference_t<$maybe-const$<Const, Views>>> && ...)
 ```
 :::
 
 ```cpp
-friend constexpr void iter_swap(const @_iterator_@& l, const @_iterator_@& r)
-  noexcept(@_see below_@)
-  requires (indirectly_swappable<iterator_t<@_maybe-const_@<Const, Views>>> && ...);
+friend constexpr void iter_swap(const $iterator$& l, const $iterator$& r)
+  noexcept($see below$)
+  requires (indirectly_swappable<iterator_t<$maybe-const$<Const, Views>>> && ...);
 ```
 
 [#]{.pnum} _Effects_: For every integer 0 &le; _i_ &lt; `sizeof...(Views)`,
-performs `ranges::iter_swap(std::get<@_i_@>(l.@_current\__@), std::get<@_i_@>(r.@_current\__@))`.
+performs `ranges::iter_swap(std::get<$i$>(l.$current_$), std::get<$i$>(r.$current_$))`.
 
 [#]{.pnum} _Remarks:_ The expression within `noexcept` is equivalent to the logical AND of the following expressions:
 
 ::: bq
 ```cpp
-  noexcept(ranges::iter_swap(std::get<@_i_@>(l.@_current\__@), std::get<@_i_@>(r.@_current\__@)))
+  noexcept(ranges::iter_swap(std::get<$i$>(l.$current_$), std::get<$i$>(r.$current_$)))
 ```
 :::
 
@@ -1674,78 +1674,78 @@ for every integer 0 &le; _i_ &lt; `sizeof...(Views)`.
 
 :::
 
-#### 24.7.?.4 Class template `zip_view::@_sentinel_@` [range.zip.sentinel] {-}
+#### 24.7.?.4 Class template `zip_view::$sentinel$` [range.zip.sentinel] {-}
 
 ```cpp
 namespace std::ranges {
   template<input_range... Views>
     requires (view<Views> && ...) && (sizeof...(Views) > 0)
   template<bool Const>
-  class zip_view<Views...>::@_sentinel_@ {
-    @_tuple-or-pair_@<sentinel_t<@_maybe-const_@<Const, Views>>...> @_end\__@;                                // exposition only
-    constexpr explicit @_sentinel_@(@_tuple-or-pair_@<sentinel_t<@_maybe-const_@<Const, Views>>...> end);    // exposition only
+  class zip_view<Views...>::$sentinel$ {
+    $tuple-or-pair$<sentinel_t<$maybe-const$<Const, Views>>...> $end_$;                                // exposition only
+    constexpr explicit $sentinel$($tuple-or-pair$<sentinel_t<$maybe-const$<Const, Views>>...> end);    // exposition only
   public:
-    @_sentinel_@() = default;
-    constexpr @_sentinel_@(@_sentinel_@<!Const> i)
-      requires Const && (convertible_to<sentinel_t<Views>, sentinel_t<@_maybe-const_@<Const, Views>>> && ...);
+    $sentinel$() = default;
+    constexpr $sentinel$($sentinel$<!Const> i)
+      requires Const && (convertible_to<sentinel_t<Views>, sentinel_t<$maybe-const$<Const, Views>>> && ...);
 
     template<bool OtherConst>
-      requires (sentinel_for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
-    friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
+      requires (sentinel_for<sentinel_t<$maybe-const$<Const, Views>>, iterator_t<$maybe-const$<OtherConst, Views>>> && ...)
+    friend constexpr bool operator==(const $iterator$<OtherConst>& x, const $sentinel$& y);
 
     template<bool OtherConst>
-      requires (sized_sentinel_for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
-    friend constexpr common_type_t<range_difference_t<@_maybe-const_@<OtherConst, Views>>...>
-      operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
+      requires (sized_sentinel_for<sentinel_t<$maybe-const$<Const, Views>>, iterator_t<$maybe-const$<OtherConst, Views>>> && ...)
+    friend constexpr common_type_t<range_difference_t<$maybe-const$<OtherConst, Views>>...>
+      operator-(const $iterator$<OtherConst>& x, const $sentinel$& y);
 
     template<bool OtherConst>
-      requires (sized_sentinel_for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
-    friend constexpr common_type_t<range_difference_t<@_maybe-const_@<OtherConst, Views>>...>
-      operator-(const @_sentinel_@& y, const @_iterator_@<OtherConst>& x);
+      requires (sized_sentinel_for<sentinel_t<$maybe-const$<Const, Views>>, iterator_t<$maybe-const$<OtherConst, Views>>> && ...)
+    friend constexpr common_type_t<range_difference_t<$maybe-const$<OtherConst, Views>>...>
+      operator-(const $sentinel$& y, const $iterator$<OtherConst>& x);
   };
 }
 ```
 ::: itemdecl
 
 ```cpp
-constexpr explicit @_sentinel_@(@_tuple-or-pair_@<sentinel_t<@_maybe-const_@<Const, Views>>...> end);
+constexpr explicit $sentinel$($tuple-or-pair$<sentinel_t<$maybe-const$<Const, Views>>...> end);
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_end\__@` with `end`.
+[#]{.pnum} _Effects_: Initializes `$end_$` with `end`.
 
 ```cpp
-constexpr @_sentinel_@(@_sentinel_@<!Const> i)
-  requires Const && (convertible_to<sentinel_t<Views>, sentinel_t<@_maybe-const_@<Const, Views>>> && ...);
+constexpr $sentinel$($sentinel$<!Const> i)
+  requires Const && (convertible_to<sentinel_t<Views>, sentinel_t<$maybe-const$<Const, Views>>> && ...);
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_end\__@` with `std::move(i.@_end\__@)`.
+[#]{.pnum} _Effects_: Initializes `$end_$` with `std::move(i.$end_$)`.
 
 ```cpp
 template<bool OtherConst>
-  requires (sentinel_for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
-friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
+  requires (sentinel_for<sentinel_t<$maybe-const$<Const, Views>>, iterator_t<$maybe-const$<OtherConst, Views>>> && ...)
+friend constexpr bool operator==(const $iterator$<OtherConst>& x, const $sentinel$& y);
 ```
 
 [#]{.pnum} _Returns_: `true` if there exists an integer 0 &le; _i_ &lt; `sizeof...(Views)`
-such that `bool(std::get<@_i_@>(x.@_current\__@) == std::get<@_i_@>(y.@_end\__@))` is `true`. Otherwise, `false`.
+such that `bool(std::get<$i$>(x.$current_$) == std::get<$i$>(y.$end_$))` is `true`. Otherwise, `false`.
 
 
 ```cpp
 template<bool OtherConst>
-  requires (sized_sentinel_for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
-friend constexpr common_type_t<range_difference_t<@_maybe-const_@<OtherConst, Views>>...>
-  operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
+  requires (sized_sentinel_for<sentinel_t<$maybe-const$<Const, Views>>, iterator_t<$maybe-const$<OtherConst, Views>>> && ...)
+friend constexpr common_type_t<range_difference_t<$maybe-const$<OtherConst, Views>>...>
+  operator-(const $iterator$<OtherConst>& x, const $sentinel$& y);
 ```
 
-[#]{.pnum} Let `D` be the return type. Let _DIST(i)_ be `D(std::get<@_i_@>(x.@_current\__@) - std::get<@_i_@>(y.@_end\__@))`.
+[#]{.pnum} Let `D` be the return type. Let _DIST(i)_ be `D(std::get<$i$>(x.$current_$) - std::get<$i$>(y.$end_$))`.
 
-[#]{.pnum} _Returns:_ The value with the smallest absolute value among _DIST(n)_ for all integers 0 &le; _n_ &lt; `sizeof...(Views)`,
+[#]{.pnum} _Returns:_ The value with the smallest absolute value among _DIST(n)_ for all integers 0 &le; _n_ &lt; `sizeof...(Views)`.
 
 ```cpp
 template<bool OtherConst>
-  requires (sized_sentinel_for<sentinel_t<@_maybe-const_@<Const, Views>>, iterator_t<@_maybe-const_@<OtherConst, Views>>> && ...)
-friend constexpr common_type_t<range_difference_t<@_maybe-const_@<OtherConst, Views>>...>
-  operator-(const @_sentinel_@& y, const @_iterator_@<OtherConst>& x);
+  requires (sized_sentinel_for<sentinel_t<$maybe-const$<Const, Views>>, iterator_t<$maybe-const$<OtherConst, Views>>> && ...)
+friend constexpr common_type_t<range_difference_t<$maybe-const$<OtherConst, Views>>...>
+  operator-(const $sentinel$& y, const $iterator$<OtherConst>& x);
 ```
 [#]{.pnum} _Effects_: Equivalent to `return -(x - y);`
 
@@ -1769,7 +1769,7 @@ the invocable object to the _M <sup>th</sup>_ elements of all views.
 
 - [#.#]{.pnum} if `Es` is an empty pack, let `FD` be `decay_t<decltype((F))>`.
   - [#.#.#]{.pnum} if `copy_constructible<FD> && regular_invocable<FD&>` is `false`, `views::zip_transform(F, Es...)` is ill-formed.
-  - [#.#.#]{.pnum} Otherwise, the expression `views::zip_transform(F, Es...)` is expression-equivalent to `(void)F, @_decay-copy_@(views::empty<decay_t<invoke_result_t<FD&>>>)`.
+  - [#.#.#]{.pnum} Otherwise, the expression `views::zip_transform(F, Es...)` is expression-equivalent to `(void)F, $decay-copy$(views::empty<decay_t<invoke_result_t<FD&>>>)`.
 - [#.#]{.pnum} Otherwise, the expression `views::zip_transform(F, Es...)` is expression-equivalent to `zip_transform_view(F, Es...)`.
 
 ::: example
@@ -1793,19 +1793,19 @@ namespace std::ranges {
 template<copy_constructible F, input_range... Views>
   requires (view<Views> && ...) && (sizeof...(Views) > 0) && is_object_v<F> &&
             regular_invocable<F&, range_reference_t<Views>...> &&
-            @_can-reference_@<invoke_result_t<F&, range_reference_t<Views>...>>
+            $can-reference$<invoke_result_t<F&, range_reference_t<Views>...>>
 class zip_transform_view : public view_interface<zip_transform_view<F, Views...>> {
-  @_semiregular-box_@<F> @_fun\__@;               // exposition only
-  zip_view<Views...> @_zip\__@;               // exposition only
+  $semiregular-box$<F> $fun_$;               // exposition only
+  zip_view<Views...> $zip_$;               // exposition only
 
-  using @_InnerView_@ = zip_view<Views...>;  // exposition only
+  using $InnerView$ = zip_view<Views...>;  // exposition only
   template<bool Const>
-  using @_ziperator_@ = iterator_t<@_maybe-const_@<Const, @_InnerView_@>>;  // exposition only
+  using $ziperator$ = iterator_t<$maybe-const$<Const, $InnerView$>>;  // exposition only
   template<bool Const>
-  using @_zentinel_@ = sentinel_t<@_maybe-const_@<Const, @_InnerView_@>>;   // exposition only
+  using $zentinel$ = sentinel_t<$maybe-const$<Const, $InnerView$>>;   // exposition only
 
-  template<bool> class @_iterator_@;         // exposition only
-  template<bool> class @_sentinel_@;         // exposition only
+  template<bool> class $iterator$;         // exposition only
+  template<bool> class $sentinel$;         // exposition only
 
 public:
   constexpr zip_transform_view() = default;
@@ -1813,44 +1813,44 @@ public:
   constexpr explicit zip_transform_view(F fun, Views... views);
 
   constexpr auto begin() {
-    return @_iterator_@<false>(*this, @_zip\__@.begin());
+    return $iterator$<false>(*this, $zip_$.begin());
   }
 
   constexpr auto begin() const
-    requires range<const @_InnerView_@> &&
+    requires range<const $InnerView$> &&
              regular_invocable<const F&, range_reference_t<const Views>...>
   {
-    return @_iterator_@<true>(*this, @_zip\__@.begin());
+    return $iterator$<true>(*this, $zip_$.begin());
   }
 
   constexpr auto end() {
-    return @_sentinel_@<false>(@_zip\__@.end());
+    return $sentinel$<false>($zip_$.end());
   }
 
-  constexpr auto end() requires common_range<@_InnerView_@> {
-    return @_iterator_@<false>(*this, @_zip\__@.end());
-  }
-
-  constexpr auto end() const
-    requires range<const @_InnerView_@> &&
-             regular_invocable<const F&, range_reference_t<const Views>...>
-  {
-    return @_sentinel_@<true>(@_zip\__@.end());
+  constexpr auto end() requires common_range<$InnerView$> {
+    return $iterator$<false>(*this, $zip_$.end());
   }
 
   constexpr auto end() const
-    requires common_range<const @_InnerView_@> &&
+    requires range<const $InnerView$> &&
              regular_invocable<const F&, range_reference_t<const Views>...>
   {
-    return @_iterator_@<true>(*this, @_zip\__@.end());
+    return $sentinel$<true>($zip_$.end());
   }
 
-  constexpr auto size() requires sized_range<@_InnerView_@> {
-    return @_zip\__@.size();
+  constexpr auto end() const
+    requires common_range<const $InnerView$> &&
+             regular_invocable<const F&, range_reference_t<const Views>...>
+  {
+    return $iterator$<true>(*this, $zip_$.end());
   }
 
-  constexpr auto size() const requires sized_range<const @_InnerView_@> {
-    return @_zip\__@.size();
+  constexpr auto size() requires sized_range<$InnerView$> {
+    return $zip_$.size();
+  }
+
+  constexpr auto size() const requires sized_range<const $InnerView$> {
+    return $zip_$.size();
   }
 };
 
@@ -1866,84 +1866,84 @@ template<class F, class... Rs>
 constexpr explicit zip_transform_view(F fun, Views... views);
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_fun\__@` with `std::move(fun)` and
-`@_zip\__@` with `std::move(views)...`.
+[#]{.pnum} _Effects_: Initializes `$fun_$` with `std::move(fun)` and
+`$zip_$` with `std::move(views)...`.
 
 :::
 
-#### 24.7.?.3 Class template `zip_transform_view::@_iterator_@` [range.zip.transform.iterator] {-}
+#### 24.7.?.3 Class template `zip_transform_view::$iterator$` [range.zip.transform.iterator] {-}
 
 ```cpp
 namespace std::ranges {
   template<copy_constructible F, input_range... Views>
     requires (view<Views> && ...) && (sizeof...(Views) > 0) && is_object_v<F> &&
               regular_invocable<F&, range_reference_t<Views>...> &&
-              @_can-reference_@<invoke_result_t<F&, range_reference_t<Views>...>>
+              $can-reference$<invoke_result_t<F&, range_reference_t<Views>...>>
   template<bool Const>
-  class zip_transform_view<F, Views...>::@_iterator_@ {
-    using @_Parent_@ = @_maybe-const_@<Const, zip_transform_view>;      // exposition only
-    using @_Base_@ = @_maybe-const_@<Const, @_InnerView_@>;                 // exposition only
-    @_Parent_@* @_parent\__@ = nullptr;                                  // exposition only
-    @_ziperator_@<Const> @_inner\__@ = @_ziperator_@<Const>();               // exposition only
+  class zip_transform_view<F, Views...>::$iterator$ {
+    using $Parent$ = $maybe-const$<Const, zip_transform_view>;      // exposition only
+    using $Base$ = $maybe-const$<Const, $InnerView$>;                 // exposition only
+    $Parent$* $parent_$ = nullptr;                                  // exposition only
+    $ziperator$<Const> $inner_$ = $ziperator$<Const>();               // exposition only
 
-    constexpr @_iterator_@(@_Parent_@& parent, @_ziperator_@<Const> inner); // exposition only
+    constexpr $iterator$($Parent$& parent, $ziperator$<Const> inner); // exposition only
 
   public:
-    using iterator_category = @_see below_@;                        // not always present
-    using iterator_concept  = typename @_ziperator_@<Const>::iterator_concept;
+    using iterator_category = $see below$;                        // not always present
+    using iterator_concept  = typename $ziperator$<Const>::iterator_concept;
     using value_type =
-      remove_cvref_t<invoke_result_t<@_maybe-const_@<Const, F>&, range_reference_t<@_maybe-const_@<Const, Views>>...>>;
-    using difference_type = range_difference_t<@_Base_@>;
+      remove_cvref_t<invoke_result_t<$maybe-const$<Const, F>&, range_reference_t<$maybe-const$<Const, Views>>...>>;
+    using difference_type = range_difference_t<$Base$>;
 
-    @_iterator_@() = default;
-    constexpr @_iterator_@(@_iterator_@<!Const> i)
-      requires Const && convertible_to<@_ziperator_@<false>, @_ziperator_@<Const>>;
+    $iterator$() = default;
+    constexpr $iterator$($iterator$<!Const> i)
+      requires Const && convertible_to<$ziperator$<false>, $ziperator$<Const>>;
 
-    constexpr decltype(auto) operator*() const noexcept(@_see below_@);
-    constexpr @_iterator_@& operator++();
+    constexpr decltype(auto) operator*() const noexcept($see below$);
+    constexpr $iterator$& operator++();
     constexpr void operator++(int);
-    constexpr @_iterator_@ operator++(int) requires forward_range<@_Base_@>;
+    constexpr $iterator$ operator++(int) requires forward_range<$Base$>;
 
-    constexpr @_iterator_@& operator--() requires bidirectional_range<@_Base_@>;
-    constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
+    constexpr $iterator$& operator--() requires bidirectional_range<$Base$>;
+    constexpr $iterator$ operator--(int) requires bidirectional_range<$Base$>;
 
-    constexpr @_iterator_@& operator+=(difference_type x) requires random_access_range<@_Base_@>;
-    constexpr @_iterator_@& operator-=(difference_type x) requires random_access_range<@_Base_@>;
+    constexpr $iterator$& operator+=(difference_type x) requires random_access_range<$Base$>;
+    constexpr $iterator$& operator-=(difference_type x) requires random_access_range<$Base$>;
 
-    constexpr decltype(auto) operator[](difference_type n) const requires random_access_range<@_Base_@>;
+    constexpr decltype(auto) operator[](difference_type n) const requires random_access_range<$Base$>;
 
-    friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y)
-      requires equality_comparable<@_ziperator_@<Const>>;
+    friend constexpr bool operator==(const $iterator$& x, const $iterator$& y)
+      requires equality_comparable<$ziperator$<Const>>;
 
-    friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@>;
-    friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@>;
-    friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@>;
-    friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@>;
-    friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@> && three_way_comparable<@_ziperator_@<Const>>;
+    friend constexpr bool operator<(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
+    friend constexpr bool operator>(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
+    friend constexpr bool operator<=(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
+    friend constexpr bool operator>=(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
+    friend constexpr auto operator<=>(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$> && three_way_comparable<$ziperator$<Const>>;
 
-    friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-      requires random_access_range<@_Base_@>;
-    friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-      requires random_access_range<@_Base_@>;
-    friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
-      requires random_access_range<@_Base_@>;
-    friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
-      requires sized_sentinel_for<@_ziperator_@<Const>, @_ziperator_@<Const>>;
+    friend constexpr $iterator$ operator+(const $iterator$& i, difference_type n)
+      requires random_access_range<$Base$>;
+    friend constexpr $iterator$ operator+(difference_type n, const $iterator$& i)
+      requires random_access_range<$Base$>;
+    friend constexpr $iterator$ operator-(const $iterator$& i, difference_type n)
+      requires random_access_range<$Base$>;
+    friend constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
+      requires sized_sentinel_for<$ziperator$<Const>, $ziperator$<Const>>;
   };
 }
 ```
 
-[#]{.pnum} The member _typedef-name_ `@_iterator_@::iterator_category` is defined if and only if `@_Base_@` models `forward_range`.
-In that case, `@_iterator_@::iterator_category` is defined as follows:
+[#]{.pnum} The member _typedef-name_ `$iterator$::iterator_category` is defined if and only if `$Base$` models `forward_range`.
+In that case, `$iterator$::iterator_category` is defined as follows:
 
-- If `invoke_result_t<@_maybe-const_@<Const, F>&, range_reference_t<@_maybe-const_@<Const, Views>>...>` is not an lvalue reference,
+- If `invoke_result_t<$maybe-const$<Const, F>&, range_reference_t<$maybe-const$<Const, Views>>...>` is not an lvalue reference,
   `iterator_category` denotes `input_iterator_tag`.
-- Otherwise, let `Cs...` denote the pack of types `iterator_traits<iterator_t<@_maybe-const_@<Const, Views>>>::iterator_category...`.
+- Otherwise, let `Cs...` denote the pack of types `iterator_traits<iterator_t<$maybe-const$<Const, Views>>>::iterator_category...`.
   - If `(derived_from<Cs, random_access_iterator_tag> && ...)` is `true`, `iterator_category` denotes `random_access_iterator_tag`;
   - Otherwise, if `(derived_from<Cs, bidirectional_iterator_tag> && ...)` is `true`, `iterator_category` denotes `bidirectional_iterator_tag`;
   - Otherwise, if `(derived_from<Cs, forward_iterator_tag> && ...)` is `true`, `iterator_category` denotes `forward_iterator_tag`;
@@ -1953,20 +1953,20 @@ In that case, `@_iterator_@::iterator_category` is defined as follows:
 ::: itemdecl
 
 ```cpp
-constexpr @_iterator_@(@_Parent_@& parent, @_ziperator_@<Const> inner);
+constexpr $iterator$($Parent$& parent, $ziperator$<Const> inner);
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_parent\__@` with `addressof(parent)` and `@_inner\__@` with `std::move(inner)`.
+[#]{.pnum} _Effects_: Initializes `$parent_$` with `addressof(parent)` and `$inner_$` with `std::move(inner)`.
 
 ```cpp
-constexpr @_iterator_@(@_iterator_@<!Const> i)
-  requires Const && convertible_to<@_ziperator_@<false>, @_ziperator_@<Const>>;
+constexpr $iterator$($iterator$<!Const> i)
+  requires Const && convertible_to<$ziperator$<false>, $ziperator$<Const>>;
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_parent\__@` with `i.@_parent\__@` and `@_inner\__@` with `std::move(i.@_inner\__@)`.
+[#]{.pnum} _Effects_: Initializes `$parent_$` with `i.$parent_$` and `$inner_$` with `std::move(i.$inner_$)`.
 
 ```cpp
-constexpr decltype(auto) operator*() const noexcept(@_see below_@);
+constexpr decltype(auto) operator*() const noexcept($see below$);
 ```
 
 [#]{.pnum} _Effects_: Equivalent to:
@@ -1974,24 +1974,24 @@ constexpr decltype(auto) operator*() const noexcept(@_see below_@);
 ::: bq
 ```cpp
   return apply([&](const auto&... iters) -> decltype(auto) {
-    return invoke(*@_parent\__@->@_fun\__@, *iters...);
-  }, @_inner\__@.@_current\__@);
+    return invoke(*$parent_$->$fun_$, *iters...);
+  }, $inner_$.$current_$);
 ```
 :::
 
 [#]{.pnum} _Remarks:_
 Let `Is` be the pack `0, 1, ..., (sizeof...(Views)-1)`.
 The expression within `noexcept` is equivalent to
-`noexcept(invoke(*@_parent\__@->@_fun\__@, *std::get<Is>(@_inner\__@.@_current\__@)...))`.
+`noexcept(invoke(*$parent_$->$fun_$, *std::get<Is>($inner_$.$current_$)...))`.
 
 ```cpp
-constexpr @_iterator_@& operator++();
+constexpr $iterator$& operator++();
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  ++@_inner\__@;
+  ++$inner_$;
   return *this;
 ```
 :::
@@ -2003,7 +2003,7 @@ constexpr void operator++(int);
 [#]{.pnum} _Effects_: Equivalent to `++*this;`.
 
 ```cpp
-constexpr @_iterator_@ operator++(int) requires forward_range<@_Base_@>;
+constexpr $iterator$ operator++(int) requires forward_range<$Base$>;
 ```
 
 [#]{.pnum} _Effects_: Equivalent to:
@@ -2018,20 +2018,20 @@ constexpr @_iterator_@ operator++(int) requires forward_range<@_Base_@>;
 
 
 ```cpp
-constexpr @_iterator_@& operator--() requires bidirectional_range<@_Base_@>;
+constexpr $iterator$& operator--() requires bidirectional_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  --@_inner\__@;
+  --$inner_$;
   return *this;
 ```
 :::
 
 
 ```cpp
-constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
+constexpr $iterator$ operator--(int) requires bidirectional_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
@@ -2044,158 +2044,158 @@ constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
 :::
 
 ```cpp
-constexpr @_iterator_@& operator+=(difference_type x)
-  requires random_access_range<@_Base_@>;
+constexpr $iterator$& operator+=(difference_type x)
+  requires random_access_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  @_inner\__@ += x;
+  $inner_$ += x;
   return *this;
 ```
 :::
 
 ```cpp
-constexpr @_iterator_@& operator-=(difference_type x)
-  requires random_access_range<@_Base_@>;
+constexpr $iterator$& operator-=(difference_type x)
+  requires random_access_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  @_inner\__@ -= x;
+  $inner_$ -= x;
   return *this;
 ```
 :::
 
 ```cpp
 constexpr decltype(auto) operator[](difference_type n) const
-  requires random_access_range<@_Base_@>;
+  requires random_access_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
   return apply([&]<class...Is>(const Is&... iters) -> decltype(auto) {
-    return invoke(*@_parent\__@->@_fun\__@, iters[iter_difference_t<Is>(n)]...);
-  }, @_inner\__@.@_current\__@);
+    return invoke(*$parent_$->$fun_$, iters[iter_difference_t<Is>(n)]...);
+  }, $inner_$.$current_$);
 ```
 :::
 
 ```cpp
-friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y)
-  requires equality_comparable<@_ziperator_@<Const>>;
-friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@>;
-friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@>;
-friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@>;
-friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@>;
-friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@> && three_way_comparable<@_ziperator_@<Const>>;
+friend constexpr bool operator==(const $iterator$& x, const $iterator$& y)
+  requires equality_comparable<$ziperator$<Const>>;
+friend constexpr bool operator<(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
+friend constexpr bool operator>(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
+friend constexpr bool operator<=(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
+friend constexpr bool operator>=(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
+friend constexpr auto operator<=>(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$> && three_way_comparable<$ziperator$<Const>>;
 ```
 [#]{.pnum} Let _`op`_ be the operator.
 
-[#]{.pnum} _Effects_: Equivalent to: `return x.@_inner\__@ @_op_@ y.@_inner\__@; `
+[#]{.pnum} _Effects_: Equivalent to: `return x.$inner_$ $op$ y.$inner_$; `
 
 
 ```cpp
-friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-  requires random_access_range<@_Base_@>;
-friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-  requires random_access_range<@_Base_@>;
+friend constexpr $iterator$ operator+(const $iterator$& i, difference_type n)
+  requires random_access_range<$Base$>;
+friend constexpr $iterator$ operator+(difference_type n, const $iterator$& i)
+  requires random_access_range<$Base$>;
 ```
 
-[#]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*i.@_parent\__@, i.@_inner\__@ + n);`
+[#]{.pnum} _Effects_: Equivalent to: `return $iterator$(*i.$parent_$, i.$inner_$ + n);`
 
 ```cpp
-friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
-  requires random_access_range<@_Base_@>;
+friend constexpr $iterator$ operator-(const $iterator$& i, difference_type n)
+  requires random_access_range<$Base$>;
 ```
 
-[#]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*i.@_parent\__@, i.@_inner\__@ - n);`
+[#]{.pnum} _Effects_: Equivalent to: `return $iterator$(*i.$parent_$, i.$inner_$ - n);`
 
 ```cpp
-friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
-  requires sized_sentinel_for<@_ziperator_@<Const>, @_ziperator_@<Const>>;
+friend constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
+  requires sized_sentinel_for<$ziperator$<Const>, $ziperator$<Const>>;
 ```
 
-[#]{.pnum} _Effects_: Equivalent to: `return x.@_inner\__@ - y.@_inner\__@;`
+[#]{.pnum} _Effects_: Equivalent to: `return x.$inner_$ - y.$inner_$;`
 
 :::
 
-#### 24.7.?.4 Class template `zip_transform_view::@_sentinel_@` [range.zip.transform.sentinel] {-}
+#### 24.7.?.4 Class template `zip_transform_view::$sentinel$` [range.zip.transform.sentinel] {-}
 
 ```cpp
 namespace std::ranges {
   template<copy_constructible F, input_range... Views>
     requires (view<Views> && ...) && (sizeof...(Views) > 0) && is_object_v<F> &&
               regular_invocable<F&, range_reference_t<Views>...> &&
-              @_can-reference_@<invoke_result_t<F&, range_reference_t<Views>...>>
+              $can-reference$<invoke_result_t<F&, range_reference_t<Views>...>>
   template<bool Const>
-  class zip_transform_view<F, Views...>::@_sentinel_@ {
-    @_zentinel_@<Const> @_inner\__@;                             // exposition only
-    constexpr explicit @_sentinel_@(@_zentinel_@<Const> inner); // exposition only
+  class zip_transform_view<F, Views...>::$sentinel$ {
+    $zentinel$<Const> $inner_$;                             // exposition only
+    constexpr explicit $sentinel$($zentinel$<Const> inner); // exposition only
   public:
-    @_sentinel_@() = default;
-    constexpr @_sentinel_@(@_sentinel_@<!Const> i)
-      requires Const && convertible_to<@_zentinel_@<false>, @_zentinel_@<Const>>;
+    $sentinel$() = default;
+    constexpr $sentinel$($sentinel$<!Const> i)
+      requires Const && convertible_to<$zentinel$<false>, $zentinel$<Const>>;
 
     template<bool OtherConst>
-      requires sentinel_for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
-    friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
+      requires sentinel_for<$zentinel$<Const>, $ziperator$<OtherConst>>
+    friend constexpr bool operator==(const $iterator$<OtherConst>& x, const $sentinel$& y);
 
     template<bool OtherConst>
-      requires sized_sentinel_for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
-    friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
-      operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
+      requires sized_sentinel_for<$zentinel$<Const>, $ziperator$<OtherConst>>
+    friend constexpr range_difference_t<$maybe-const$<OtherConst, $InnerView$>>
+      operator-(const $iterator$<OtherConst>& x, const $sentinel$& y);
 
     template<bool OtherConst>
-      requires sized_sentinel_for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
-    friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
-      operator-(const @_sentinel_@& x, const @_iterator_@<OtherConst>& y);
+      requires sized_sentinel_for<$zentinel$<Const>, $ziperator$<OtherConst>>
+    friend constexpr range_difference_t<$maybe-const$<OtherConst, $InnerView$>>
+      operator-(const $sentinel$& x, const $iterator$<OtherConst>& y);
   };
 }
 ```
 ::: itemdecl
 
 ```cpp
-constexpr explicit @_sentinel_@(@_zentinel_@<Const> inner);
+constexpr explicit $sentinel$($zentinel$<Const> inner);
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_inner\__@` with `inner`.
+[#]{.pnum} _Effects_: Initializes `$inner_$` with `inner`.
 
 ```cpp
-constexpr @_sentinel_@(@_sentinel_@<!Const> i)
-  requires Const && convertible_to<@_zentinel_@<false>, @_zentinel_@<Const>>;
+constexpr $sentinel$($sentinel$<!Const> i)
+  requires Const && convertible_to<$zentinel$<false>, $zentinel$<Const>>;
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_inner\__@` with `std::move(i.@_inner\__@)`.
-
-```cpp
-template<bool OtherConst>
-  requires sentinel_for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
-friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
-```
-
-[#]{.pnum} _Effects_: Equivalent to `return x.@_inner\__@ == y.@_inner\__@;`
-
+[#]{.pnum} _Effects_: Initializes `$inner_$` with `std::move(i.$inner_$)`.
 
 ```cpp
 template<bool OtherConst>
-  requires sized_sentinel_for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
-friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
-  operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
+  requires sentinel_for<$zentinel$<Const>, $ziperator$<OtherConst>>
+friend constexpr bool operator==(const $iterator$<OtherConst>& x, const $sentinel$& y);
+```
+
+[#]{.pnum} _Effects_: Equivalent to `return x.$inner_$ == y.$inner_$;`
+
+
+```cpp
+template<bool OtherConst>
+  requires sized_sentinel_for<$zentinel$<Const>, $ziperator$<OtherConst>>
+friend constexpr range_difference_t<$maybe-const$<OtherConst, $InnerView$>>
+  operator-(const $iterator$<OtherConst>& x, const $sentinel$& y);
 
 template<bool OtherConst>
-  requires sized_sentinel_for<@_zentinel_@<Const>, @_ziperator_@<OtherConst>>
-friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
-  operator-(const @_sentinel_@& x, const @_iterator_@<OtherConst>& y);
+  requires sized_sentinel_for<$zentinel$<Const>, $ziperator$<OtherConst>>
+friend constexpr range_difference_t<$maybe-const$<OtherConst, $InnerView$>>
+  operator-(const $sentinel$& x, const $iterator$<OtherConst>& y);
 ```
-[#]{.pnum} _Effects_: Equivalent to `return x.@_inner\__@ - y.@_inner\__@;`
+[#]{.pnum} _Effects_: Equivalent to `return x.$inner_$ - y.$inner_$;`
 
 :::
 
@@ -2217,7 +2217,7 @@ view has fewer than _N_ elements, the resulting view is empty.
 ([range.adaptor.object]{.sref}). Given a subexpression `E` and a constant expression `N`,
 the expression `views::adjacent<N>(E)` is expression-equivalent to
 
-- [#.#]{.pnum} `(void)E, @_decay-copy_@(views::empty<tuple<>>)` if `N` is equal to `0`,
+- [#.#]{.pnum} `(void)E, $decay-copy$(views::empty<tuple<>>)` if `N` is equal to `0`,
 - [#.#]{.pnum} otherwise, `adjacent_view<views::all_t<decltype((E))>, N>(E)`.
 
 ::: example
@@ -2232,7 +2232,7 @@ for (auto i : v | views::adjacent<2>) {
 ```
 :::
 
-[#]{.pnum} Define `@_REPEAT_@(T, N)` as a pack of _N_ types, each of which denotes the same type as `T`.
+[#]{.pnum} Define `$REPEAT$(T, N)` as a pack of _N_ types, each of which denotes the same type as `T`.
 
 #### 24.7.?.2 Class template `adjacent_view` [range.adjacent.view] {-}
 
@@ -2242,39 +2242,39 @@ namespace std::ranges {
 template<forward_range V, size_t N>
   requires view<V> && (N > 0)
 class adjacent_view : public view_interface<adjacent_view<V, N>>{
-  V @_base\__@ = V();                     // exposition only
+  V $base_$ = V();                     // exposition only
 
-  template<bool> class @_iterator_@;     // exposition only
-  template<bool> class @_sentinel_@;     // exposition only
+  template<bool> class $iterator$;     // exposition only
+  template<bool> class $sentinel$;     // exposition only
 
-  struct @_as-sentinel_@{};              // exposition only
+  struct $as-sentinel${};              // exposition only
 
 public:
   constexpr adjacent_view() = default;
   constexpr explicit adjacent_view(V base);
 
-  constexpr auto begin() requires (!@_simple-view_@<V>) {
-    return @_iterator_@<false>(ranges::begin(@_base\__@), ranges::end(@_base\__@));
+  constexpr auto begin() requires (!$simple-view$<V>) {
+    return $iterator$<false>(ranges::begin($base_$), ranges::end($base_$));
   }
 
   constexpr auto begin() const requires range<const V> {
-    return @_iterator_@<true>(ranges::begin(@_base\__@), ranges::end(@_base\__@));
+    return $iterator$<true>(ranges::begin($base_$), ranges::end($base_$));
   }
 
-  constexpr auto end() requires (!@_simple-view_@<V> && !common_range<V>) {
-    return @_sentinel_@<false>(ranges::end(@_base\__@));
+  constexpr auto end() requires (!$simple-view$<V> && !common_range<V>) {
+    return $sentinel$<false>(ranges::end($base_$));
   }
 
-  constexpr auto end() requires (!@_simple-view_@<V> && common_range<V>){
-    return @_iterator_@<false>(@_as-sentinel_@{}, ranges::begin(@_base\__@), ranges::end(@_base\__@));
+  constexpr auto end() requires (!$simple-view$<V> && common_range<V>){
+    return $iterator$<false>($as-sentinel${}, ranges::begin($base_$), ranges::end($base_$));
   }
 
   constexpr auto end() const requires range<const V> {
-    return @_sentinel_@<true>(ranges::end(@_base\__@));
+    return $sentinel$<true>(ranges::end($base_$));
   }
 
   constexpr auto end() const requires common_range<const V> {
-    return @_iterator_@<true>(@_as-sentinel_@{}, ranges::begin(@_base\__@), ranges::end(@_base\__@));
+    return $iterator$<true>($as-sentinel${}, ranges::begin($base_$), ranges::end($base_$));
   }
 
   constexpr auto size() requires sized_range<V>;
@@ -2290,7 +2290,7 @@ public:
 constexpr explicit adjacent_view(V base);
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_base\__@` with `std::move(base)`.
+[#]{.pnum} _Effects_: Initializes `$base_$` with `std::move(base)`.
 
 ```cpp
 constexpr auto size() requires sized_range<V>;
@@ -2301,86 +2301,86 @@ constexpr auto size() const requires sized_range<const V>;
 
 ::: bq
 ```cpp
-auto sz = ranges::size(@_base\__@);
+auto sz = ranges::size($base_$);
 sz -= std::min<decltype(sz)>(sz, N-1);
 return sz;
 ```
 :::
 :::
 
-#### 24.7.?.3 Class template `adjacent_view::@_iterator_@` [range.adjacent.iterator] {-}
+#### 24.7.?.3 Class template `adjacent_view::$iterator$` [range.adjacent.iterator] {-}
 
 ```cpp
 namespace std::ranges {
   template<forward_range V, size_t N>
     requires view<V> && (N > 0)
   template<bool Const>
-  class adjacent_view<V, N>::@_iterator_@ {
-    using @_Base_@ = @_maybe-const_@<Const, V>;                                             // exposition only
-    array<iterator_t<@_Base_@>, N> @_current\__@ = array<iterator_t<@_Base_@>, N>();             // exposition only
-    constexpr @_iterator_@(iterator_t<@_Base_@> first, sentinel_t<@_Base_@> last);              // exposition only
-    constexpr @_iterator_@(@_as-sentinel_@, iterator_t<@_Base_@> first, iterator_t<@_Base_@> last); // exposition only
+  class adjacent_view<V, N>::$iterator$ {
+    using $Base$ = $maybe-const$<Const, V>;                                             // exposition only
+    array<iterator_t<$Base$>, N> $current_$ = array<iterator_t<$Base$>, N>();             // exposition only
+    constexpr $iterator$(iterator_t<$Base$> first, sentinel_t<$Base$> last);              // exposition only
+    constexpr $iterator$($as-sentinel$, iterator_t<$Base$> first, iterator_t<$Base$> last); // exposition only
   public:
     using iterator_category = input_iterator_tag;
-    using iterator_concept  = @_see below_@;
-    using value_type = @_tuple-or-pair_@<@_REPEAT_@(range_value_t<@_Base_@>, N)...>;
-    using difference_type = range_difference_t<@_Base_@>;
+    using iterator_concept  = $see below$;
+    using value_type = $tuple-or-pair$<$REPEAT$(range_value_t<$Base$>, N)...>;
+    using difference_type = range_difference_t<$Base$>;
 
-    @_iterator_@() = default;
-    constexpr @_iterator_@(@_iterator_@<!Const> i)
-      requires Const && convertible_to<iterator_t<V>, iterator_t<@_Base_@>>;
+    $iterator$() = default;
+    constexpr $iterator$($iterator$<!Const> i)
+      requires Const && convertible_to<iterator_t<V>, iterator_t<$Base$>>;
 
     constexpr auto operator*() const;
-    constexpr @_iterator_@& operator++();
-    constexpr @_iterator_@ operator++(int);
+    constexpr $iterator$& operator++();
+    constexpr $iterator$ operator++(int);
 
-    constexpr @_iterator_@& operator--() requires bidirectional_range<@_Base_@>;
-    constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
+    constexpr $iterator$& operator--() requires bidirectional_range<$Base$>;
+    constexpr $iterator$ operator--(int) requires bidirectional_range<$Base$>;
 
-    constexpr @_iterator_@& operator+=(difference_type x)
-      requires random_access_range<@_Base_@>;
-    constexpr @_iterator_@& operator-=(difference_type x)
-      requires random_access_range<@_Base_@>;
+    constexpr $iterator$& operator+=(difference_type x)
+      requires random_access_range<$Base$>;
+    constexpr $iterator$& operator-=(difference_type x)
+      requires random_access_range<$Base$>;
 
     constexpr auto operator[](difference_type n) const
-      requires random_access_range<@_Base_@>;
+      requires random_access_range<$Base$>;
 
-    friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y);
+    friend constexpr bool operator==(const $iterator$& x, const $iterator$& y);
 
-    friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@>;
-    friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@>;
-    friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@>;
-    friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@>;
-    friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@> &&
-               three_way_comparable<iterator_t<@_Base_@>>;
+    friend constexpr bool operator<(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
+    friend constexpr bool operator>(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
+    friend constexpr bool operator<=(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
+    friend constexpr bool operator>=(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
+    friend constexpr auto operator<=>(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$> &&
+               three_way_comparable<iterator_t<$Base$>>;
 
-    friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-      requires random_access_range<@_Base_@>;
-    friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-      requires random_access_range<@_Base_@>;
-    friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
-      requires random_access_range<@_Base_@>;
-    friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
-      requires sized_sentinel_for<iterator_t<@_Base_@>, iterator_t<@_Base_@>>;
+    friend constexpr $iterator$ operator+(const $iterator$& i, difference_type n)
+      requires random_access_range<$Base$>;
+    friend constexpr $iterator$ operator+(difference_type n, const $iterator$& i)
+      requires random_access_range<$Base$>;
+    friend constexpr $iterator$ operator-(const $iterator$& i, difference_type n)
+      requires random_access_range<$Base$>;
+    friend constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
+      requires sized_sentinel_for<iterator_t<$Base$>, iterator_t<$Base$>>;
 
-    friend constexpr auto iter_move(const @_iterator_@& i) noexcept(@_see below_@);
+    friend constexpr auto iter_move(const $iterator$& i) noexcept($see below$);
 
-    friend constexpr void iter_swap(const @_iterator_@& l, const @_iterator_@& r)
-      noexcept(@_see below_@)
-      requires indirectly_swappable<iterator_t<@_Base_@>>;
+    friend constexpr void iter_swap(const $iterator$& l, const $iterator$& r)
+      noexcept($see below$)
+      requires indirectly_swappable<iterator_t<$Base$>>;
   };
 }
 ```
 
-[#]{.pnum} `@_iterator_@::iterator_concept` is defined as follows:
+[#]{.pnum} `$iterator$::iterator_concept` is defined as follows:
 
-- [#.#]{.pnum} If `@_Base_@` models `random_access_range`, then `iterator_concept` denotes `random_access_iterator_tag`.
-- [#.#]{.pnum} Otherwise, if `@_Base_@` models `bidirectional_range`, then `iterator_concept` denotes `bidirectional_iterator_tag`.
+- [#.#]{.pnum} If `$Base$` models `random_access_range`, then `iterator_concept` denotes `random_access_iterator_tag`.
+- [#.#]{.pnum} Otherwise, if `$Base$` models `bidirectional_range`, then `iterator_concept` denotes `bidirectional_iterator_tag`.
 - [#.#]{.pnum} Otherwise, `iterator_concept` denotes `forward_iterator_tag`.
 
 [#]{.pnum} If the invocation of any non-const member function of _`iterator`_ exits via an exception,
@@ -2389,29 +2389,29 @@ the iterator acquires a singular value.
 ::: itemdecl
 
 ```cpp
-constexpr @_iterator_@(iterator_t<@_Base_@> first, sentinel_t<@_Base_@> last);
+constexpr $iterator$(iterator_t<$Base$> first, sentinel_t<$Base$> last);
 ```
 
 [#]{.pnum} _Postconditions_: `@_current\__[0]@ == first` is `true`, and
 for every integer 1 &le; _i_ &lt; `N`,
-`@_current\__@[@_i_@] == ranges::next(@_current\__@[@_i_@-1], 1, last)` is `true`.
+`$current_$[$i$] == ranges::next($current_$[$i$-1], 1, last)` is `true`.
 
 ```cpp
-constexpr @_iterator_@(@_as-sentinel_@, iterator_t<@_Base_@> first, iterator_t<@_Base_@> last);
+constexpr $iterator$($as-sentinel$, iterator_t<$Base$> first, iterator_t<$Base$> last);
 ```
 
-[#]{.pnum} _Postconditions_: If `@_Base_@` does not model `bidirectional_range`,
-each element of `@_current\__@` is equal to `last`.
+[#]{.pnum} _Postconditions_: If `$Base$` does not model `bidirectional_range`,
+each element of `$current_$` is equal to `last`.
 Otherwise, `@_current\__[N-1]@ == last` is `true`, and
 for every integer 0 &le; _i_ &lt; `(N - 1)`,
-`@_current\__@[@_i_@] == ranges::prev(@_current\__@[@_i_@+1], 1, first)` is `true`.
+`$current_$[$i$] == ranges::prev($current_$[$i$+1], 1, first)` is `true`.
 
 ```cpp
-constexpr @_iterator_@(@_iterator_@<!Const> i)
-  requires Const && (convertible_to<iterator_t<V>, iterator_t<@_Base_@>>;
+constexpr $iterator$($iterator$<!Const> i)
+  requires Const && (convertible_to<iterator_t<V>, iterator_t<$Base$>>;
 ```
 
-[#]{.pnum} _Effects_: Initializes each element of `@_current\__@` with the corresponding element of `i.@_current\__@` as an xvalue.
+[#]{.pnum} _Effects_: Initializes each element of `$current_$` with the corresponding element of `i.$current_$` as an xvalue.
 
 ```cpp
   constexpr auto operator*() const;
@@ -2421,25 +2421,25 @@ constexpr @_iterator_@(@_iterator_@<!Const> i)
 
 ::: bq
 ```cpp
-  return @_tuple-transform_@([](auto& i) -> decltype(auto) { return *i; }, @_current\__@);
+  return $tuple-transform$([](auto& i) -> decltype(auto) { return *i; }, $current_$);
 ```
 :::
 
 ```cpp
-constexpr @_iterator_@& operator++();
+constexpr $iterator$& operator++();
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  ranges::copy(@_current\__@ | views::drop(1), @_current\__@.begin());
-  ++@_current\__@.back();
+  ranges::copy($current_$ | views::drop(1), $current_$.begin());
+  ++$current_$.back();
   return *this;
 ```
 :::
 
 ```cpp
-constexpr @_iterator_@ operator++(int);
+constexpr $iterator$ operator++(int);
 ```
 
 [#]{.pnum} _Effects_: Equivalent to:
@@ -2454,21 +2454,21 @@ constexpr @_iterator_@ operator++(int);
 
 
 ```cpp
-constexpr @_iterator_@& operator--() requires bidirectional_range<@_Base_@>;
+constexpr $iterator$& operator--() requires bidirectional_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  ranges::copy_backward(@_current\__@ | views::take(N - 1), @_current\__@.end());
-  --@_current\__@.front();
+  ranges::copy_backward($current_$ | views::take(N - 1), $current_$.end());
+  --$current_$.front();
   return *this;
 ```
 :::
 
 
 ```cpp
-constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
+constexpr $iterator$ operator--(int) requires bidirectional_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
@@ -2481,89 +2481,89 @@ constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
 :::
 
 ```cpp
-constexpr @_iterator_@& operator+=(difference_type x)
-  requires random_access_range<@_Base_@>;
+constexpr $iterator$& operator+=(difference_type x)
+  requires random_access_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  for(auto& i : @_current\__@) { i += x; }
+  for(auto& i : $current_$) { i += x; }
   return *this;
 ```
 :::
 
 ```cpp
-  constexpr @_iterator_@& operator-=(difference_type x)
-    requires random_access_range<@_Base_@>;
+  constexpr $iterator$& operator-=(difference_type x)
+    requires random_access_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  for(auto& i : @_current\__@) { i -= x; }
+  for(auto& i : $current_$) { i -= x; }
   return *this;
 ```
 :::
 
 ```cpp
 constexpr auto operator[](difference_type n) const
-  requires random_access_range<@_Base_@>;
+  requires random_access_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  return @_tuple-transform_@([&](auto& i) -> decltype(auto) { return i[n]; }, @_current\__@);
+  return $tuple-transform$([&](auto& i) -> decltype(auto) { return i[n]; }, $current_$);
 ```
 :::
 
 ```cpp
-friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y);
+friend constexpr bool operator==(const $iterator$& x, const $iterator$& y);
 ```
-[#]{.pnum} _Returns:_ `x.@_current\__@.back() == y.@_current\__@.back()`.
+[#]{.pnum} _Returns:_ `x.$current_$.back() == y.$current_$.back()`.
 
 ```cpp
-friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@>;
+friend constexpr bool operator<(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
 ```
-[#]{.pnum} _Returns_: `x.@_current\__@.back() < y.@_current\__@.back()`
+[#]{.pnum} _Returns_: `x.$current_$.back() < y.$current_$.back()`
 
 ```cpp
-friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@>;
+friend constexpr bool operator>(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to: `return y < x; `
 
 ```cpp
-friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@>;
+friend constexpr bool operator<=(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
 ```
 
 [#]{.pnum} _Effects_: Equivalent to: `return !(y < x); `
 
 
 ```cpp
-friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@>;
+friend constexpr bool operator>=(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
 ```
 
 [#]{.pnum} _Effects_: Equivalent to: `return !(x < y); `
 
 ```cpp
-friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@> &&
-           three_way_comparable<iterator_t<@_Base_@>>;
+friend constexpr auto operator<=>(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$> &&
+           three_way_comparable<iterator_t<$Base$>>;
 ```
 
-[#]{.pnum} _Returns_: `x.@_current\__@.back() <=> y.@_current\__@.back()`
+[#]{.pnum} _Returns_: `x.$current_$.back() <=> y.$current_$.back()`
 
 
 ```cpp
-friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-  requires random_access_range<@_Base_@>;
-friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-  requires random_access_range<@_Base_@>;
+friend constexpr $iterator$ operator+(const $iterator$& i, difference_type n)
+  requires random_access_range<$Base$>;
+friend constexpr $iterator$ operator+(difference_type n, const $iterator$& i)
+  requires random_access_range<$Base$>;
 ```
 
 [#]{.pnum} _Effects_: Equivalent to:
@@ -2577,8 +2577,8 @@ friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i
 :::
 
 ```cpp
-friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
-  requires random_access_range<@_Base_@>;
+friend constexpr $iterator$ operator-(const $iterator$& i, difference_type n)
+  requires random_access_range<$Base$>;
 ```
 
 [#]{.pnum} _Effects_: Equivalent to:
@@ -2592,20 +2592,20 @@ friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n
 :::
 
 ```cpp
-friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
-  requires sized_sentinel_for<iterator_t<@_Base_@>, iterator_t<@_Base_@>>;
+friend constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
+  requires sized_sentinel_for<iterator_t<$Base$>, iterator_t<$Base$>>;
 ```
-[#]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@.back() - y.@_current\__@.back()`.
+[#]{.pnum} _Effects_: Equivalent to: `return x.$current_$.back() - y.$current_$.back()`.
 
 ```cpp
-friend constexpr auto iter_move(const @_iterator_@& i) noexcept(@_see below_@);
+friend constexpr auto iter_move(const $iterator$& i) noexcept($see below$);
 ```
 
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  return @_tuple-transform_@(ranges::iter_move, i.@_current\__@);
+  return $tuple-transform$(ranges::iter_move, i.$current_$);
 ```
 :::
 
@@ -2613,32 +2613,32 @@ friend constexpr auto iter_move(const @_iterator_@& i) noexcept(@_see below_@);
 
 ::: bq
 ```cpp
-  noexcept(ranges::iter_move(declval<iterator_t<@_Base_@> const&>())) &&
-  is_nothrow_move_constructible_v<range_rvalue_reference_t<@_Base_@>>
+  noexcept(ranges::iter_move(declval<iterator_t<$Base$> const&>())) &&
+  is_nothrow_move_constructible_v<range_rvalue_reference_t<$Base$>>
 ```
 :::
 
 ```cpp
-friend constexpr void iter_swap(const @_iterator_@& l, const @_iterator_@& r)
-  noexcept(@_see below_@)
-  requires indirectly_swappable<iterator_t<@_Base_@>>;
+friend constexpr void iter_swap(const $iterator$& l, const $iterator$& r)
+  noexcept($see below$)
+  requires indirectly_swappable<iterator_t<$Base$>>;
 ```
-[#]{.pnum} _Preconditions:_ None of the iterators in `l.@_current\__@` is equal to an iterator in `r.@_current\__@`.
+[#]{.pnum} _Preconditions:_ None of the iterators in `l.$current_$` is equal to an iterator in `r.$current_$`.
 
 [#]{.pnum} _Effects_: For every integer 0 &le; _i_ &lt; `N`,
-performs `ranges::iter_swap(l.@_current\__@[@_i_@], r.@_current\__@[@_i_@])`.
+performs `ranges::iter_swap(l.$current_$[$i$], r.$current_$[$i$])`.
 
 [#]{.pnum} _Remarks:_ The expression within `noexcept` is equivalent to:
 
 ::: bq
 ```cpp
-  noexcept(ranges::iter_swap(declval<iterator_t<@_Base_@>>(), declval<iterator_t<@_Base_@>>()))
+  noexcept(ranges::iter_swap(declval<iterator_t<$Base$>>(), declval<iterator_t<$Base$>>()))
 ```
 :::
 
 :::
 
-#### 24.7.?.4 Class template `adjacent_view::@_sentinel_@` [range.adjacent.sentinel] {-}
+#### 24.7.?.4 Class template `adjacent_view::$sentinel$` [range.adjacent.sentinel] {-}
 
 ```cpp
 namespace std::ranges {
@@ -2646,70 +2646,70 @@ namespace std::ranges {
   template<forward_range V, size_t N>
     requires view<V> && (N > 0)
   template<bool Const>
-  class adjacent_view<V, N>::@_sentinel_@ {
-    using @_Base_@ = @_maybe-const_@<Const, V>;                     // exposition only
-    sentinel_t<@_Base_@> @_end\__@ = sentinel_t<@_Base_@>();             // exposition only
-    constexpr explicit @_sentinel_@(sentinel_t<@_Base_@> end);      // exposition only
+  class adjacent_view<V, N>::$sentinel$ {
+    using $Base$ = $maybe-const$<Const, V>;                     // exposition only
+    sentinel_t<$Base$> $end_$ = sentinel_t<$Base$>();             // exposition only
+    constexpr explicit $sentinel$(sentinel_t<$Base$> end);      // exposition only
   public:
-    @_sentinel_@() = default;
-    constexpr @_sentinel_@(@_sentinel_@<!Const> i)
-      requires Const && convertible_to<sentinel_t<V>, sentinel_t<@_Base_@>>;
+    $sentinel$() = default;
+    constexpr $sentinel$($sentinel$<!Const> i)
+      requires Const && convertible_to<sentinel_t<V>, sentinel_t<$Base$>>;
 
     template<bool OtherConst>
-      requires sentinel_for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
-    friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
+      requires sentinel_for<sentinel_t<$Base$>, iterator_t<$maybe-const$<OtherConst, V>>>
+    friend constexpr bool operator==(const $iterator$<OtherConst>& x, const $sentinel$& y);
 
     template<bool OtherConst>
-      requires sized_sentinel_for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
-    friend constexpr range_difference_t<@_maybe-const_@<OtherConst, V>>
-      operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
+      requires sized_sentinel_for<sentinel_t<$Base$>, iterator_t<$maybe-const$<OtherConst, V>>>
+    friend constexpr range_difference_t<$maybe-const$<OtherConst, V>>
+      operator-(const $iterator$<OtherConst>& x, const $sentinel$& y);
 
     template<bool OtherConst>
-      requires sized_sentinel_for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
-    friend constexpr range_difference_t<@_maybe-const_@<OtherConst, V>>
-      operator-(const @_sentinel_@& y, const @_iterator_@<OtherConst>& x);
+      requires sized_sentinel_for<sentinel_t<$Base$>, iterator_t<$maybe-const$<OtherConst, V>>>
+    friend constexpr range_difference_t<$maybe-const$<OtherConst, V>>
+      operator-(const $sentinel$& y, const $iterator$<OtherConst>& x);
   };
 }
 ```
 ::: itemdecl
 
 ```cpp
-constexpr explicit @_sentinel_@(sentinel_t<@_Base_@> end);
+constexpr explicit $sentinel$(sentinel_t<$Base$> end);
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_end\__@` with `end`.
+[#]{.pnum} _Effects_: Initializes `$end_$` with `end`.
 
 ```cpp
-constexpr @_sentinel_@(@_sentinel_@<!Const> i)
-  requires Const && convertible_to<sentinel_t<V>, sentinel_t<@_Base_@>>;
+constexpr $sentinel$($sentinel$<!Const> i)
+  requires Const && convertible_to<sentinel_t<V>, sentinel_t<$Base$>>;
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_end\__@` with `std::move(i.@_end\__@)`.
-
-```cpp
-template<bool OtherConst>
-  requires sentinel_for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
-friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
-```
-
-[#]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@.back() == y.@_end\__@;`.
-
+[#]{.pnum} _Effects_: Initializes `$end_$` with `std::move(i.$end_$)`.
 
 ```cpp
 template<bool OtherConst>
-  requires sized_sentinel_for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
-friend constexpr range_difference_t<@_maybe-const_@<OtherConst, V>>
-  operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
+  requires sentinel_for<sentinel_t<$Base$>, iterator_t<$maybe-const$<OtherConst, V>>>
+friend constexpr bool operator==(const $iterator$<OtherConst>& x, const $sentinel$& y);
 ```
-[#]{.pnum} _Effects_: Equivalent to: `return x.@_current\__@.back() - y.@_end\__@;`.
+
+[#]{.pnum} _Effects_: Equivalent to: `return x.$current_$.back() == y.$end_$;`.
+
 
 ```cpp
 template<bool OtherConst>
-  requires sized_sentinel_for<sentinel_t<@_Base_@>, iterator_t<@_maybe-const_@<OtherConst, V>>>
-friend constexpr range_difference_t<@_maybe-const_@<OtherConst, V>>
-  operator-(const @_sentinel_@& y, const @_iterator_@<OtherConst>& x);
+  requires sized_sentinel_for<sentinel_t<$Base$>, iterator_t<$maybe-const$<OtherConst, V>>>
+friend constexpr range_difference_t<$maybe-const$<OtherConst, V>>
+  operator-(const $iterator$<OtherConst>& x, const $sentinel$& y);
 ```
-[#]{.pnum} _Effects_: Equivalent to: `return y.@_end\__@ - x.@_current\__@.back();`.
+[#]{.pnum} _Effects_: Equivalent to: `return x.$current_$.back() - y.$end_$;`.
+
+```cpp
+template<bool OtherConst>
+  requires sized_sentinel_for<sentinel_t<$Base$>, iterator_t<$maybe-const$<OtherConst, V>>>
+friend constexpr range_difference_t<$maybe-const$<OtherConst, V>>
+  operator-(const $sentinel$& y, const $iterator$<OtherConst>& x);
+```
+[#]{.pnum} _Effects_: Equivalent to: `return y.$end_$ - x.$current_$.back();`.
 
 :::
 
@@ -2752,20 +2752,20 @@ for (auto i : v | views::adjacent_transform<2>(std::multiplies())) {
 namespace std::ranges {
   template<forward_range V, copy_constructible F, size_t N>
    requires view<V> && (N > 0) && is_object_v<F> &&
-            regular_invocable<F&, @_REPEAT_@(range_reference_t<V>, N)...> &&
-            @_can-reference_@<invoke_result_t<F&, @_REPEAT_@(range_reference_t<V>, N)...>>
+            regular_invocable<F&, $REPEAT$(range_reference_t<V>, N)...> &&
+            $can-reference$<invoke_result_t<F&, $REPEAT$(range_reference_t<V>, N)...>>
   class adjacent_transform_view : public view_interface<adjacent_transform_view<V, F, N>> {
-  @_semiregular-box_@<F> @_fun\__@;                  // exposition only
-  adjacent_view<V, N> @_inner\__@;               // exposition only
+  $semiregular-box$<F> $fun_$;                  // exposition only
+  adjacent_view<V, N> $inner_$;               // exposition only
 
-  using @_InnerView_@ = adjacent_view<V, N>;    // exposition only
+  using $InnerView$ = adjacent_view<V, N>;    // exposition only
   template<bool Const>
-  using @_inner-iterator_@ = iterator_t<@_maybe-const_@<Const, @_InnerView_@>>;  // exposition only
+  using $inner-iterator$ = iterator_t<$maybe-const$<Const, $InnerView$>>;  // exposition only
   template<bool Const>
-  using @_inner-sentinel_@ = sentinel_t<@_maybe-const_@<Const, @_InnerView_@>>;  // exposition only
+  using $inner-sentinel$ = sentinel_t<$maybe-const$<Const, $InnerView$>>;  // exposition only
 
-  template<bool> class @_iterator_@;         // exposition only
-  template<bool> class @_sentinel_@;         // exposition only
+  template<bool> class $iterator$;         // exposition only
+  template<bool> class $sentinel$;         // exposition only
 
 public:
   constexpr adjacent_transform_view() = default;
@@ -2773,44 +2773,44 @@ public:
   constexpr explicit adjacent_transform_view(V base, F fun);
 
   constexpr auto begin() {
-    return @_iterator_@<false>(*this, @_inner\__@.begin());
+    return $iterator$<false>(*this, $inner_$.begin());
   }
 
   constexpr auto begin() const
-    requires range<const @_InnerView_@> &&
-             regular_invocable<const F&, @_REPEAT_@(range_reference_t<const V>, N)...>
+    requires range<const $InnerView$> &&
+             regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
   {
-    return @_iterator_@<true>(*this, @_inner\__@.begin());
+    return $iterator$<true>(*this, $inner_$.begin());
   }
 
   constexpr auto end() {
-    return @_sentinel_@<false>(@_inner\__@.end());
+    return $sentinel$<false>($inner_$.end());
   }
 
-  constexpr auto end() requires common_range<@_InnerView_@> {
-    return @_iterator_@<false>(*this, @_inner\__@.end());
-  }
-
-  constexpr auto end() const
-    requires range<const @_InnerView_@> &&
-             regular_invocable<const F&, @_REPEAT_@(range_reference_t<const V>, N)...>
-  {
-    return @_sentinel_@<true>(@_inner\__@.end());
+  constexpr auto end() requires common_range<$InnerView$> {
+    return $iterator$<false>(*this, $inner_$.end());
   }
 
   constexpr auto end() const
-    requires common_range<const @_InnerView_@> &&
-             regular_invocable<const F&, @_REPEAT_@(range_reference_t<const V>, N)...>
+    requires range<const $InnerView$> &&
+             regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
   {
-    return @_iterator_@<true>(*this, @_inner\__@.end());
+    return $sentinel$<true>($inner_$.end());
   }
 
-  constexpr auto size() requires sized_range<@_InnerView_@> {
-    return @_inner\__@.size();
+  constexpr auto end() const
+    requires common_range<const $InnerView$> &&
+             regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
+  {
+    return $iterator$<true>(*this, $inner_$.end());
   }
 
-  constexpr auto size() const requires sized_range<const @_InnerView_@> {
-    return @_inner\__@.size();
+  constexpr auto size() requires sized_range<$InnerView$> {
+    return $inner_$.size();
+  }
+
+  constexpr auto size() const requires sized_range<const $InnerView$> {
+    return $inner_$.size();
   }
 };
 
@@ -2823,81 +2823,81 @@ public:
 constexpr explicit adjacent_transform_view(V base, F fun);
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_fun\__@` with `std::move(fun)` and
-`@_inner\__@` with `std::move(base)`.
+[#]{.pnum} _Effects_: Initializes `$fun_$` with `std::move(fun)` and
+`$inner_$` with `std::move(base)`.
 
 :::
 
-#### 24.7.?.3 Class template `adjacent_transform_view::@_iterator_@` [range.adjacent.transform.iterator] {-}
+#### 24.7.?.3 Class template `adjacent_transform_view::$iterator$` [range.adjacent.transform.iterator] {-}
 
 ```cpp
 namespace std::ranges {
   template<forward_range V, copy_constructible F, size_t N>
     requires view<V> && (N > 0) && is_object_v<F> &&
-             regular_invocable<F&, @_REPEAT_@(range_reference_t<V>, N)...> &&
-             @_can-reference_@<invoke_result_t<F&, @_REPEAT_@(range_reference_t<V>, N)...>>
+             regular_invocable<F&, $REPEAT$(range_reference_t<V>, N)...> &&
+             $can-reference$<invoke_result_t<F&, $REPEAT$(range_reference_t<V>, N)...>>
   template<bool Const>
-  class adjacent_transform_view<F, V...>::@_iterator_@ {
-    using @_Parent_@ = @_maybe-const_@<Const, adjacent_transform_view>;      // exposition only
-    using @_Base_@ = @_maybe-const_@<Const, V>;                              // exposition only
-    @_Parent_@* @_parent\__@ = nullptr;                                       // exposition only
-    @_inner-iterator_@<Const> @_inner\__@ = @_inner-iterator_@<Const>();          // exposition only
+  class adjacent_transform_view<F, V...>::$iterator$ {
+    using $Parent$ = $maybe-const$<Const, adjacent_transform_view>;      // exposition only
+    using $Base$ = $maybe-const$<Const, V>;                              // exposition only
+    $Parent$* $parent_$ = nullptr;                                       // exposition only
+    $inner-iterator$<Const> $inner_$ = $inner-iterator$<Const>();          // exposition only
 
-    constexpr @_iterator_@(@_Parent_@& parent, @_inner-iterator_@<Const> inner); // exposition only
+    constexpr $iterator$($Parent$& parent, $inner-iterator$<Const> inner); // exposition only
 
   public:
-    using iterator_category = @_see below_@;
-    using iterator_concept  = typename @_inner-iterator_@<Const>::iterator_concept;
+    using iterator_category = $see below$;
+    using iterator_concept  = typename $inner-iterator$<Const>::iterator_concept;
     using value_type =
-      remove_cvref_t<invoke_result_t<@_maybe-const_@<Const, F>&, @_REPEAT_@(range_reference_t<@_Base_@>, N)...>>;
-    using difference_type = range_difference_t<@_Base_@>;
+      remove_cvref_t<invoke_result_t<$maybe-const$<Const, F>&, $REPEAT$(range_reference_t<$Base$>, N)...>>;
+    using difference_type = range_difference_t<$Base$>;
 
-    @_iterator_@() = default;
-    constexpr @_iterator_@(@_iterator_@<!Const> i)
-      requires Const && convertible_to<@_inner-iterator_@<false>, @_inner-iterator_@<Const>>;
+    $iterator$() = default;
+    constexpr $iterator$($iterator$<!Const> i)
+      requires Const && convertible_to<$inner-iterator$<false>, $inner-iterator$<Const>>;
 
-    constexpr decltype(auto) operator*() const noexcept(@_see below_@);
-    constexpr @_iterator_@& operator++();
-    constexpr @_iterator_@ operator++(int);
+    constexpr decltype(auto) operator*() const noexcept($see below$);
+    constexpr $iterator$& operator++();
+    constexpr $iterator$ operator++(int);
 
-    constexpr @_iterator_@& operator--() requires bidirectional_range<@_Base_@>;
-    constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
+    constexpr $iterator$& operator--() requires bidirectional_range<$Base$>;
+    constexpr $iterator$ operator--(int) requires bidirectional_range<$Base$>;
 
-    constexpr @_iterator_@& operator+=(difference_type x) requires random_access_range<@_Base_@>;
-    constexpr @_iterator_@& operator-=(difference_type x) requires random_access_range<@_Base_@>;
+    constexpr $iterator$& operator+=(difference_type x) requires random_access_range<$Base$>;
+    constexpr $iterator$& operator-=(difference_type x) requires random_access_range<$Base$>;
 
-    constexpr decltype(auto) operator[](difference_type n) const requires random_access_range<@_Base_@>;
+    constexpr decltype(auto) operator[](difference_type n) const requires random_access_range<$Base$>;
 
-    friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y);
+    friend constexpr bool operator==(const $iterator$& x, const $iterator$& y);
 
-    friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@>;
-    friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@>;
-    friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@>;
-    friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@>;
-    friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-      requires random_access_range<@_Base_@> && three_way_comparable<@_inner-iterator_@<Const>>;
+    friend constexpr bool operator<(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
+    friend constexpr bool operator>(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
+    friend constexpr bool operator<=(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
+    friend constexpr bool operator>=(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
+    friend constexpr auto operator<=>(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$> && three_way_comparable<$inner-iterator$<Const>>;
 
-    friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-      requires random_access_range<@_Base_@>;
-    friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-      requires random_access_range<@_Base_@>;
-    friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
-      requires random_access_range<@_Base_@>;
-    friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
-      requires sized_sentinel_for<@_inner-iterator_@<Const>, @_inner-iterator_@<Const>>;
+    friend constexpr $iterator$ operator+(const $iterator$& i, difference_type n)
+      requires random_access_range<$Base$>;
+    friend constexpr $iterator$ operator+(difference_type n, const $iterator$& i)
+      requires random_access_range<$Base$>;
+    friend constexpr $iterator$ operator-(const $iterator$& i, difference_type n)
+      requires random_access_range<$Base$>;
+    friend constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
+      requires sized_sentinel_for<$inner-iterator$<Const>, $inner-iterator$<Const>>;
   };
 }
 ```
 
-[#]{.pnum} The member _typedef-name_ `@_iterator_@::iterator_category` is defined as follows:
+[#]{.pnum} The member _typedef-name_ `$iterator$::iterator_category` is defined as follows:
 
-- If `invoke_result_t<@_maybe-const_@<Const, F>&, @_REPEAT_@(range_reference_t<@_Base_@>, N)...>` is not an lvalue reference,
+- If `invoke_result_t<$maybe-const$<Const, F>&, $REPEAT$(range_reference_t<$Base$>, N)...>` is not an lvalue reference,
   `iterator_category` denotes `input_iterator_tag`.
-- Otherwise, let `C` denote the type `iterator_traits<iterator_t<@_Base_@>>::iterator_category`.
+- Otherwise, let `C` denote the type `iterator_traits<iterator_t<$Base$>>::iterator_category`.
   - If `derived_from<C, random_access_iterator_tag>` is `true`, `iterator_category` denotes `random_access_iterator_tag`;
   - Otherwise, if `derived_from<C, bidirectional_iterator_tag>` is `true`, `iterator_category` denotes `bidirectional_iterator_tag`;
   - Otherwise, if `derived_from<C, forward_iterator_tag>` is `true`, `iterator_category` denotes `forward_iterator_tag`;
@@ -2907,20 +2907,20 @@ namespace std::ranges {
 ::: itemdecl
 
 ```cpp
-constexpr @_iterator_@(@_Parent_@& parent, @_inner-iterator_@<Const> inner);
+constexpr $iterator$($Parent$& parent, $inner-iterator$<Const> inner);
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_parent\__@` with `addressof(parent)` and `@_inner\__@` with `std::move(inner)`.
+[#]{.pnum} _Effects_: Initializes `$parent_$` with `addressof(parent)` and `$inner_$` with `std::move(inner)`.
 
 ```cpp
-constexpr @_iterator_@(@_iterator_@<!Const> i)
-  requires Const && convertible_to<@_inner-iterator_@<false>, @_inner-iterator_@<Const>>;
+constexpr $iterator$($iterator$<!Const> i)
+  requires Const && convertible_to<$inner-iterator$<false>, $inner-iterator$<Const>>;
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_parent\__@` with `i.@_parent\__@` and `@_inner\__@` with `std::move(i.@_inner\__@)`.
+[#]{.pnum} _Effects_: Initializes `$parent_$` with `i.$parent_$` and `$inner_$` with `std::move(i.$inner_$)`.
 
 ```cpp
-constexpr decltype(auto) operator*() const noexcept(@_see below_@);
+constexpr decltype(auto) operator*() const noexcept($see below$);
 ```
 
 [#]{.pnum} _Effects_: Equivalent to:
@@ -2928,30 +2928,30 @@ constexpr decltype(auto) operator*() const noexcept(@_see below_@);
 ::: bq
 ```cpp
   return apply([&](const auto&... iters) -> decltype(auto) {
-    return invoke(*@_parent\__@->@_fun\__@, *iters...);
-  }, @_inner\__@.@_current\__@);
+    return invoke(*$parent_$->$fun_$, *iters...);
+  }, $inner_$.$current_$);
 ```
 :::
 
 [#]{.pnum} _Remarks:_
 Let `Is` be the pack `0, 1, ..., (N-1)`.
 The expression within `noexcept` is equivalent to
-`noexcept(invoke(*@_parent\__@->@_fun\__@, *std::get<Is>(@_inner\__@.@_current\__@)...))`.
+`noexcept(invoke(*$parent_$->$fun_$, *std::get<Is>($inner_$.$current_$)...))`.
 
 ```cpp
-constexpr @_iterator_@& operator++();
+constexpr $iterator$& operator++();
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  ++@_inner\__@;
+  ++$inner_$;
   return *this;
 ```
 :::
 
 ```cpp
-constexpr @_iterator_@ operator++(int);
+constexpr $iterator$ operator++(int);
 ```
 
 [#]{.pnum} _Effects_: Equivalent to:
@@ -2966,20 +2966,20 @@ constexpr @_iterator_@ operator++(int);
 
 
 ```cpp
-constexpr @_iterator_@& operator--() requires bidirectional_range<@_Base_@>;
+constexpr $iterator$& operator--() requires bidirectional_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  --@_inner\__@;
+  --$inner_$;
   return *this;
 ```
 :::
 
 
 ```cpp
-constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
+constexpr $iterator$ operator--(int) requires bidirectional_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
@@ -2992,157 +2992,157 @@ constexpr @_iterator_@ operator--(int) requires bidirectional_range<@_Base_@>;
 :::
 
 ```cpp
-constexpr @_iterator_@& operator+=(difference_type x)
-  requires random_access_range<@_Base_@>;
+constexpr $iterator$& operator+=(difference_type x)
+  requires random_access_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  @_inner\__@ += x;
+  $inner_$ += x;
   return *this;
 ```
 :::
 
 ```cpp
-constexpr @_iterator_@& operator-=(difference_type x)
-  requires random_access_range<@_Base_@>;
+constexpr $iterator$& operator-=(difference_type x)
+  requires random_access_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
-  @_inner\__@ -= x;
+  $inner_$ -= x;
   return *this;
 ```
 :::
 
 ```cpp
 constexpr decltype(auto) operator[](difference_type n) const
-  requires random_access_range<@_Base_@>;
+  requires random_access_range<$Base$>;
 ```
 [#]{.pnum} _Effects_: Equivalent to:
 
 ::: bq
 ```cpp
   return apply([&](const auto&... iters) -> decltype(auto) {
-    return invoke(*@_parent\__@->@_fun\__@, iters[n]...);
-  }, @_inner\__@.@_current\__@);
+    return invoke(*$parent_$->$fun_$, iters[n]...);
+  }, $inner_$.$current_$);
 ```
 :::
 
 ```cpp
-friend constexpr bool operator==(const @_iterator_@& x, const @_iterator_@& y);
-friend constexpr bool operator<(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@>;
-friend constexpr bool operator>(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@>;
-friend constexpr bool operator<=(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@>;
-friend constexpr bool operator>=(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@>;
-friend constexpr auto operator<=>(const @_iterator_@& x, const @_iterator_@& y)
-  requires random_access_range<@_Base_@> && three_way_comparable<@_inner-iterator_@<Const>>;
+friend constexpr bool operator==(const $iterator$& x, const $iterator$& y);
+friend constexpr bool operator<(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
+friend constexpr bool operator>(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
+friend constexpr bool operator<=(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
+friend constexpr bool operator>=(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
+friend constexpr auto operator<=>(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$> && three_way_comparable<$inner-iterator$<Const>>;
 ```
 [#]{.pnum} Let _`op`_ be the operator.
 
-[#]{.pnum} _Effects_: Equivalent to: `return x.@_inner\__@ @_op_@ y.@_inner\__@; `
+[#]{.pnum} _Effects_: Equivalent to: `return x.$inner_$ $op$ y.$inner_$; `
 
 
 ```cpp
-friend constexpr @_iterator_@ operator+(const @_iterator_@& i, difference_type n)
-  requires random_access_range<@_Base_@>;
-friend constexpr @_iterator_@ operator+(difference_type n, const @_iterator_@& i)
-  requires random_access_range<@_Base_@>;
+friend constexpr $iterator$ operator+(const $iterator$& i, difference_type n)
+  requires random_access_range<$Base$>;
+friend constexpr $iterator$ operator+(difference_type n, const $iterator$& i)
+  requires random_access_range<$Base$>;
 ```
 
-[#]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*i.@_parent\__@, i.@_inner\__@ + n);`
+[#]{.pnum} _Effects_: Equivalent to: `return $iterator$(*i.$parent_$, i.$inner_$ + n);`
 
 ```cpp
-friend constexpr @_iterator_@ operator-(const @_iterator_@& i, difference_type n)
-  requires random_access_range<@_Base_@>;
+friend constexpr $iterator$ operator-(const $iterator$& i, difference_type n)
+  requires random_access_range<$Base$>;
 ```
 
-[#]{.pnum} _Effects_: Equivalent to: `return @_iterator_@(*i.@_parent\__@, i.@_inner\__@ - n);`
+[#]{.pnum} _Effects_: Equivalent to: `return $iterator$(*i.$parent_$, i.$inner_$ - n);`
 
 ```cpp
-friend constexpr difference_type operator-(const @_iterator_@& x, const @_iterator_@& y)
-  requires sized_sentinel_for<@_inner-iterator_@<Const>, @_inner-iterator_@<Const>>;
+friend constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
+  requires sized_sentinel_for<$inner-iterator$<Const>, $inner-iterator$<Const>>;
 ```
 
-[#]{.pnum} _Effects_: Equivalent to: `return x.@_inner\__@ - y.@_inner\__@;`
+[#]{.pnum} _Effects_: Equivalent to: `return x.$inner_$ - y.$inner_$;`
 
 :::
 
-#### 24.7.?.4 Class template `adjacent_transform_view::@_sentinel_@` [range.adjacent.transform.sentinel] {-}
+#### 24.7.?.4 Class template `adjacent_transform_view::$sentinel$` [range.adjacent.transform.sentinel] {-}
 
 ```cpp
 namespace std::ranges {
   template<forward_range V, copy_constructible F, size_t N>
     requires view<V> && (N > 0) && is_object_v<F> &&
-             regular_invocable<F&, @_REPEAT_@(range_reference_t<V>, N)...> &&
-             @_can-reference_@<invoke_result_t<F&, @_REPEAT_@(range_reference_t<V>, N)...>>
+             regular_invocable<F&, $REPEAT$(range_reference_t<V>, N)...> &&
+             $can-reference$<invoke_result_t<F&, $REPEAT$(range_reference_t<V>, N)...>>
   template<bool Const>
-  class adjacent_transform_view<V, F, N>::@_sentinel_@ {
-    @_inner-sentinel_@<Const> @_inner\__@;                              // exposition only
-    constexpr explicit @_sentinel_@(@_inner-sentinel_@<Const> inner);  // exposition only
+  class adjacent_transform_view<V, F, N>::$sentinel$ {
+    $inner-sentinel$<Const> $inner_$;                              // exposition only
+    constexpr explicit $sentinel$($inner-sentinel$<Const> inner);  // exposition only
   public:
-    @_sentinel_@() = default;
-    constexpr @_sentinel_@(@_sentinel_@<!Const> i)
-      requires Const && convertible_to<@_inner-sentinel_@<false>, @_inner-sentinel_@<Const>>;
+    $sentinel$() = default;
+    constexpr $sentinel$($sentinel$<!Const> i)
+      requires Const && convertible_to<$inner-sentinel$<false>, $inner-sentinel$<Const>>;
 
     template<bool OtherConst>
-      requires sentinel_for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
-    friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
+      requires sentinel_for<$inner-sentinel$<Const>, $inner-iterator$<OtherConst>>
+    friend constexpr bool operator==(const $iterator$<OtherConst>& x, const $sentinel$& y);
 
     template<bool OtherConst>
-      requires sized_sentinel_for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
-    friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
-      operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
+      requires sized_sentinel_for<$inner-sentinel$<Const>, $inner-iterator$<OtherConst>>
+    friend constexpr range_difference_t<$maybe-const$<OtherConst, $InnerView$>>
+      operator-(const $iterator$<OtherConst>& x, const $sentinel$& y);
 
     template<bool OtherConst>
-      requires sized_sentinel_for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
-    friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
-      operator-(const @_sentinel_@& x, const @_iterator_@<OtherConst>& y);
+      requires sized_sentinel_for<$inner-sentinel$<Const>, $inner-iterator$<OtherConst>>
+    friend constexpr range_difference_t<$maybe-const$<OtherConst, $InnerView$>>
+      operator-(const $sentinel$& x, const $iterator$<OtherConst>& y);
   };
 }
 ```
 ::: itemdecl
 
 ```cpp
-constexpr explicit @_sentinel_@(@_inner-sentinel_@<Const> inner);
+constexpr explicit $sentinel$($inner-sentinel$<Const> inner);
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_inner\__@` with `inner`.
+[#]{.pnum} _Effects_: Initializes `$inner_$` with `inner`.
 
 ```cpp
-constexpr @_sentinel_@(@_sentinel_@<!Const> i)
-  requires Const && convertible_to<@_inner-sentinel_@<false>, @_inner-sentinel_@<Const>>;
+constexpr $sentinel$($sentinel$<!Const> i)
+  requires Const && convertible_to<$inner-sentinel$<false>, $inner-sentinel$<Const>>;
 ```
 
-[#]{.pnum} _Effects_: Initializes `@_inner\__@` with `std::move(i.@_inner\__@)`.
-
-```cpp
-template<bool OtherConst>
-  requires sentinel_for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
-friend constexpr bool operator==(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
-```
-
-[#]{.pnum} _Effects_: Equivalent to `return x.@_inner\__@ == y.@_inner\__@;`
-
+[#]{.pnum} _Effects_: Initializes `$inner_$` with `std::move(i.$inner_$)`.
 
 ```cpp
 template<bool OtherConst>
-  requires sized_sentinel_for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
-friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
-  operator-(const @_iterator_@<OtherConst>& x, const @_sentinel_@& y);
+  requires sentinel_for<$inner-sentinel$<Const>, $inner-iterator$<OtherConst>>
+friend constexpr bool operator==(const $iterator$<OtherConst>& x, const $sentinel$& y);
+```
+
+[#]{.pnum} _Effects_: Equivalent to `return x.$inner_$ == y.$inner_$;`
+
+
+```cpp
+template<bool OtherConst>
+  requires sized_sentinel_for<$inner-sentinel$<Const>, $inner-iterator$<OtherConst>>
+friend constexpr range_difference_t<$maybe-const$<OtherConst, $InnerView$>>
+  operator-(const $iterator$<OtherConst>& x, const $sentinel$& y);
 
 template<bool OtherConst>
-  requires sized_sentinel_for<@_inner-sentinel_@<Const>, @_inner-iterator_@<OtherConst>>
-friend constexpr range_difference_t<@_maybe-const_@<OtherConst, @_InnerView_@>>
-  operator-(const @_sentinel_@& x, const @_iterator_@<OtherConst>& y);
+  requires sized_sentinel_for<$inner-sentinel$<Const>, $inner-iterator$<OtherConst>>
+friend constexpr range_difference_t<$maybe-const$<OtherConst, $InnerView$>>
+  operator-(const $sentinel$& x, const $iterator$<OtherConst>& y);
 ```
-[#]{.pnum} _Effects_: Equivalent to `return x.@_inner\__@ - y.@_inner\__@;`
+[#]{.pnum} _Effects_: Equivalent to `return x.$inner_$ - y.$inner_$;`
 
 :::
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2021-05-28" />
+  <meta name="dcterms.date" content="2021-05-30" />
   <title>zip</title>
   <style>
       code{white-space: pre-wrap;}
@@ -533,7 +533,7 @@ blockquote { background-color: #f6f8fa; }
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2021-05-28</td>
+    <td>2021-05-30</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -598,8 +598,8 @@ blockquote { background-color: #f6f8fa; }
 <ul>
 <li><a href="#overview-range.zip.overview">24.7.?.1 Overview [range.zip.overview]<span></span></a></li>
 <li><a href="#class-template-zip_view-range.zip.view">24.7.?.2 Class template <code class="sourceCode cpp">zip_view</code> [range.zip.view]<span></span></a></li>
-<li><a href="#class-template-zip_view_iterator_-range.zip.iterator">24.7.?.3 Class template <code class="sourceCode cpp">zip_view<span class="op">::</span><em>iterator</em></code> [range.zip.iterator]<span></span></a></li>
-<li><a href="#class-template-zip_view_sentinel_-range.zip.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">zip_view<span class="op">::</span><em>sentinel</em></code> [range.zip.sentinel]<span></span></a></li>
+<li><a href="#class-template-zip_viewiterator-range.zip.iterator">24.7.?.3 Class template <code class="sourceCode cpp">zip_view<span class="op">::</span><em>iterator</em></code> [range.zip.iterator]<span></span></a></li>
+<li><a href="#class-template-zip_viewsentinel-range.zip.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">zip_view<span class="op">::</span><em>sentinel</em></code> [range.zip.sentinel]<span></span></a></li>
 </ul></li>
 </ul></li>
 <li><a href="#zip_transform"><span class="toc-section-number">5.7</span> <code class="sourceCode cpp">zip_transform</code><span></span></a>
@@ -608,8 +608,8 @@ blockquote { background-color: #f6f8fa; }
 <ul>
 <li><a href="#overview-range.zip.transform.overview">24.7.?.1 Overview [range.zip.transform.overview]<span></span></a></li>
 <li><a href="#class-template-zip_transform_view-range.zip.transform.view">24.7.?.2 Class template <code class="sourceCode cpp">zip_transform_view</code> [range.zip.transform.view]<span></span></a></li>
-<li><a href="#class-template-zip_transform_view_iterator_-range.zip.transform.iterator">24.7.?.3 Class template <code class="sourceCode cpp">zip_transform_view<span class="op">::</span><em>iterator</em></code> [range.zip.transform.iterator]<span></span></a></li>
-<li><a href="#class-template-zip_transform_view_sentinel_-range.zip.transform.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">zip_transform_view<span class="op">::</span><em>sentinel</em></code> [range.zip.transform.sentinel]<span></span></a></li>
+<li><a href="#class-template-zip_transform_viewiterator-range.zip.transform.iterator">24.7.?.3 Class template <code class="sourceCode cpp">zip_transform_view<span class="op">::</span><em>iterator</em></code> [range.zip.transform.iterator]<span></span></a></li>
+<li><a href="#class-template-zip_transform_viewsentinel-range.zip.transform.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">zip_transform_view<span class="op">::</span><em>sentinel</em></code> [range.zip.transform.sentinel]<span></span></a></li>
 </ul></li>
 </ul></li>
 <li><a href="#adjacent"><span class="toc-section-number">5.8</span> <code class="sourceCode cpp">adjacent</code><span></span></a>
@@ -618,8 +618,8 @@ blockquote { background-color: #f6f8fa; }
 <ul>
 <li><a href="#overview-range.adjacent.overview">24.7.?.1 Overview [range.adjacent.overview]<span></span></a></li>
 <li><a href="#class-template-adjacent_view-range.adjacent.view">24.7.?.2 Class template <code class="sourceCode cpp">adjacent_view</code> [range.adjacent.view]<span></span></a></li>
-<li><a href="#class-template-adjacent_view_iterator_-range.adjacent.iterator">24.7.?.3 Class template <code class="sourceCode cpp">adjacent_view<span class="op">::</span><em>iterator</em></code> [range.adjacent.iterator]<span></span></a></li>
-<li><a href="#class-template-adjacent_view_sentinel_-range.adjacent.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">adjacent_view<span class="op">::</span><em>sentinel</em></code> [range.adjacent.sentinel]<span></span></a></li>
+<li><a href="#class-template-adjacent_viewiterator-range.adjacent.iterator">24.7.?.3 Class template <code class="sourceCode cpp">adjacent_view<span class="op">::</span><em>iterator</em></code> [range.adjacent.iterator]<span></span></a></li>
+<li><a href="#class-template-adjacent_viewsentinel-range.adjacent.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">adjacent_view<span class="op">::</span><em>sentinel</em></code> [range.adjacent.sentinel]<span></span></a></li>
 </ul></li>
 </ul></li>
 <li><a href="#adjacent_transform"><span class="toc-section-number">5.9</span> <code class="sourceCode cpp">adjacent_transform</code><span></span></a>
@@ -628,8 +628,8 @@ blockquote { background-color: #f6f8fa; }
 <ul>
 <li><a href="#overview-range.adjacent.transform.overview">24.7.?.1 Overview [range.adjacent.transform.overview]<span></span></a></li>
 <li><a href="#class-template-adjacent_transform_view-range.adjacent.transform.view">24.7.?.2 Class template <code class="sourceCode cpp">adjacent_transform_view</code> [range.adjacent.transform.view]<span></span></a></li>
-<li><a href="#class-template-adjacent_transform_view_iterator_-range.adjacent.transform.iterator">24.7.?.3 Class template <code class="sourceCode cpp">adjacent_transform_view<span class="op">::</span><em>iterator</em></code> [range.adjacent.transform.iterator]<span></span></a></li>
-<li><a href="#class-template-adjacent_transform_view_sentinel_-range.adjacent.transform.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">adjacent_transform_view<span class="op">::</span><em>sentinel</em></code> [range.adjacent.transform.sentinel]<span></span></a></li>
+<li><a href="#class-template-adjacent_transform_viewiterator-range.adjacent.transform.iterator">24.7.?.3 Class template <code class="sourceCode cpp">adjacent_transform_view<span class="op">::</span><em>iterator</em></code> [range.adjacent.transform.iterator]<span></span></a></li>
+<li><a href="#class-template-adjacent_transform_viewsentinel-range.adjacent.transform.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">adjacent_transform_view<span class="op">::</span><em>sentinel</em></code> [range.adjacent.transform.sentinel]<span></span></a></li>
 </ul></li>
 </ul></li>
 <li><a href="#feature-test-macro"><span class="toc-section-number">5.10</span> Feature-test macro<span></span></a></li>
@@ -1659,7 +1659,7 @@ blockquote { background-color: #f6f8fa; }
 </blockquote>
 </blockquote>
 </div>
-<h4 class="unnumbered" data-number id="class-template-zip_view_iterator_-range.zip.iterator">24.7.?.3 Class template <code class="sourceCode cpp">zip_view<span class="op">::</span><em>iterator</em></code> [range.zip.iterator]<a href="#class-template-zip_view_iterator_-range.zip.iterator" class="self-link"></a></h4>
+<h4 class="unnumbered" data-number id="class-template-zip_viewiterator-range.zip.iterator">24.7.?.3 Class template <code class="sourceCode cpp">zip_view<span class="op">::</span><em>iterator</em></code> [range.zip.iterator]<a href="#class-template-zip_viewiterator-range.zip.iterator" class="self-link"></a></h4>
 <div class="sourceCode" id="cb43"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb43-1"><a href="#cb43-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
 <span id="cb43-2"><a href="#cb43-2"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const, <span class="kw">class</span><span class="op">...</span> Views<span class="op">&gt;</span></span>
 <span id="cb43-3"><a href="#cb43-3"></a>    <span class="kw">concept</span> <em>all-random-access</em> <span class="op">=</span> <span class="op">(</span>random_access_range<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, Views<span class="op">&gt;&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">...)</span>;    <span class="co">// exposition only</span></span>
@@ -1913,7 +1913,7 @@ blockquote { background-color: #f6f8fa; }
 <p>for every integer 0 ≤ <em>i</em> &lt; <code class="sourceCode cpp"><span class="kw">sizeof</span><span class="op">...(</span>Views<span class="op">)</span></code>.</p>
 </blockquote>
 </div>
-<h4 class="unnumbered" data-number id="class-template-zip_view_sentinel_-range.zip.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">zip_view<span class="op">::</span><em>sentinel</em></code> [range.zip.sentinel]<a href="#class-template-zip_view_sentinel_-range.zip.sentinel" class="self-link"></a></h4>
+<h4 class="unnumbered" data-number id="class-template-zip_viewsentinel-range.zip.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">zip_view<span class="op">::</span><em>sentinel</em></code> [range.zip.sentinel]<a href="#class-template-zip_viewsentinel-range.zip.sentinel" class="self-link"></a></h4>
 <div class="sourceCode" id="cb79"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb79-1"><a href="#cb79-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
 <span id="cb79-2"><a href="#cb79-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>input_range<span class="op">...</span> Views<span class="op">&gt;</span></span>
 <span id="cb79-3"><a href="#cb79-3"></a>    <span class="kw">requires</span> <span class="op">(</span>view<span class="op">&lt;</span>Views<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">...)</span> <span class="op">&amp;&amp;</span> <span class="op">(</span><span class="kw">sizeof</span><span class="op">...(</span>Views<span class="op">)</span> <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span></span>
@@ -1963,7 +1963,7 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb83-4"><a href="#cb83-4"></a>  <span class="kw">operator</span><span class="op">-(</span><span class="kw">const</span> <em>iterator</em><span class="op">&lt;</span>OtherConst<span class="op">&gt;&amp;</span> x, <span class="kw">const</span> <em>sentinel</em><span class="op">&amp;</span> y<span class="op">)</span>;</span></code></pre></div>
 <blockquote>
 <p><span class="marginalizedparent"><a class="marginalized">4</a></span> Let <code class="sourceCode cpp">D</code> be the return type. Let <em>DIST(i)</em> be <code class="sourceCode cpp">D<span class="op">(</span>std<span class="op">::</span>get<span class="op">&lt;</span><em>i</em><span class="op">&gt;(</span>x<span class="op">.</span><em>current_</em><span class="op">)</span> <span class="op">-</span> std<span class="op">::</span>get<span class="op">&lt;</span><em>i</em><span class="op">&gt;(</span>y<span class="op">.</span><em>end_</em><span class="op">))</span></code>.</p>
-<p><span class="marginalizedparent"><a class="marginalized">5</a></span> <em>Returns:</em> The value with the smallest absolute value among <em>DIST(n)</em> for all integers 0 ≤ <em>n</em> &lt; <code class="sourceCode cpp"><span class="kw">sizeof</span><span class="op">...(</span>Views<span class="op">)</span></code>,</p>
+<p><span class="marginalizedparent"><a class="marginalized">5</a></span> <em>Returns:</em> The value with the smallest absolute value among <em>DIST(n)</em> for all integers 0 ≤ <em>n</em> &lt; <code class="sourceCode cpp"><span class="kw">sizeof</span><span class="op">...(</span>Views<span class="op">)</span></code>.</p>
 </blockquote>
 <div class="sourceCode" id="cb84"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb84-1"><a href="#cb84-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> OtherConst<span class="op">&gt;</span></span>
 <span id="cb84-2"><a href="#cb84-2"></a>  <span class="kw">requires</span> <span class="op">(</span>sized_sentinel_for<span class="op">&lt;</span>sentinel_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>Const, Views<span class="op">&gt;&gt;</span>, iterator_t<span class="op">&lt;</span><em>maybe-const</em><span class="op">&lt;</span>OtherConst, Views<span class="op">&gt;&gt;&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">...)</span></span>
@@ -2074,7 +2074,7 @@ blockquote { background-color: #f6f8fa; }
 <p><span class="marginalizedparent"><a class="marginalized">1</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp"><em>fun_</em></code> with <code class="sourceCode cpp">std<span class="op">::</span>move<span class="op">(</span>fun<span class="op">)</span></code> and <code class="sourceCode cpp"><em>zip_</em></code> with <code class="sourceCode cpp">std<span class="op">::</span>move<span class="op">(</span>views<span class="op">)...</span></code>.</p>
 </blockquote>
 </div>
-<h4 class="unnumbered" data-number id="class-template-zip_transform_view_iterator_-range.zip.transform.iterator">24.7.?.3 Class template <code class="sourceCode cpp">zip_transform_view<span class="op">::</span><em>iterator</em></code> [range.zip.transform.iterator]<a href="#class-template-zip_transform_view_iterator_-range.zip.transform.iterator" class="self-link"></a></h4>
+<h4 class="unnumbered" data-number id="class-template-zip_transform_viewiterator-range.zip.transform.iterator">24.7.?.3 Class template <code class="sourceCode cpp">zip_transform_view<span class="op">::</span><em>iterator</em></code> [range.zip.transform.iterator]<a href="#class-template-zip_transform_viewiterator-range.zip.transform.iterator" class="self-link"></a></h4>
 <div class="sourceCode" id="cb88"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb88-1"><a href="#cb88-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
 <span id="cb88-2"><a href="#cb88-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>copy_constructible F, input_range<span class="op">...</span> Views<span class="op">&gt;</span></span>
 <span id="cb88-3"><a href="#cb88-3"></a>    <span class="kw">requires</span> <span class="op">(</span>view<span class="op">&lt;</span>Views<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">...)</span> <span class="op">&amp;&amp;</span> <span class="op">(</span><span class="kw">sizeof</span><span class="op">...(</span>Views<span class="op">)</span> <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">&amp;&amp;</span> is_object_v<span class="op">&lt;</span>F<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
@@ -2268,7 +2268,7 @@ blockquote { background-color: #f6f8fa; }
 <p><span class="marginalizedparent"><a class="marginalized">18</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>inner_</em> <span class="op">-</span> y<span class="op">.</span><em>inner_</em>;</code></p>
 </blockquote>
 </div>
-<h4 class="unnumbered" data-number id="class-template-zip_transform_view_sentinel_-range.zip.transform.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">zip_transform_view<span class="op">::</span><em>sentinel</em></code> [range.zip.transform.sentinel]<a href="#class-template-zip_transform_view_sentinel_-range.zip.transform.sentinel" class="self-link"></a></h4>
+<h4 class="unnumbered" data-number id="class-template-zip_transform_viewsentinel-range.zip.transform.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">zip_transform_view<span class="op">::</span><em>sentinel</em></code> [range.zip.transform.sentinel]<a href="#class-template-zip_transform_viewsentinel-range.zip.transform.sentinel" class="self-link"></a></h4>
 <div class="sourceCode" id="cb112"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb112-1"><a href="#cb112-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
 <span id="cb112-2"><a href="#cb112-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>copy_constructible F, input_range<span class="op">...</span> Views<span class="op">&gt;</span></span>
 <span id="cb112-3"><a href="#cb112-3"></a>    <span class="kw">requires</span> <span class="op">(</span>view<span class="op">&lt;</span>Views<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">...)</span> <span class="op">&amp;&amp;</span> <span class="op">(</span><span class="kw">sizeof</span><span class="op">...(</span>Views<span class="op">)</span> <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">&amp;&amp;</span> is_object_v<span class="op">&lt;</span>F<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
@@ -2409,7 +2409,7 @@ blockquote { background-color: #f6f8fa; }
 </blockquote>
 </blockquote>
 </div>
-<h4 class="unnumbered" data-number id="class-template-adjacent_view_iterator_-range.adjacent.iterator">24.7.?.3 Class template <code class="sourceCode cpp">adjacent_view<span class="op">::</span><em>iterator</em></code> [range.adjacent.iterator]<a href="#class-template-adjacent_view_iterator_-range.adjacent.iterator" class="self-link"></a></h4>
+<h4 class="unnumbered" data-number id="class-template-adjacent_viewiterator-range.adjacent.iterator">24.7.?.3 Class template <code class="sourceCode cpp">adjacent_view<span class="op">::</span><em>iterator</em></code> [range.adjacent.iterator]<a href="#class-template-adjacent_viewiterator-range.adjacent.iterator" class="self-link"></a></h4>
 <div class="sourceCode" id="cb122"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb122-1"><a href="#cb122-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
 <span id="cb122-2"><a href="#cb122-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>forward_range V, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
 <span id="cb122-3"><a href="#cb122-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>N <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span></span>
@@ -2645,7 +2645,7 @@ blockquote { background-color: #f6f8fa; }
 </blockquote>
 </blockquote>
 </div>
-<h4 class="unnumbered" data-number id="class-template-adjacent_view_sentinel_-range.adjacent.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">adjacent_view<span class="op">::</span><em>sentinel</em></code> [range.adjacent.sentinel]<a href="#class-template-adjacent_view_sentinel_-range.adjacent.sentinel" class="self-link"></a></h4>
+<h4 class="unnumbered" data-number id="class-template-adjacent_viewsentinel-range.adjacent.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">adjacent_view<span class="op">::</span><em>sentinel</em></code> [range.adjacent.sentinel]<a href="#class-template-adjacent_viewsentinel-range.adjacent.sentinel" class="self-link"></a></h4>
 <div class="sourceCode" id="cb158"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb158-1"><a href="#cb158-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
 <span id="cb158-2"><a href="#cb158-2"></a>  <span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
 <span id="cb158-3"><a href="#cb158-3"></a>  <span class="kw">template</span><span class="op">&lt;</span>forward_range V, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
@@ -2798,7 +2798,7 @@ blockquote { background-color: #f6f8fa; }
 <p><span class="marginalizedparent"><a class="marginalized">1</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp"><em>fun_</em></code> with <code class="sourceCode cpp">std<span class="op">::</span>move<span class="op">(</span>fun<span class="op">)</span></code> and <code class="sourceCode cpp"><em>inner_</em></code> with <code class="sourceCode cpp">std<span class="op">::</span>move<span class="op">(</span>base<span class="op">)</span></code>.</p>
 </blockquote>
 </div>
-<h4 class="unnumbered" data-number id="class-template-adjacent_transform_view_iterator_-range.adjacent.transform.iterator">24.7.?.3 Class template <code class="sourceCode cpp">adjacent_transform_view<span class="op">::</span><em>iterator</em></code> [range.adjacent.transform.iterator]<a href="#class-template-adjacent_transform_view_iterator_-range.adjacent.transform.iterator" class="self-link"></a></h4>
+<h4 class="unnumbered" data-number id="class-template-adjacent_transform_viewiterator-range.adjacent.transform.iterator">24.7.?.3 Class template <code class="sourceCode cpp">adjacent_transform_view<span class="op">::</span><em>iterator</em></code> [range.adjacent.transform.iterator]<a href="#class-template-adjacent_transform_viewiterator-range.adjacent.transform.iterator" class="self-link"></a></h4>
 <div class="sourceCode" id="cb167"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb167-1"><a href="#cb167-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
 <span id="cb167-2"><a href="#cb167-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>forward_range V, copy_constructible F, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
 <span id="cb167-3"><a href="#cb167-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>N <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">&amp;&amp;</span> is_object_v<span class="op">&lt;</span>F<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
@@ -2985,7 +2985,7 @@ blockquote { background-color: #f6f8fa; }
 <p><span class="marginalizedparent"><a class="marginalized">17</a></span> <em>Effects</em>: Equivalent to: <code class="sourceCode cpp"><span class="cf">return</span> x<span class="op">.</span><em>inner_</em> <span class="op">-</span> y<span class="op">.</span><em>inner_</em>;</code></p>
 </blockquote>
 </div>
-<h4 class="unnumbered" data-number id="class-template-adjacent_transform_view_sentinel_-range.adjacent.transform.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">adjacent_transform_view<span class="op">::</span><em>sentinel</em></code> [range.adjacent.transform.sentinel]<a href="#class-template-adjacent_transform_view_sentinel_-range.adjacent.transform.sentinel" class="self-link"></a></h4>
+<h4 class="unnumbered" data-number id="class-template-adjacent_transform_viewsentinel-range.adjacent.transform.sentinel">24.7.?.4 Class template <code class="sourceCode cpp">adjacent_transform_view<span class="op">::</span><em>sentinel</em></code> [range.adjacent.transform.sentinel]<a href="#class-template-adjacent_transform_viewsentinel-range.adjacent.transform.sentinel" class="self-link"></a></h4>
 <div class="sourceCode" id="cb190"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb190-1"><a href="#cb190-1"></a><span class="kw">namespace</span> std<span class="op">::</span>ranges <span class="op">{</span></span>
 <span id="cb190-2"><a href="#cb190-2"></a>  <span class="kw">template</span><span class="op">&lt;</span>forward_range V, copy_constructible F, <span class="dt">size_t</span> N<span class="op">&gt;</span></span>
 <span id="cb190-3"><a href="#cb190-3"></a>    <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>N <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">&amp;&amp;</span> is_object_v<span class="op">&lt;</span>F<span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
