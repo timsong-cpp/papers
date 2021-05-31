@@ -2392,7 +2392,7 @@ the iterator acquires a singular value.
 constexpr $iterator$(iterator_t<$Base$> first, sentinel_t<$Base$> last);
 ```
 
-[#]{.pnum} _Postconditions_: `@_current\__[0]@ == first` is `true`, and
+[#]{.pnum} _Postconditions_: `$current_$[0] == first` is `true`, and
 for every integer 1 &le; _i_ &lt; `N`,
 `$current_$[$i$] == ranges::next($current_$[$i$-1], 1, last)` is `true`.
 
@@ -2402,7 +2402,7 @@ constexpr $iterator$($as-sentinel$, iterator_t<$Base$> first, iterator_t<$Base$>
 
 [#]{.pnum} _Postconditions_: If `$Base$` does not model `bidirectional_range`,
 each element of `$current_$` is equal to `last`.
-Otherwise, `@_current\__[N-1]@ == last` is `true`, and
+Otherwise, `$current_$[N-1] == last` is `true`, and
 for every integer 0 &le; _i_ &lt; `(N - 1)`,
 `$current_$[$i$] == ranges::prev($current_$[$i$+1], 1, first)` is `true`.
 
