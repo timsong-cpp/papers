@@ -21,7 +21,7 @@ all as described in section 3.2 of [@P2214R0].
 
 # Revision history
 
-- R2: Typo fixes. Incorporated LWG review feedback on 2021-05-21 and 2021-05-28.
+- R2: Incorporated LWG review feedback on 2021-05-21, 2021-05-28 and 2021-06-04.
   Account for integer-class types in the handling of `difference_type` and `size_type`.
 - R1: Added feature test macro. Expanded discussion regarding 1) `operator==` for
   forward-or-weaker `zip` iterators and 2) `adjacent` on input ranges.
@@ -1089,7 +1089,7 @@ Edit [iterator.concept.winc]{.sref} as indicated:
 any integral type [as well as any integer-class type]{.diffins}. Expressions of integral
 type are both implicitly and explicitly convertible to any integer-class type.
 Conversions between integral and integer-class types
-[and between two integer class types]{.diffins}
+[and between two integer-class types]{.diffins}
 do not exit via an exception.
 
 [&hellip;]
@@ -1245,7 +1245,7 @@ class zip_view : public view_interface<zip_view<Views...>>{
   template<bool> class $sentinel$;         // exposition only
 
 public:
-  constexpr zip_view() = default;
+  zip_view() = default;
   constexpr explicit zip_view(Views... views);
 
   constexpr auto begin() requires (!($simple-view$<Views> && ...)) {
@@ -1765,11 +1765,15 @@ and produces a `view` whose _M <sup>th</sup>_ element is the result of applying
 the invocable object to the _M <sup>th</sup>_ elements of all views.
 
 [#]{.pnum} The name `views::zip_transform` denotes a customization point object
-([customization.point.object]{.sref}). Given a subexpression `F` and a pack of subexpressions `Es...`,
+([customization.point.object]{.sref}). Let `F` be a subexpression,
+and let `Es...` be a pack of subexpressions.
 
-- [#.#]{.pnum} if `Es` is an empty pack, let `FD` be `decay_t<decltype((F))>`.
-  - [#.#.#]{.pnum} if `copy_constructible<FD> && regular_invocable<FD&>` is `false`, `views::zip_transform(F, Es...)` is ill-formed.
-  - [#.#.#]{.pnum} Otherwise, the expression `views::zip_transform(F, Es...)` is expression-equivalent to `(void)F, $decay-copy$(views::empty<decay_t<invoke_result_t<FD&>>>)`.
+- [#.#]{.pnum} If `Es` is an empty pack, let `FD` be `decay_t<decltype((F))>`.
+  - [#.#.#]{.pnum} If `copy_constructible<FD> && regular_invocable<FD&>` is `false`,
+    or if `decay_t<invoke_result_t<FD&>>` is not an object type,
+    `views::zip_transform(F, Es...)` is ill-formed.
+  - [#.#.#]{.pnum} Otherwise, the expression `views::zip_transform(F, Es...)`
+    is expression-equivalent to `(void)F, $decay-copy$(views::empty<decay_t<invoke_result_t<FD&>>>)`.
 - [#.#]{.pnum} Otherwise, the expression `views::zip_transform(F, Es...)` is expression-equivalent to `zip_transform_view(F, Es...)`.
 
 ::: example
@@ -1808,7 +1812,7 @@ class zip_transform_view : public view_interface<zip_transform_view<F, Views...>
   template<bool> class $sentinel$;         // exposition only
 
 public:
-  constexpr zip_transform_view() = default;
+  zip_transform_view() = default;
 
   constexpr explicit zip_transform_view(F fun, Views... views);
 
@@ -1941,13 +1945,13 @@ namespace std::ranges {
 [#]{.pnum} The member _typedef-name_ `$iterator$::iterator_category` is defined if and only if `$Base$` models `forward_range`.
 In that case, `$iterator$::iterator_category` is defined as follows:
 
-- If `invoke_result_t<$maybe-const$<Const, F>&, range_reference_t<$maybe-const$<Const, Views>>...>` is not an lvalue reference,
+- [#.#]{.pnum} If `invoke_result_t<$maybe-const$<Const, F>&, range_reference_t<$maybe-const$<Const, Views>>...>` is not an lvalue reference,
   `iterator_category` denotes `input_iterator_tag`.
-- Otherwise, let `Cs...` denote the pack of types `iterator_traits<iterator_t<$maybe-const$<Const, Views>>>::iterator_category...`.
-  - If `(derived_from<Cs, random_access_iterator_tag> && ...)` is `true`, `iterator_category` denotes `random_access_iterator_tag`;
-  - Otherwise, if `(derived_from<Cs, bidirectional_iterator_tag> && ...)` is `true`, `iterator_category` denotes `bidirectional_iterator_tag`;
-  - Otherwise, if `(derived_from<Cs, forward_iterator_tag> && ...)` is `true`, `iterator_category` denotes `forward_iterator_tag`;
-  - Otherwise, `iterator_category` denotes `input_iterator_tag`.
+- [#.#]{.pnum} Otherwise, let `Cs...` denote the pack of types `iterator_traits<iterator_t<$maybe-const$<Const, Views>>>::iterator_category...`.
+  - [#.#.#]{.pnum} If `(derived_from<Cs, random_access_iterator_tag> && ...)` is `true`, `iterator_category` denotes `random_access_iterator_tag`.
+  - [#.#.#]{.pnum} Otherwise, if `(derived_from<Cs, bidirectional_iterator_tag> && ...)` is `true`, `iterator_category` denotes `bidirectional_iterator_tag`.
+  - [#.#.#]{.pnum} Otherwise, if `(derived_from<Cs, forward_iterator_tag> && ...)` is `true`, `iterator_category` denotes `forward_iterator_tag`.
+  - [#.#.#]{.pnum} Otherwise, `iterator_category` denotes `input_iterator_tag`.
 
 
 ::: itemdecl
@@ -2000,7 +2004,7 @@ constexpr $iterator$& operator++();
 constexpr void operator++(int);
 ```
 
-[#]{.pnum} _Effects_: Equivalent to `++*this;`.
+[#]{.pnum} _Effects_: Equivalent to `++*this`.
 
 ```cpp
 constexpr $iterator$ operator++(int) requires forward_range<$Base$>;
@@ -2250,7 +2254,7 @@ class adjacent_view : public view_interface<adjacent_view<V, N>>{
   struct $as-sentinel${};              // exposition only
 
 public:
-  constexpr adjacent_view() = default;
+  adjacent_view() requires default_initializable<V> = default;
   constexpr explicit adjacent_view(V base);
 
   constexpr auto begin() requires (!$simple-view$<V>) {
@@ -2261,20 +2265,22 @@ public:
     return $iterator$<true>(ranges::begin($base_$), ranges::end($base_$));
   }
 
-  constexpr auto end() requires (!$simple-view$<V> && !common_range<V>) {
-    return $sentinel$<false>(ranges::end($base_$));
+  constexpr auto end() requires (!$simple-view$<V>) {
+    if constexpr (common_range<V>) {
+      return $iterator$<false>($as-sentinel${}, ranges::begin($base_$), ranges::end($base_$));
+    }
+    else {
+      return $sentinel$<false>(ranges::end($base_$));
+    }
   }
 
-  constexpr auto end() requires (!$simple-view$<V> && common_range<V>){
-    return $iterator$<false>($as-sentinel${}, ranges::begin($base_$), ranges::end($base_$));
-  }
-
-  constexpr auto end() const requires range<const V> {
-    return $sentinel$<true>(ranges::end($base_$));
-  }
-
-  constexpr auto end() const requires common_range<const V> {
-    return $iterator$<true>($as-sentinel${}, ranges::begin($base_$), ranges::end($base_$));
+  constexpr auto end() requires range<const V> {
+    if constexpr (common_range<const V>) {
+      return $iterator$<true>($as-sentinel${}, ranges::begin($base_$), ranges::end($base_$));
+    }
+    else {
+      return $sentinel$<true>(ranges::end($base_$));
+    }
   }
 
   constexpr auto size() requires sized_range<V>;
@@ -2301,9 +2307,11 @@ constexpr auto size() const requires sized_range<const V>;
 
 ::: bq
 ```cpp
-auto sz = ranges::size($base_$);
-sz -= std::min<decltype(sz)>(sz, N-1);
-return sz;
+using ST = decltype(ranges::size($base_$));
+using CT = common_type_t<ST, size_t>;
+auto sz = static_cast<CT>(ranges::size($base_$));
+sz -= std::min<CT>(sz, N - 1);
+return static_cast<ST>(sz);
 ```
 :::
 :::
@@ -2428,15 +2436,14 @@ constexpr $iterator$($iterator$<!Const> i)
 ```cpp
 constexpr $iterator$& operator++();
 ```
-[#]{.pnum} _Effects_: Equivalent to:
 
-::: bq
-```cpp
-  ranges::copy($current_$ | views::drop(1), $current_$.begin());
-  ++$current_$.back();
-  return *this;
-```
-:::
+[#]{.pnum} _Preconditions:_ `$current_$.back()` is incrementable.
+
+[#]{.pnum} _Postconditions_: Each element of `$current_$` is equal to `ranges::next($i$)`,
+where $i$ is the value of that element before the call.
+
+[#]{.pnum} _Returns_: `*this`.
+
 
 ```cpp
 constexpr $iterator$ operator++(int);
@@ -2456,15 +2463,12 @@ constexpr $iterator$ operator++(int);
 ```cpp
 constexpr $iterator$& operator--() requires bidirectional_range<$Base$>;
 ```
-[#]{.pnum} _Effects_: Equivalent to:
+[#]{.pnum} _Preconditions:_ `$current_$.front()` is decrementable.
 
-::: bq
-```cpp
-  ranges::copy_backward($current_$ | views::take(N - 1), $current_$.end());
-  --$current_$.front();
-  return *this;
-```
-:::
+[#]{.pnum} _Postconditions_: Each element of `$current_$` is equal to `ranges::prev($i$)`,
+where $i$ is the value of that element before the call.
+
+[#]{.pnum} _Returns_: `*this`.
 
 
 ```cpp
@@ -2484,27 +2488,23 @@ constexpr $iterator$ operator--(int) requires bidirectional_range<$Base$>;
 constexpr $iterator$& operator+=(difference_type x)
   requires random_access_range<$Base$>;
 ```
-[#]{.pnum} _Effects_: Equivalent to:
+[#]{.pnum} _Preconditions:_ `$current_$.back() + x` has well defined behavior.
 
-::: bq
-```cpp
-  for(auto& i : $current_$) { i += x; }
-  return *this;
-```
-:::
+[#]{.pnum} _Postconditions_: Each element of `$current_$` is equal to `$i$ + x`,
+where $i$ is the value of that element before the call.
+
+[#]{.pnum} _Returns_: `*this`.
 
 ```cpp
   constexpr $iterator$& operator-=(difference_type x)
     requires random_access_range<$Base$>;
 ```
-[#]{.pnum} _Effects_: Equivalent to:
+[#]{.pnum} _Preconditions:_ `$current_$.front() - x` has well defined behavior.
 
-::: bq
-```cpp
-  for(auto& i : $current_$) { i -= x; }
-  return *this;
-```
-:::
+[#]{.pnum} _Postconditions_: Each element of `$current_$` is equal to `$i$ - x`,
+where $i$ is the value of that element before the call.
+
+[#]{.pnum} _Returns_: `*this`.
 
 ```cpp
 constexpr auto operator[](difference_type n) const
@@ -2527,7 +2527,7 @@ friend constexpr bool operator==(const $iterator$& x, const $iterator$& y);
 friend constexpr bool operator<(const $iterator$& x, const $iterator$& y)
   requires random_access_range<$Base$>;
 ```
-[#]{.pnum} _Returns_: `x.$current_$.back() < y.$current_$.back()`
+[#]{.pnum} _Returns_: `x.$current_$.back() < y.$current_$.back()`.
 
 ```cpp
 friend constexpr bool operator>(const $iterator$& x, const $iterator$& y)
@@ -2556,7 +2556,7 @@ friend constexpr auto operator<=>(const $iterator$& x, const $iterator$& y)
            three_way_comparable<iterator_t<$Base$>>;
 ```
 
-[#]{.pnum} _Returns_: `x.$current_$.back() <=> y.$current_$.back()`
+[#]{.pnum} _Returns_: `x.$current_$.back() <=> y.$current_$.back()`.
 
 
 ```cpp
@@ -2595,7 +2595,7 @@ friend constexpr $iterator$ operator-(const $iterator$& i, difference_type n)
 friend constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
   requires sized_sentinel_for<iterator_t<$Base$>, iterator_t<$Base$>>;
 ```
-[#]{.pnum} _Effects_: Equivalent to: `return x.$current_$.back() - y.$current_$.back()`.
+[#]{.pnum} _Effects_: Equivalent to: `return x.$current_$.back() - y.$current_$.back();`
 
 ```cpp
 friend constexpr auto iter_move(const $iterator$& i) noexcept($see below$);
@@ -2642,7 +2642,6 @@ performs `ranges::iter_swap(l.$current_$[$i$], r.$current_$[$i$])`.
 
 ```cpp
 namespace std::ranges {
-  namespace std::ranges {
   template<forward_range V, size_t N>
     requires view<V> && (N > 0)
   template<bool Const>
@@ -2692,7 +2691,7 @@ template<bool OtherConst>
 friend constexpr bool operator==(const $iterator$<OtherConst>& x, const $sentinel$& y);
 ```
 
-[#]{.pnum} _Effects_: Equivalent to: `return x.$current_$.back() == y.$end_$;`.
+[#]{.pnum} _Effects_: Equivalent to: `return x.$current_$.back() == y.$end_$;`
 
 
 ```cpp
@@ -2701,7 +2700,7 @@ template<bool OtherConst>
 friend constexpr range_difference_t<$maybe-const$<OtherConst, V>>
   operator-(const $iterator$<OtherConst>& x, const $sentinel$& y);
 ```
-[#]{.pnum} _Effects_: Equivalent to: `return x.$current_$.back() - y.$end_$;`.
+[#]{.pnum} _Effects_: Equivalent to: `return x.$current_$.back() - y.$end_$;`
 
 ```cpp
 template<bool OtherConst>
@@ -2709,7 +2708,7 @@ template<bool OtherConst>
 friend constexpr range_difference_t<$maybe-const$<OtherConst, V>>
   operator-(const $sentinel$& y, const $iterator$<OtherConst>& x);
 ```
-[#]{.pnum} _Effects_: Equivalent to: `return y.$end_$ - x.$current_$.back();`.
+[#]{.pnum} _Effects_: Equivalent to: `return y.$end_$ - x.$current_$.back();`
 
 :::
 
@@ -2729,10 +2728,15 @@ elements of the original view. If the original view has fewer than _N_ elements,
 the resulting view is empty.
 
 [#]{.pnum} The name `views::adjacent_transform<N>` denotes a range adaptor object
-([range.adaptor.object]{.sref}). Given subexpressions `E` and `F`,
+([range.adaptor.object]{.sref}). Given subexpressions `E` and `F` and a constant
+expression `N`,
 
-- [#.#]{.pnum} if `N` is equal to 0, `views::adjacent_transform<N>(E, F)` is expression-equivalent to `(void)E, views::zip_transform(F)`, except that the evaluations of `E` and `F` are indeterminately sequenced.
-- [#.#]{.pnum} Otherwise, the expression `views::adjacent_transform<N>(E, F)` is expression-equivalent to `adjacent_transform_view<views::all_t<decltype((E))>, decay_t<F>, N>(E, F)`.
+- [#.#]{.pnum} if `N` is equal to 0, `views::adjacent_transform<N>(E, F)`
+is expression-equivalent to `(void)E, views::zip_transform(F)`,
+except that the evaluations of `E` and `F` are indeterminately sequenced;
+- [#.#]{.pnum} otherwise, the expression `views::adjacent_transform<N>(E, F)`
+is expression-equivalent to
+`adjacent_transform_view<views::all_t<decltype((E))>, decay_t<decltype((F))>, N>(E, F)`.
 
 ::: example
 
@@ -2755,64 +2759,64 @@ namespace std::ranges {
             regular_invocable<F&, $REPEAT$(range_reference_t<V>, N)...> &&
             $can-reference$<invoke_result_t<F&, $REPEAT$(range_reference_t<V>, N)...>>
   class adjacent_transform_view : public view_interface<adjacent_transform_view<V, F, N>> {
-  $semiregular-box$<F> $fun_$;                  // exposition only
-  adjacent_view<V, N> $inner_$;               // exposition only
+    $semiregular-box$<F> $fun_$;                  // exposition only
+    adjacent_view<V, N> $inner_$;               // exposition only
 
-  using $InnerView$ = adjacent_view<V, N>;    // exposition only
-  template<bool Const>
-  using $inner-iterator$ = iterator_t<$maybe-const$<Const, $InnerView$>>;  // exposition only
-  template<bool Const>
-  using $inner-sentinel$ = sentinel_t<$maybe-const$<Const, $InnerView$>>;  // exposition only
+    using $InnerView$ = adjacent_view<V, N>;    // exposition only
+    template<bool Const>
+    using $inner-iterator$ = iterator_t<$maybe-const$<Const, $InnerView$>>;  // exposition only
+    template<bool Const>
+    using $inner-sentinel$ = sentinel_t<$maybe-const$<Const, $InnerView$>>;  // exposition only
 
-  template<bool> class $iterator$;         // exposition only
-  template<bool> class $sentinel$;         // exposition only
+    template<bool> class $iterator$;         // exposition only
+    template<bool> class $sentinel$;         // exposition only
 
-public:
-  constexpr adjacent_transform_view() = default;
+  public:
+    adjacent_transform_view() = default;
 
-  constexpr explicit adjacent_transform_view(V base, F fun);
+    constexpr explicit adjacent_transform_view(V base, F fun);
 
-  constexpr auto begin() {
-    return $iterator$<false>(*this, $inner_$.begin());
-  }
+    constexpr auto begin() {
+      return $iterator$<false>(*this, $inner_$.begin());
+    }
 
-  constexpr auto begin() const
-    requires range<const $InnerView$> &&
-             regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
-  {
-    return $iterator$<true>(*this, $inner_$.begin());
-  }
+    constexpr auto begin() const
+      requires range<const $InnerView$> &&
+              regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
+    {
+      return $iterator$<true>(*this, $inner_$.begin());
+    }
 
-  constexpr auto end() {
-    return $sentinel$<false>($inner_$.end());
-  }
+    constexpr auto end() {
+      return $sentinel$<false>($inner_$.end());
+    }
 
-  constexpr auto end() requires common_range<$InnerView$> {
-    return $iterator$<false>(*this, $inner_$.end());
-  }
+    constexpr auto end() requires common_range<$InnerView$> {
+      return $iterator$<false>(*this, $inner_$.end());
+    }
 
-  constexpr auto end() const
-    requires range<const $InnerView$> &&
-             regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
-  {
-    return $sentinel$<true>($inner_$.end());
-  }
+    constexpr auto end() const
+      requires range<const $InnerView$> &&
+              regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
+    {
+      return $sentinel$<true>($inner_$.end());
+    }
 
-  constexpr auto end() const
-    requires common_range<const $InnerView$> &&
-             regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
-  {
-    return $iterator$<true>(*this, $inner_$.end());
-  }
+    constexpr auto end() const
+      requires common_range<const $InnerView$> &&
+              regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
+    {
+      return $iterator$<true>(*this, $inner_$.end());
+    }
 
-  constexpr auto size() requires sized_range<$InnerView$> {
-    return $inner_$.size();
-  }
+    constexpr auto size() requires sized_range<$InnerView$> {
+      return $inner_$.size();
+    }
 
-  constexpr auto size() const requires sized_range<const $InnerView$> {
-    return $inner_$.size();
-  }
-};
+    constexpr auto size() const requires sized_range<const $InnerView$> {
+      return $inner_$.size();
+    }
+  };
 
 }
 ```
@@ -2895,13 +2899,13 @@ namespace std::ranges {
 
 [#]{.pnum} The member _typedef-name_ `$iterator$::iterator_category` is defined as follows:
 
-- If `invoke_result_t<$maybe-const$<Const, F>&, $REPEAT$(range_reference_t<$Base$>, N)...>` is not an lvalue reference,
+- [#.#]{.pnum} If `invoke_result_t<$maybe-const$<Const, F>&, $REPEAT$(range_reference_t<$Base$>, N)...>` is not an lvalue reference,
   `iterator_category` denotes `input_iterator_tag`.
-- Otherwise, let `C` denote the type `iterator_traits<iterator_t<$Base$>>::iterator_category`.
-  - If `derived_from<C, random_access_iterator_tag>` is `true`, `iterator_category` denotes `random_access_iterator_tag`;
-  - Otherwise, if `derived_from<C, bidirectional_iterator_tag>` is `true`, `iterator_category` denotes `bidirectional_iterator_tag`;
-  - Otherwise, if `derived_from<C, forward_iterator_tag>` is `true`, `iterator_category` denotes `forward_iterator_tag`;
-  - Otherwise, `iterator_category` denotes `input_iterator_tag`.
+- [#.#]{.pnum} Otherwise, let `C` denote the type `iterator_traits<iterator_t<$Base$>>::iterator_category`.
+  - [#.#.#]{.pnum} If `derived_from<C, random_access_iterator_tag>` is `true`, `iterator_category` denotes `random_access_iterator_tag`.
+  - [#.#.#]{.pnum} Otherwise, if `derived_from<C, bidirectional_iterator_tag>` is `true`, `iterator_category` denotes `bidirectional_iterator_tag`.
+  - [#.#.#]{.pnum} Otherwise, if `derived_from<C, forward_iterator_tag>` is `true`, `iterator_category` denotes `forward_iterator_tag`.
+  - [#.#.#]{.pnum} Otherwise, `iterator_category` denotes `input_iterator_tag`.
 
 
 ::: itemdecl
