@@ -649,7 +649,7 @@ blockquote { background-color: #f6f8fa; }
 <p>all as described in section 3.2 of <span class="citation" data-cites="P2214R0">[<a href="#ref-P2214R0" role="doc-biblioref">P2214R0</a>]</span>.</p>
 <h1 data-number="2" style="border-bottom:1px solid #cccccc" id="revision-history"><span class="header-section-number">2</span> Revision history<a href="#revision-history" class="self-link"></a></h1>
 <ul>
-<li>R2: Incorporated LWG review feedback on 2021-05-21, 2021-05-28 and 2021-06-04. Account for integer-class types in the handling of <code class="sourceCode cpp">difference_type</code> and <code class="sourceCode cpp">size_type</code>. Account for <span class="citation" data-cites="P2325R3">[<a href="#ref-P2325R3" role="doc-biblioref">P2325R3</a>]</span>.</li>
+<li>R2: Incorporated LWG review feedback on 2021-05-21, 2021-05-28 and 2021-06-04. Account for integer-class types in the handling of <code class="sourceCode cpp">difference_type</code> and <code class="sourceCode cpp">size_type</code>. Rebase to the expected post-2021-06 working draft.</li>
 <li>R1: Added feature test macro. Expanded discussion regarding 1) <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">==</span></code> for forward-or-weaker <code class="sourceCode cpp">zip</code> iterators and 2) <code class="sourceCode cpp">adjacent</code> on input ranges. Miscellaneous wording fixes (thanks to Barry Revzin and Tomasz Kamiński). Added a short example.</li>
 </ul>
 <h1 data-number="3" style="border-bottom:1px solid #cccccc" id="examples"><span class="header-section-number">3</span> Examples<a href="#examples" class="self-link"></a></h1>
@@ -727,7 +727,7 @@ blockquote { background-color: #f6f8fa; }
 <h3 data-number="4.3.5" id="iter_swap"><span class="header-section-number">4.3.5</span> <code class="sourceCode cpp">iter_swap</code><a href="#iter_swap" class="self-link"></a></h3>
 <p>Since the iterators of <code class="sourceCode cpp">adjacent_view</code> refer to potentially overlapping elements of the underlying view, <code class="sourceCode cpp">iter_swap</code> cannot really “exchange the values” of the range elements when the iterators overlap. However, it does not appear to be possible to disable <code class="sourceCode cpp">ranges<span class="op">::</span>iter_swap</code> (deleting or not providing <code class="sourceCode cpp">iter_swap</code> will simply fallback to the default implementation), and swapping non-overlapping iterators is still useful functionality. Thus, the wording below retains <code class="sourceCode cpp">iter_swap</code> but gives it a precondition that there is no overlap.</p>
 <h1 data-number="5" style="border-bottom:1px solid #cccccc" id="wording"><span class="header-section-number">5</span> Wording<a href="#wording" class="self-link"></a></h1>
-<p>This wording is relative to <span class="citation" data-cites="N4878">[<a href="#ref-N4878" role="doc-biblioref">N4878</a>]</span>.</p>
+<p>This wording is relative to <span class="citation" data-cites="N4885">[<a href="#ref-N4885" role="doc-biblioref">N4885</a>]</span> after the application of <span class="citation" data-cites="P2325R3">[<a href="#ref-P2325R3" role="doc-biblioref">P2325R3</a>]</span>, <span class="citation" data-cites="LWG3526">[<a href="#ref-LWG3526" role="doc-biblioref">LWG3526</a>]</span>, and <span class="citation" data-cites="LWG3527">[<a href="#ref-LWG3527" role="doc-biblioref">LWG3527</a>]</span>.</p>
 <h2 data-number="5.1" id="tuple"><span class="header-section-number">5.1</span> <code class="sourceCode cpp">tuple</code><a href="#tuple" class="self-link"></a></h2>
 <div>
 <ol type="1">
@@ -919,47 +919,47 @@ blockquote { background-color: #f6f8fa; }
 <div>
 <div class="sourceCode" id="cb7"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1"></a>template&lt;class... UTypes&gt; constexpr explicit(<em>see below</em>) tuple(const tuple&lt;UTypes...&gt;&amp; u);</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_15" id="pnum_15">18</a></span> <em>Constraints:</em></p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_15" id="pnum_15">19</a></span> <em>Constraints:</em></p>
 <ul>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_16" id="pnum_16">(18.1)</a></span> <code class="sourceCode default">sizeof...(Types)</code> equals <code class="sourceCode default">sizeof...(UTypes</code>) and</li>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_17" id="pnum_17">(18.2)</a></span><code class="sourceCode default">is_constructible_v&lt;T<em><sub>i</sub></em>, const U<em><sub>i</sub></em>&amp;&gt;</code> is <code class="sourceCode default">true</code> for all <em>i</em>, and</li>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_18" id="pnum_18">(18.3)</a></span> either <code class="sourceCode default">sizeof...(Types)</code> is not 1, or (when <code class="sourceCode default">Types...</code> expands to <code class="sourceCode default">T</code> and <code class="sourceCode default">UTypes...</code> expands to <code class="sourceCode default">U</code>) <code class="sourceCode default">is_convertible_v&lt;const tuple&lt;U&gt;&amp;, T&gt;</code>, <code class="sourceCode default">is_constructible_v&lt;T, const tuple&lt;U&gt;&amp;&gt;</code>, and <code class="sourceCode default">is_same_v&lt;T, U&gt;</code> are all <code class="sourceCode default">false</code>.</li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_16" id="pnum_16">(19.1)</a></span> <code class="sourceCode default">sizeof...(Types)</code> equals <code class="sourceCode default">sizeof...(UTypes</code>) and</li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_17" id="pnum_17">(19.2)</a></span><code class="sourceCode default">is_constructible_v&lt;T<em><sub>i</sub></em>, const U<em><sub>i</sub></em>&amp;&gt;</code> is <code class="sourceCode default">true</code> for all <em>i</em>, and</li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_18" id="pnum_18">(19.3)</a></span> either <code class="sourceCode default">sizeof...(Types)</code> is not 1, or (when <code class="sourceCode default">Types...</code> expands to <code class="sourceCode default">T</code> and <code class="sourceCode default">UTypes...</code> expands to <code class="sourceCode default">U</code>) <code class="sourceCode default">is_convertible_v&lt;const tuple&lt;U&gt;&amp;, T&gt;</code>, <code class="sourceCode default">is_constructible_v&lt;T, const tuple&lt;U&gt;&amp;&gt;</code>, and <code class="sourceCode default">is_same_v&lt;T, U&gt;</code> are all <code class="sourceCode default">false</code>.</li>
 </ul>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_19" id="pnum_19">19</a></span> <em>Effects:</em> Initializes each element of <code class="sourceCode default">*this</code> with the corresponding element of <code class="sourceCode default">u</code>.</p>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_20" id="pnum_20">20</a></span> <em>Remarks:</em> The expression inside <code class="sourceCode default">explicit</code> is equivalent to: <code class="sourceCode default">!conjunction_v&lt;is_convertible&lt;const UTypes&amp;, Types&gt;...&gt;</code></p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_19" id="pnum_19">20</a></span> <em>Effects:</em> Initializes each element of <code class="sourceCode default">*this</code> with the corresponding element of <code class="sourceCode default">u</code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_20" id="pnum_20">21</a></span> <em>Remarks:</em> The expression inside <code class="sourceCode default">explicit</code> is equivalent to: <code class="sourceCode default">!conjunction_v&lt;is_convertible&lt;const UTypes&amp;, Types&gt;...&gt;</code></p>
 </blockquote>
 <div class="sourceCode" id="cb8"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1"></a>template&lt;class... UTypes&gt; constexpr explicit(<em>see below</em>) tuple(tuple&lt;UTypes...&gt;&amp;&amp; u);</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_21" id="pnum_21">21</a></span> <em>Constraints:</em></p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_21" id="pnum_21">22</a></span> <em>Constraints:</em></p>
 <ul>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_22" id="pnum_22">(21.1)</a></span> <code class="sourceCode default">sizeof...(Types)</code> equals <code class="sourceCode default">sizeof...(UTypes</code>), and</li>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_23" id="pnum_23">(21.2)</a></span><code class="sourceCode default">is_constructible_v&lt;T<em><sub>i</sub></em>, U<em><sub>i</sub></em>&gt;</code> is <code class="sourceCode default">true</code> for all <em>i</em>, and</li>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_24" id="pnum_24">(21.3)</a></span> either <code class="sourceCode default">sizeof...(Types)</code> is not 1, or (when <code class="sourceCode default">Types...</code> expands to <code class="sourceCode default">T</code> and <code class="sourceCode default">UTypes...</code> expands to <code class="sourceCode default">U</code>) <code class="sourceCode default">is_convertible_v&lt;tuple&lt;U&gt;, T&gt;</code>, <code class="sourceCode default">is_constructible_v&lt;T, tuple&lt;U&gt;&gt;</code>, and <code class="sourceCode default">is_same_v&lt;T, U&gt;</code> are all <code class="sourceCode default">false</code>.</li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_22" id="pnum_22">(22.1)</a></span> <code class="sourceCode default">sizeof...(Types)</code> equals <code class="sourceCode default">sizeof...(UTypes</code>), and</li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_23" id="pnum_23">(22.2)</a></span><code class="sourceCode default">is_constructible_v&lt;T<em><sub>i</sub></em>, U<em><sub>i</sub></em>&gt;</code> is <code class="sourceCode default">true</code> for all <em>i</em>, and</li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_24" id="pnum_24">(22.3)</a></span> either <code class="sourceCode default">sizeof...(Types)</code> is not 1, or (when <code class="sourceCode default">Types...</code> expands to <code class="sourceCode default">T</code> and <code class="sourceCode default">UTypes...</code> expands to <code class="sourceCode default">U</code>) <code class="sourceCode default">is_convertible_v&lt;tuple&lt;U&gt;, T&gt;</code>, <code class="sourceCode default">is_constructible_v&lt;T, tuple&lt;U&gt;&gt;</code>, and <code class="sourceCode default">is_same_v&lt;T, U&gt;</code> are all <code class="sourceCode default">false</code>.</li>
 </ul>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_25" id="pnum_25">22</a></span> <em>Effects:</em> For all <em>i</em>, initializes the <em>i</em><sup>th</sup> element of <code class="sourceCode default">*this</code> with <code class="sourceCode default">std::forward&lt;U<em><sub>i</sub></em>&gt;(get&lt;<em>i</em>&gt;(u))</code>.</p>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_26" id="pnum_26">23</a></span> <em>Remarks:</em> The expression inside <code class="sourceCode default">explicit</code> is equivalent to: <code class="sourceCode default">!conjunction_v&lt;is_convertible&lt;UTypes, Types&gt;...&gt;</code></p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_25" id="pnum_25">23</a></span> <em>Effects:</em> For all <em>i</em>, initializes the <em>i</em><sup>th</sup> element of <code class="sourceCode default">*this</code> with <code class="sourceCode default">std::forward&lt;U<em><sub>i</sub></em>&gt;(get&lt;<em>i</em>&gt;(u))</code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_26" id="pnum_26">24</a></span> <em>Remarks:</em> The expression inside <code class="sourceCode default">explicit</code> is equivalent to: <code class="sourceCode default">!conjunction_v&lt;is_convertible&lt;UTypes, Types&gt;...&gt;</code></p>
 </blockquote>
 <div class="sourceCode" id="cb9"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1"></a>template&lt;class U1, class U2&gt; constexpr explicit(<em>see below</em>) tuple(const pair&lt;U1, U2&gt;&amp; u);</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_27" id="pnum_27">24</a></span> <em>Constraints:</em></p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_27" id="pnum_27">25</a></span> <em>Constraints:</em></p>
 <ul>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_28" id="pnum_28">(24.1)</a></span> <code class="sourceCode default">sizeof...(Types)</code> is 2,</li>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_29" id="pnum_29">(24.2)</a></span> <code class="sourceCode default">is_constructible_v&lt;T<sub>0</sub>, const U1&amp;&gt;</code> is <code class="sourceCode default">true</code>, and</li>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_30" id="pnum_30">(24.3)</a></span> <code class="sourceCode default">is_constructible_v&lt;T<sub>1</sub>, const U2&amp;&gt;</code> is <code class="sourceCode default">true</code></li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_28" id="pnum_28">(25.1)</a></span> <code class="sourceCode default">sizeof...(Types)</code> is 2,</li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_29" id="pnum_29">(25.2)</a></span> <code class="sourceCode default">is_constructible_v&lt;T<sub>0</sub>, const U1&amp;&gt;</code> is <code class="sourceCode default">true</code>, and</li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_30" id="pnum_30">(25.3)</a></span> <code class="sourceCode default">is_constructible_v&lt;T<sub>1</sub>, const U2&amp;&gt;</code> is <code class="sourceCode default">true</code></li>
 </ul>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_31" id="pnum_31">25</a></span> <em>Effects:</em> Initializes the first element with <code class="sourceCode default">u.first</code> and the second element with <code class="sourceCode default">u.second</code>.</p>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_32" id="pnum_32">26</a></span> <em>Remarks:</em> The expression inside <code class="sourceCode default">explicit</code> is equivalent to: <code class="sourceCode default">!is_convertible_v&lt;const U1&amp;, T<sub>0</sub>&gt; || !is_convertible_v&lt;const U2&amp;, T<sub>1</sub>&gt;</code></p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_31" id="pnum_31">26</a></span> <em>Effects:</em> Initializes the first element with <code class="sourceCode default">u.first</code> and the second element with <code class="sourceCode default">u.second</code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_32" id="pnum_32">27</a></span> <em>Remarks:</em> The expression inside <code class="sourceCode default">explicit</code> is equivalent to: <code class="sourceCode default">!is_convertible_v&lt;const U1&amp;, T<sub>0</sub>&gt; || !is_convertible_v&lt;const U2&amp;, T<sub>1</sub>&gt;</code></p>
 </blockquote>
 <div class="sourceCode" id="cb10"><pre class="sourceCode default cpp"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1"></a>template&lt;class U1, class U2&gt; constexpr explicit(<em>see below</em>) tuple(pair&lt;U1, U2&gt;&amp;&amp; u);</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_33" id="pnum_33">27</a></span> <em>Constraints:</em></p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_33" id="pnum_33">28</a></span> <em>Constraints:</em></p>
 <ul>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_34" id="pnum_34">(27.1)</a></span> <code class="sourceCode default">sizeof...(Types)</code> is 2,</li>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_35" id="pnum_35">(27.2)</a></span> <code class="sourceCode default">is_constructible_v&lt;T<sub>0</sub>, U1&gt;</code> is <code class="sourceCode default">true</code>, and</li>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_36" id="pnum_36">(27.3)</a></span> <code class="sourceCode default">is_constructible_v&lt;T<sub>1</sub>, U2&gt;</code> is <code class="sourceCode default">true</code></li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_34" id="pnum_34">(28.1)</a></span> <code class="sourceCode default">sizeof...(Types)</code> is 2,</li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_35" id="pnum_35">(28.2)</a></span> <code class="sourceCode default">is_constructible_v&lt;T<sub>0</sub>, U1&gt;</code> is <code class="sourceCode default">true</code>, and</li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_36" id="pnum_36">(28.3)</a></span> <code class="sourceCode default">is_constructible_v&lt;T<sub>1</sub>, U2&gt;</code> is <code class="sourceCode default">true</code></li>
 </ul>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_37" id="pnum_37">28</a></span> <em>Effects:</em> Initializes the first element with <code class="sourceCode default">std::forward&lt;U1&gt;(u.first)</code> and the second element with <code class="sourceCode default">std::forward&lt;U2&gt;(u.second)</code>.</p>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_38" id="pnum_38">29</a></span> <em>Remarks:</em> The expression inside <code class="sourceCode default">explicit</code> is equivalent to: <code class="sourceCode default">!is_convertible_v&lt;U1, T<sub>0</sub>&gt; || !is_convertible_v&lt;U2, T<sub>1</sub>&gt;</code></p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_37" id="pnum_37">29</a></span> <em>Effects:</em> Initializes the first element with <code class="sourceCode default">std::forward&lt;U1&gt;(u.first)</code> and the second element with <code class="sourceCode default">std::forward&lt;U2&gt;(u.second)</code>.</p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_38" id="pnum_38">30</a></span> <em>Remarks:</em> The expression inside <code class="sourceCode default">explicit</code> is equivalent to: <code class="sourceCode default">!is_convertible_v&lt;U1, T<sub>0</sub>&gt; || !is_convertible_v&lt;U2, T<sub>1</sub>&gt;</code></p>
 </blockquote>
 </div>
 
@@ -1372,28 +1372,28 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb31-6"><a href="#cb31-6"></a>   // [allocator.uses.construction], uses-allocator construction</span>
 <span id="cb31-7"><a href="#cb31-7"></a>   template&lt;class T, class Alloc, class... Args&gt;</span>
 <span id="cb31-8"><a href="#cb31-8"></a>     constexpr auto uses_allocator_construction_args(const Alloc&amp; alloc,</span>
-<span id="cb31-9"><a href="#cb31-9"></a>                                                     Args&amp;&amp;... args) noexcept -&gt; <em>see below</em>;</span>
+<span id="cb31-9"><a href="#cb31-9"></a>                                                     Args&amp;&amp;... args) noexcept;</span>
 <span id="cb31-10"><a href="#cb31-10"></a>   template&lt;class T, class Alloc, class Tuple1, class Tuple2&gt;</span>
 <span id="cb31-11"><a href="#cb31-11"></a>     constexpr auto uses_allocator_construction_args(const Alloc&amp; alloc, piecewise_construct_t,</span>
 <span id="cb31-12"><a href="#cb31-12"></a>                                                     Tuple1&amp;&amp; x, Tuple2&amp;&amp; y)</span>
-<span id="cb31-13"><a href="#cb31-13"></a>                                                     noexcept -&gt; <em>see below</em>;</span>
+<span id="cb31-13"><a href="#cb31-13"></a>                                                     noexcept;</span>
 <span id="cb31-14"><a href="#cb31-14"></a>   template&lt;class T, class Alloc&gt;</span>
-<span id="cb31-15"><a href="#cb31-15"></a>     constexpr auto uses_allocator_construction_args(const Alloc&amp; alloc) noexcept -&gt; <em>see below</em>;</span>
+<span id="cb31-15"><a href="#cb31-15"></a>     constexpr auto uses_allocator_construction_args(const Alloc&amp; alloc) noexcept;</span>
 <span id="cb31-16"><a href="#cb31-16"></a>   template&lt;class T, class Alloc, class U, class V&gt;</span>
 <span id="cb31-17"><a href="#cb31-17"></a>     constexpr auto uses_allocator_construction_args(const Alloc&amp; alloc,</span>
-<span id="cb31-18"><a href="#cb31-18"></a>                                                     U&amp;&amp; u, V&amp;&amp; v) noexcept -&gt; <em>see below</em>;</span>
+<span id="cb31-18"><a href="#cb31-18"></a>                                                     U&amp;&amp; u, V&amp;&amp; v) noexcept;</span>
 <span id="cb31-19"><a href="#cb31-19"></a><span class="va">+  template&lt;class T, class Alloc, class U, class V&gt;</span></span>
 <span id="cb31-20"><a href="#cb31-20"></a><span class="va">+    constexpr auto uses_allocator_construction_args(const Alloc&amp; alloc,</span></span>
-<span id="cb31-21"><a href="#cb31-21"></a><span class="va">+                                                    pair&lt;U,V&gt;&amp; pr) noexcept -&gt; <em>see below</em>;</span></span>
+<span id="cb31-21"><a href="#cb31-21"></a><span class="va">+                                                    pair&lt;U,V&gt;&amp; pr) noexcept;</span></span>
 <span id="cb31-22"><a href="#cb31-22"></a>   template&lt;class T, class Alloc, class U, class V&gt;</span>
 <span id="cb31-23"><a href="#cb31-23"></a>     constexpr auto uses_allocator_construction_args(const Alloc&amp; alloc,</span>
-<span id="cb31-24"><a href="#cb31-24"></a>                                                     const pair&lt;U,V&gt;&amp; pr) noexcept -&gt; <em>see below</em>;</span>
+<span id="cb31-24"><a href="#cb31-24"></a>                                                     const pair&lt;U,V&gt;&amp; pr) noexcept;</span>
 <span id="cb31-25"><a href="#cb31-25"></a>   template&lt;class T, class Alloc, class U, class V&gt;</span>
 <span id="cb31-26"><a href="#cb31-26"></a>     constexpr auto uses_allocator_construction_args(const Alloc&amp; alloc,</span>
-<span id="cb31-27"><a href="#cb31-27"></a>                                                     pair&lt;U,V&gt;&amp;&amp; pr) noexcept -&gt; <em>see below</em>;</span>
+<span id="cb31-27"><a href="#cb31-27"></a>                                                     pair&lt;U,V&gt;&amp;&amp; pr) noexcept;</span>
 <span id="cb31-28"><a href="#cb31-28"></a><span class="va">+  template&lt;class T, class Alloc, class U, class V&gt;</span></span>
 <span id="cb31-29"><a href="#cb31-29"></a><span class="va">+    constexpr auto uses_allocator_construction_args(const Alloc&amp; alloc,</span></span>
-<span id="cb31-30"><a href="#cb31-30"></a><span class="va">+                                                    const pair&lt;U,V&gt;&amp;&amp; pr) noexcept -&gt; <em>see below</em>;</span></span>
+<span id="cb31-30"><a href="#cb31-30"></a><span class="va">+                                                    const pair&lt;U,V&gt;&amp;&amp; pr) noexcept;</span></span>
 <span id="cb31-31"><a href="#cb31-31"></a>   template&lt;class T, class Alloc, class... Args&gt;</span>
 <span id="cb31-32"><a href="#cb31-32"></a>     constexpr T make_obj_using_allocator(const Alloc&amp; alloc, Args&amp;&amp;... args);</span>
 <span id="cb31-33"><a href="#cb31-33"></a>   template&lt;class T, class Alloc, class... Args&gt;</span>
@@ -1405,7 +1405,7 @@ blockquote { background-color: #f6f8fa; }
 </div>
 </blockquote>
 <ol start="5" type="1">
-<li>Edit <span>20.10.8.2 <a href="https://wg21.link/allocator.uses.construction">[allocator.uses.construction]</a></span> as indicated (the wording below incorporates the proposed resolution of <span class="citation" data-cites="LWG3527">[<a href="#ref-LWG3527" role="doc-biblioref">LWG3527</a>]</span>):</li>
+<li>Edit <span>20.10.8.2 <a href="https://wg21.link/allocator.uses.construction">[allocator.uses.construction]</a></span> as indicated:</li>
 </ol>
 <blockquote>
 <div>
@@ -1413,10 +1413,10 @@ blockquote { background-color: #f6f8fa; }
 <div>
 <div class="sourceCode" id="cb32"><pre class="sourceCode diff"><code class="sourceCode diff"><span id="cb32-1"><a href="#cb32-1"></a><span class="va">+ template&lt;class T, class Alloc, class U, class V&gt;</span></span>
 <span id="cb32-2"><a href="#cb32-2"></a><span class="va">+   constexpr auto uses_allocator_construction_args(const Alloc&amp; alloc,</span></span>
-<span id="cb32-3"><a href="#cb32-3"></a><span class="va">+                                                   pair&lt;U,V&gt;&amp; pr) noexcept -&gt; <em>see below</em>;</span></span>
+<span id="cb32-3"><a href="#cb32-3"></a><span class="va">+                                                   pair&lt;U,V&gt;&amp; pr) noexcept;</span></span>
 <span id="cb32-4"><a href="#cb32-4"></a>  template&lt;class T, class Alloc, class U, class V&gt;</span>
 <span id="cb32-5"><a href="#cb32-5"></a>    constexpr auto uses_allocator_construction_args(const Alloc&amp; alloc,</span>
-<span id="cb32-6"><a href="#cb32-6"></a>                                                    const pair&lt;U,V&gt;&amp; pr) noexcept -&gt; <em>see below</em>;</span></code></pre></div>
+<span id="cb32-6"><a href="#cb32-6"></a>                                                    const pair&lt;U,V&gt;&amp; pr) noexcept;</span></code></pre></div>
 </div>
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_131" id="pnum_131">12</a></span> <em>Constraints</em>: <code class="sourceCode cpp">T</code> is a specialization of <code class="sourceCode cpp">pair</code>.</p>
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_132" id="pnum_132">13</a></span> <em>Effects</em>: Equivalent to:</p>
@@ -1428,17 +1428,17 @@ blockquote { background-color: #f6f8fa; }
 <div>
 <div class="sourceCode" id="cb34"><pre class="sourceCode diff"><code class="sourceCode diff"><span id="cb34-1"><a href="#cb34-1"></a>  template&lt;class T, class Alloc, class U, class V&gt;</span>
 <span id="cb34-2"><a href="#cb34-2"></a>    constexpr auto uses_allocator_construction_args(const Alloc&amp; alloc,</span>
-<span id="cb34-3"><a href="#cb34-3"></a>                                                    pair&lt;U,V&gt;&amp;&amp; pr) noexcept -&gt; <em>see below</em>;</span>
+<span id="cb34-3"><a href="#cb34-3"></a>                                                    pair&lt;U,V&gt;&amp;&amp; pr) noexcept;</span>
 <span id="cb34-4"><a href="#cb34-4"></a><span class="va">+ template&lt;class T, class Alloc, class U, class V&gt;</span></span>
 <span id="cb34-5"><a href="#cb34-5"></a><span class="va">+   constexpr auto uses_allocator_construction_args(const Alloc&amp; alloc,</span></span>
-<span id="cb34-6"><a href="#cb34-6"></a><span class="va">+                                                   const pair&lt;U,V&gt;&amp;&amp; pr) noexcept -&gt; <em>see below</em>;</span></span></code></pre></div>
+<span id="cb34-6"><a href="#cb34-6"></a><span class="va">+                                                   const pair&lt;U,V&gt;&amp;&amp; pr) noexcept;</span></span></code></pre></div>
 </div>
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_133" id="pnum_133">14</a></span> <em>Constraints</em>: <code class="sourceCode cpp">T</code> is a specialization of <code class="sourceCode cpp">pair</code>.</p>
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_134" id="pnum_134">15</a></span> <em>Effects</em>: Equivalent to:</p>
 <blockquote>
 <div class="sourceCode" id="cb35"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb35-1"><a href="#cb35-1"></a><span class="cf">return</span> uses_allocator_construction_args<span class="op">&lt;</span>T<span class="op">&gt;(</span>alloc, piecewise_construct,</span>
-<span id="cb35-2"><a href="#cb35-2"></a>                                           forward_as_tuple<span class="op">(</span><span class="diffdel">std::move(pr).first</span><span class="diffins">get&lt;0&gt;(std::move(pr))</span><span class="op">)</span>,</span>
-<span id="cb35-3"><a href="#cb35-3"></a>                                           forward_as_tuple<span class="op">(</span><span class="diffdel">std::move(pr).second</span><span class="diffins">get&lt;1&gt;(std::move(pr))</span><span class="op">))</span>;</span></code></pre></div>
+<span id="cb35-2"><a href="#cb35-2"></a>                                           forward_as_tuple<span class="op">(</span>get<span class="op">&lt;</span><span class="dv">0</span><span class="op">&gt;(</span>std<span class="op">::</span>move<span class="op">(</span>pr<span class="op">)))</span>,</span>
+<span id="cb35-3"><a href="#cb35-3"></a>                                           forward_as_tuple<span class="op">(</span>get<span class="op">&lt;</span><span class="dv">1</span><span class="op">&gt;(</span>std<span class="op">::</span>move<span class="op">(</span>pr<span class="op">))))</span>;</span></code></pre></div>
 </blockquote>
 </blockquote>
 </div>
@@ -3045,13 +3045,17 @@ blockquote { background-color: #f6f8fa; }
 <p>Thanks to Barry Revzin for implementing this entire paper from spec and finding several wording issues in the process.</p>
 <h1 data-number="7" style="border-bottom:1px solid #cccccc" id="bibliography"><span class="header-section-number">7</span> References<a href="#bibliography" class="self-link"></a></h1>
 <div id="refs" class="references hanging-indent" role="doc-bibliography">
+<div id="ref-LWG3526">
+<p>[LWG3526] Casey Carter. Return types of uses_allocator_construction_args unspecified. <br />
+<a href="https://wg21.link/lwg3526">https://wg21.link/lwg3526</a></p>
+</div>
 <div id="ref-LWG3527">
 <p>[LWG3527] Tim Song. uses_allocator_construction_args handles rvalue pairs of rvalue references incorrectly. <br />
 <a href="https://wg21.link/lwg3527">https://wg21.link/lwg3527</a></p>
 </div>
-<div id="ref-N4878">
-<p>[N4878] Thomas Köppe. 2020-12-15. Working Draft, Standard for Programming Language C++. <br />
-<a href="https://wg21.link/n4878">https://wg21.link/n4878</a></p>
+<div id="ref-N4885">
+<p>[N4885] Thomas Köppe. 2021-03-17. Working Draft, Standard for Programming Language C++. <br />
+<a href="https://wg21.link/n4885">https://wg21.link/n4885</a></p>
 </div>
 <div id="ref-P2214R0">
 <p>[P2214R0] Barry Revzin, Conor Hoekstra, Tim Song. 2020-10-15. A Plan for C++23 Ranges. <br />

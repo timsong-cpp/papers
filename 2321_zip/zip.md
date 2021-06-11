@@ -23,7 +23,7 @@ all as described in section 3.2 of [@P2214R0].
 
 - R2: Incorporated LWG review feedback on 2021-05-21, 2021-05-28 and 2021-06-04.
   Account for integer-class types in the handling of `difference_type` and `size_type`.
-  Account for [@P2325R3].
+  Rebase to the expected post-2021-06 working draft.
 - R1: Added feature test macro. Expanded discussion regarding 1) `operator==` for
   forward-or-weaker `zip` iterators and 2) `adjacent` on input ranges.
   Miscellaneous wording fixes (thanks to Barry Revzin and Tomasz Kamiński).
@@ -240,7 +240,8 @@ it a precondition that there is no overlap.
 
 # Wording
 
-This wording is relative to [@N4878].
+This wording is relative to [@N4885] after the application of [@P2325R3], [@LWG3526],
+and [@LWG3527].
 
 ## `tuple`
 
@@ -447,61 +448,61 @@ template<class... UTypes> constexpr explicit($see below$) tuple(const pair<U1, U
 template<class... UTypes> constexpr explicit($see below$) tuple(const tuple<UTypes...>& u);
 ```
 
-[18]{.pnum} _Constraints:_
+[19]{.pnum} _Constraints:_
 
-- [18.1]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes`) and
-- [18.2]{.pnum}`is_constructible_v<T@_<sub>i</sub>_@, const U@_<sub>i</sub>_@&>` is `true` for all _i_, and
-- [18.3]{.pnum} either `sizeof...(Types)` is not 1, or (when `Types...` expands to `T` and `UTypes...` expands to `U`)
+- [#.#]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes`) and
+- [#.#]{.pnum}`is_constructible_v<T@_<sub>i</sub>_@, const U@_<sub>i</sub>_@&>` is `true` for all _i_, and
+- [#.#]{.pnum} either `sizeof...(Types)` is not 1, or (when `Types...` expands to `T` and `UTypes...` expands to `U`)
   `is_convertible_v<const tuple<U>&, T>`, `is_constructible_v<T, const tuple<U>&>`, and `is_same_v<T, U>` are all `false`.
 
-[19]{.pnum} _Effects:_ Initializes each element of `*this` with the corresponding element of `u`.
+[#]{.pnum} _Effects:_ Initializes each element of `*this` with the corresponding element of `u`.
 
-[20]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
+[#]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!conjunction_v<is_convertible<const UTypes&, Types>...>`
 
 ```c++
 template<class... UTypes> constexpr explicit($see below$) tuple(tuple<UTypes...>&& u);
 ```
-[21]{.pnum} _Constraints:_
+[#]{.pnum} _Constraints:_
 
-- [21.1]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes`), and
-- [21.2]{.pnum}`is_constructible_v<T@_<sub>i</sub>_@, U@_<sub>i</sub>_@>` is `true` for all _i_, and
-- [21.3]{.pnum} either `sizeof...(Types)` is not 1, or (when `Types...` expands to `T` and `UTypes...` expands to `U`)
+- [#.#]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes`), and
+- [#.#]{.pnum}`is_constructible_v<T@_<sub>i</sub>_@, U@_<sub>i</sub>_@>` is `true` for all _i_, and
+- [#.#]{.pnum} either `sizeof...(Types)` is not 1, or (when `Types...` expands to `T` and `UTypes...` expands to `U`)
   `is_convertible_v<tuple<U>, T>`, `is_constructible_v<T, tuple<U>>`, and `is_same_v<T, U>` are all `false`.
 
-[22]{.pnum} _Effects:_ For all _i_, initializes the _i_<sup>th</sup> element of `*this` with `std::forward<U@_<sub>i</sub>_@>(get<$i$>(u))`.
+[#]{.pnum} _Effects:_ For all _i_, initializes the _i_<sup>th</sup> element of `*this` with `std::forward<U@_<sub>i</sub>_@>(get<$i$>(u))`.
 
-[23]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
+[#]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!conjunction_v<is_convertible<UTypes, Types>...>`
 
 ```c++
 template<class U1, class U2> constexpr explicit($see below$) tuple(const pair<U1, U2>& u);
 ```
 
-[24]{.pnum} _Constraints:_
+[#]{.pnum} _Constraints:_
 
-- [24.1]{.pnum} `sizeof...(Types)` is 2,
-- [24.2]{.pnum} `is_constructible_v<T@<sub>0</sub>@, const U1&>` is `true`, and
-- [24.3]{.pnum} `is_constructible_v<T@<sub>1</sub>@, const U2&>` is `true`
+- [#.#]{.pnum} `sizeof...(Types)` is 2,
+- [#.#]{.pnum} `is_constructible_v<T@<sub>0</sub>@, const U1&>` is `true`, and
+- [#.#]{.pnum} `is_constructible_v<T@<sub>1</sub>@, const U2&>` is `true`
 
-[25]{.pnum} _Effects:_ Initializes the first element with `u.first` and the second element with `u.second`.
+[#]{.pnum} _Effects:_ Initializes the first element with `u.first` and the second element with `u.second`.
 
-[26]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
+[#]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!is_convertible_v<const U1&, T@<sub>0</sub>@> || !is_convertible_v<const U2&, T@<sub>1</sub>@>`
 
 ```c++
 template<class U1, class U2> constexpr explicit($see below$) tuple(pair<U1, U2>&& u);
 ```
 
-[27]{.pnum} _Constraints:_
+[#]{.pnum} _Constraints:_
 
-- [27.1]{.pnum} `sizeof...(Types)` is 2,
-- [27.2]{.pnum} `is_constructible_v<T@<sub>0</sub>@, U1>` is `true`, and
-- [27.3]{.pnum} `is_constructible_v<T@<sub>1</sub>@, U2>` is `true`
+- [#.#]{.pnum} `sizeof...(Types)` is 2,
+- [#.#]{.pnum} `is_constructible_v<T@<sub>0</sub>@, U1>` is `true`, and
+- [#.#]{.pnum} `is_constructible_v<T@<sub>1</sub>@, U2>` is `true`
 
-[28]{.pnum} _Effects:_ Initializes the first element with `std::forward<U1>(u.first)` and the second element with `std::forward<U2>(u.second)`.
+[#]{.pnum} _Effects:_ Initializes the first element with `std::forward<U1>(u.first)` and the second element with `std::forward<U2>(u.second)`.
 
-[29]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
+[#]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!is_convertible_v<U1, T@<sub>0</sub>@> || !is_convertible_v<U2, T@<sub>1</sub>@>`
 
 :::
@@ -969,28 +970,28 @@ template<class U1, class U2> constexpr const pair& operator=(pair<U1, U2>&& p) c
    // [allocator.uses.construction], uses-allocator construction
    template<class T, class Alloc, class... Args>
      constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-                                                     Args&&... args) noexcept -> $see below$;
+                                                     Args&&... args) noexcept;
    template<class T, class Alloc, class Tuple1, class Tuple2>
      constexpr auto uses_allocator_construction_args(const Alloc& alloc, piecewise_construct_t,
                                                      Tuple1&& x, Tuple2&& y)
-                                                     noexcept -> $see below$;
+                                                     noexcept;
    template<class T, class Alloc>
-     constexpr auto uses_allocator_construction_args(const Alloc& alloc) noexcept -> $see below$;
+     constexpr auto uses_allocator_construction_args(const Alloc& alloc) noexcept;
    template<class T, class Alloc, class U, class V>
      constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-                                                     U&& u, V&& v) noexcept -> $see below$;
+                                                     U&& u, V&& v) noexcept;
 +  template<class T, class Alloc, class U, class V>
 +    constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-+                                                    pair<U,V>& pr) noexcept -> $see below$;
++                                                    pair<U,V>& pr) noexcept;
    template<class T, class Alloc, class U, class V>
      constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-                                                     const pair<U,V>& pr) noexcept -> $see below$;
+                                                     const pair<U,V>& pr) noexcept;
    template<class T, class Alloc, class U, class V>
      constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-                                                     pair<U,V>&& pr) noexcept -> $see below$;
+                                                     pair<U,V>&& pr) noexcept;
 +  template<class T, class Alloc, class U, class V>
 +    constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-+                                                    const pair<U,V>&& pr) noexcept -> $see below$;
++                                                    const pair<U,V>&& pr) noexcept;
    template<class T, class Alloc, class... Args>
      constexpr T make_obj_using_allocator(const Alloc& alloc, Args&&... args);
    template<class T, class Alloc, class... Args>
@@ -1001,18 +1002,17 @@ template<class U1, class U2> constexpr const pair& operator=(pair<U1, U2>&& p) c
  }
 ```
 
-- Edit [allocator.uses.construction]{.sref} as indicated (the wording below
-incorporates the proposed resolution of [@LWG3527]):
+- Edit [allocator.uses.construction]{.sref} as indicated:
 
 ::: itemdecl
 
 ```diff
 + template<class T, class Alloc, class U, class V>
 +   constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-+                                                   pair<U,V>& pr) noexcept -> $see below$;
++                                                   pair<U,V>& pr) noexcept;
   template<class T, class Alloc, class U, class V>
     constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-                                                    const pair<U,V>& pr) noexcept -> $see below$;
+                                                    const pair<U,V>& pr) noexcept;
 ```
 
 [12]{.pnum} _Constraints_: `T` is a specialization of `pair`.
@@ -1030,10 +1030,10 @@ return uses_allocator_construction_args<T>(alloc, piecewise_construct,
 ```diff
   template<class T, class Alloc, class U, class V>
     constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-                                                    pair<U,V>&& pr) noexcept -> $see below$;
+                                                    pair<U,V>&& pr) noexcept;
 + template<class T, class Alloc, class U, class V>
 +   constexpr auto uses_allocator_construction_args(const Alloc& alloc,
-+                                                   const pair<U,V>&& pr) noexcept -> $see below$;
++                                                   const pair<U,V>&& pr) noexcept;
 ```
 
 [14]{.pnum} _Constraints_: `T` is a specialization of `pair`.
@@ -1043,8 +1043,8 @@ return uses_allocator_construction_args<T>(alloc, piecewise_construct,
 ::: bq
 ```cpp
 return uses_allocator_construction_args<T>(alloc, piecewise_construct,
-                                           forward_as_tuple(@[std::move(pr).first]{.diffdel}[get<0>(std::move(pr))]{.diffins}@),
-                                           forward_as_tuple(@[std::move(pr).second]{.diffdel}[get<1>(std::move(pr))]{.diffins}@));
+                                           forward_as_tuple(get<0>(std::move(pr))),
+                                           forward_as_tuple(get<1>(std::move(pr))));
 ```
 :::
 :::
