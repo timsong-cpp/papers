@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2021-06-10" />
+  <meta name="dcterms.date" content="2021-06-11" />
   <title>zip</title>
   <style>
       code{white-space: pre-wrap;}
@@ -534,7 +534,7 @@ blockquote { background-color: #f6f8fa; }
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2021-06-10</td>
+    <td>2021-06-11</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -649,7 +649,7 @@ blockquote { background-color: #f6f8fa; }
 <p>all as described in section 3.2 of <span class="citation" data-cites="P2214R0">[<a href="#ref-P2214R0" role="doc-biblioref">P2214R0</a>]</span>.</p>
 <h1 data-number="2" style="border-bottom:1px solid #cccccc" id="revision-history"><span class="header-section-number">2</span> Revision history<a href="#revision-history" class="self-link"></a></h1>
 <ul>
-<li>R2: Incorporated LWG review feedback on 2021-05-21, 2021-05-28 and 2021-06-04. Account for integer-class types in the handling of <code class="sourceCode cpp">difference_type</code> and <code class="sourceCode cpp">size_type</code>. Rebase to the expected post-2021-06 working draft.</li>
+<li>R2: Incorporated LWG review feedback on 2021-05-21, 2021-05-28, 2021-06-04, and 2021-06-11. Account for integer-class types in the handling of <code class="sourceCode cpp">difference_type</code> and <code class="sourceCode cpp">size_type</code>. Rebase to the expected post-2021-06 working draft.</li>
 <li>R1: Added feature test macro. Expanded discussion regarding 1) <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">==</span></code> for forward-or-weaker <code class="sourceCode cpp">zip</code> iterators and 2) <code class="sourceCode cpp">adjacent</code> on input ranges. Miscellaneous wording fixes (thanks to Barry Revzin and Tomasz Kamiński). Added a short example.</li>
 </ul>
 <h1 data-number="3" style="border-bottom:1px solid #cccccc" id="examples"><span class="header-section-number">3</span> Examples<a href="#examples" class="self-link"></a></h1>
@@ -2006,7 +2006,7 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb86-5"><a href="#cb86-5"></a>            regular_invocable<span class="op">&lt;</span>F<span class="op">&amp;</span>, range_reference_t<span class="op">&lt;</span>Views<span class="op">&gt;...&gt;</span> <span class="op">&amp;&amp;</span></span>
 <span id="cb86-6"><a href="#cb86-6"></a>            <em>can-reference</em><span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span>F<span class="op">&amp;</span>, range_reference_t<span class="op">&lt;</span>Views<span class="op">&gt;...&gt;&gt;</span></span>
 <span id="cb86-7"><a href="#cb86-7"></a><span class="kw">class</span> zip_transform_view <span class="op">:</span> <span class="kw">public</span> view_interface<span class="op">&lt;</span>zip_transform_view<span class="op">&lt;</span>F, Views<span class="op">...&gt;&gt;</span> <span class="op">{</span></span>
-<span id="cb86-8"><a href="#cb86-8"></a>  <em>copyable-box</em><span class="op">&lt;</span>F<span class="op">&gt;</span> <em>fun_</em>;               <span class="co">// exposition only</span></span>
+<span id="cb86-8"><a href="#cb86-8"></a>  <em>copyable-box</em><span class="op">&lt;</span>F<span class="op">&gt;</span> <em>fun_</em>;                  <span class="co">// exposition only</span></span>
 <span id="cb86-9"><a href="#cb86-9"></a>  zip_view<span class="op">&lt;</span>Views<span class="op">...&gt;</span> <em>zip_</em>;               <span class="co">// exposition only</span></span>
 <span id="cb86-10"><a href="#cb86-10"></a></span>
 <span id="cb86-11"><a href="#cb86-11"></a>  <span class="kw">using</span> <em>InnerView</em> <span class="op">=</span> zip_view<span class="op">&lt;</span>Views<span class="op">...&gt;</span>;  <span class="co">// exposition only</span></span>
@@ -2035,40 +2035,39 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb86-34"><a href="#cb86-34"></a>  <span class="op">}</span></span>
 <span id="cb86-35"><a href="#cb86-35"></a></span>
 <span id="cb86-36"><a href="#cb86-36"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb86-37"><a href="#cb86-37"></a>    <span class="cf">return</span> <em>sentinel</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(</span><em>zip_</em><span class="op">.</span>end<span class="op">())</span>;</span>
-<span id="cb86-38"><a href="#cb86-38"></a>  <span class="op">}</span></span>
-<span id="cb86-39"><a href="#cb86-39"></a></span>
-<span id="cb86-40"><a href="#cb86-40"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">requires</span> common_range<span class="op">&lt;</span><em>InnerView</em><span class="op">&gt;</span> <span class="op">{</span></span>
-<span id="cb86-41"><a href="#cb86-41"></a>    <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(*</span><span class="kw">this</span>, <em>zip_</em><span class="op">.</span>end<span class="op">())</span>;</span>
-<span id="cb86-42"><a href="#cb86-42"></a>  <span class="op">}</span></span>
-<span id="cb86-43"><a href="#cb86-43"></a></span>
-<span id="cb86-44"><a href="#cb86-44"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">const</span></span>
-<span id="cb86-45"><a href="#cb86-45"></a>    <span class="kw">requires</span> range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
-<span id="cb86-46"><a href="#cb86-46"></a>             regular_invocable<span class="op">&lt;</span><span class="kw">const</span> F<span class="op">&amp;</span>, range_reference_t<span class="op">&lt;</span><span class="kw">const</span> Views<span class="op">&gt;...&gt;</span></span>
-<span id="cb86-47"><a href="#cb86-47"></a>  <span class="op">{</span></span>
-<span id="cb86-48"><a href="#cb86-48"></a>    <span class="cf">return</span> <em>sentinel</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(</span><em>zip_</em><span class="op">.</span>end<span class="op">())</span>;</span>
-<span id="cb86-49"><a href="#cb86-49"></a>  <span class="op">}</span></span>
-<span id="cb86-50"><a href="#cb86-50"></a></span>
-<span id="cb86-51"><a href="#cb86-51"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">const</span></span>
-<span id="cb86-52"><a href="#cb86-52"></a>    <span class="kw">requires</span> common_range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
-<span id="cb86-53"><a href="#cb86-53"></a>             regular_invocable<span class="op">&lt;</span><span class="kw">const</span> F<span class="op">&amp;</span>, range_reference_t<span class="op">&lt;</span><span class="kw">const</span> Views<span class="op">&gt;...&gt;</span></span>
-<span id="cb86-54"><a href="#cb86-54"></a>  <span class="op">{</span></span>
-<span id="cb86-55"><a href="#cb86-55"></a>    <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(*</span><span class="kw">this</span>, <em>zip_</em><span class="op">.</span>end<span class="op">())</span>;</span>
-<span id="cb86-56"><a href="#cb86-56"></a>  <span class="op">}</span></span>
-<span id="cb86-57"><a href="#cb86-57"></a></span>
-<span id="cb86-58"><a href="#cb86-58"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> size<span class="op">()</span> <span class="kw">requires</span> sized_range<span class="op">&lt;</span><em>InnerView</em><span class="op">&gt;</span> <span class="op">{</span></span>
-<span id="cb86-59"><a href="#cb86-59"></a>    <span class="cf">return</span> <em>zip_</em><span class="op">.</span>size<span class="op">()</span>;</span>
-<span id="cb86-60"><a href="#cb86-60"></a>  <span class="op">}</span></span>
-<span id="cb86-61"><a href="#cb86-61"></a></span>
-<span id="cb86-62"><a href="#cb86-62"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> size<span class="op">()</span> <span class="kw">const</span> <span class="kw">requires</span> sized_range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">{</span></span>
-<span id="cb86-63"><a href="#cb86-63"></a>    <span class="cf">return</span> <em>zip_</em><span class="op">.</span>size<span class="op">()</span>;</span>
-<span id="cb86-64"><a href="#cb86-64"></a>  <span class="op">}</span></span>
-<span id="cb86-65"><a href="#cb86-65"></a><span class="op">}</span>;</span>
-<span id="cb86-66"><a href="#cb86-66"></a></span>
-<span id="cb86-67"><a href="#cb86-67"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> F, <span class="kw">class</span><span class="op">...</span> Rs<span class="op">&gt;</span></span>
-<span id="cb86-68"><a href="#cb86-68"></a>  zip_transform_view<span class="op">(</span>F, Rs<span class="op">&amp;&amp;...)</span> <span class="op">-&gt;</span> zip_transform_view<span class="op">&lt;</span>F, views<span class="op">::</span>all_t<span class="op">&lt;</span>Rs<span class="op">&gt;...&gt;</span>;</span>
-<span id="cb86-69"><a href="#cb86-69"></a></span>
-<span id="cb86-70"><a href="#cb86-70"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb86-37"><a href="#cb86-37"></a>    <span class="cf">if</span> <span class="kw">constexpr</span> <span class="op">(</span>common_range<span class="op">&lt;</span><em>InnerView</em><span class="op">&gt;)</span> <span class="op">{</span></span>
+<span id="cb86-38"><a href="#cb86-38"></a>      <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(*</span><span class="kw">this</span>, <em>zip_</em><span class="op">.</span>end<span class="op">())</span>;</span>
+<span id="cb86-39"><a href="#cb86-39"></a>    <span class="op">}</span></span>
+<span id="cb86-40"><a href="#cb86-40"></a>    <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb86-41"><a href="#cb86-41"></a>      <span class="cf">return</span> <em>sentinel</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(</span><em>zip_</em><span class="op">.</span>end<span class="op">())</span>;</span>
+<span id="cb86-42"><a href="#cb86-42"></a>    <span class="op">}</span></span>
+<span id="cb86-43"><a href="#cb86-43"></a>  <span class="op">}</span></span>
+<span id="cb86-44"><a href="#cb86-44"></a></span>
+<span id="cb86-45"><a href="#cb86-45"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">const</span></span>
+<span id="cb86-46"><a href="#cb86-46"></a>    <span class="kw">requires</span> range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb86-47"><a href="#cb86-47"></a>             regular_invocable<span class="op">&lt;</span><span class="kw">const</span> F<span class="op">&amp;</span>, range_reference_t<span class="op">&lt;</span><span class="kw">const</span> Views<span class="op">&gt;...&gt;</span></span>
+<span id="cb86-48"><a href="#cb86-48"></a>  <span class="op">{</span></span>
+<span id="cb86-49"><a href="#cb86-49"></a>    <span class="cf">if</span> <span class="kw">constexpr</span> <span class="op">(</span>common_range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;)</span> <span class="op">{</span></span>
+<span id="cb86-50"><a href="#cb86-50"></a>      <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(*</span><span class="kw">this</span>, <em>zip_</em><span class="op">.</span>end<span class="op">())</span>;</span>
+<span id="cb86-51"><a href="#cb86-51"></a>    <span class="op">}</span></span>
+<span id="cb86-52"><a href="#cb86-52"></a>    <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb86-53"><a href="#cb86-53"></a>      <span class="cf">return</span> <em>sentinel</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(</span><em>zip_</em><span class="op">.</span>end<span class="op">())</span>;</span>
+<span id="cb86-54"><a href="#cb86-54"></a>    <span class="op">}</span></span>
+<span id="cb86-55"><a href="#cb86-55"></a>  <span class="op">}</span></span>
+<span id="cb86-56"><a href="#cb86-56"></a></span>
+<span id="cb86-57"><a href="#cb86-57"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> size<span class="op">()</span> <span class="kw">requires</span> sized_range<span class="op">&lt;</span><em>InnerView</em><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb86-58"><a href="#cb86-58"></a>    <span class="cf">return</span> <em>zip_</em><span class="op">.</span>size<span class="op">()</span>;</span>
+<span id="cb86-59"><a href="#cb86-59"></a>  <span class="op">}</span></span>
+<span id="cb86-60"><a href="#cb86-60"></a></span>
+<span id="cb86-61"><a href="#cb86-61"></a>  <span class="kw">constexpr</span> <span class="kw">auto</span> size<span class="op">()</span> <span class="kw">const</span> <span class="kw">requires</span> sized_range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb86-62"><a href="#cb86-62"></a>    <span class="cf">return</span> <em>zip_</em><span class="op">.</span>size<span class="op">()</span>;</span>
+<span id="cb86-63"><a href="#cb86-63"></a>  <span class="op">}</span></span>
+<span id="cb86-64"><a href="#cb86-64"></a><span class="op">}</span>;</span>
+<span id="cb86-65"><a href="#cb86-65"></a></span>
+<span id="cb86-66"><a href="#cb86-66"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> F, <span class="kw">class</span><span class="op">...</span> Rs<span class="op">&gt;</span></span>
+<span id="cb86-67"><a href="#cb86-67"></a>  zip_transform_view<span class="op">(</span>F, Rs<span class="op">&amp;&amp;...)</span> <span class="op">-&gt;</span> zip_transform_view<span class="op">&lt;</span>F, views<span class="op">::</span>all_t<span class="op">&lt;</span>Rs<span class="op">&gt;...&gt;</span>;</span>
+<span id="cb86-68"><a href="#cb86-68"></a></span>
+<span id="cb86-69"><a href="#cb86-69"></a><span class="op">}</span></span></code></pre></div>
 <div>
 <div class="sourceCode" id="cb87"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb87-1"><a href="#cb87-1"></a><span class="kw">constexpr</span> <span class="kw">explicit</span> zip_transform_view<span class="op">(</span>F fun, Views<span class="op">...</span> views<span class="op">)</span>;</span></code></pre></div>
 <blockquote>
@@ -2540,14 +2539,14 @@ blockquote { background-color: #f6f8fa; }
 <div class="sourceCode" id="cb134"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb134-1"><a href="#cb134-1"></a><span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">+=(</span>difference_type x<span class="op">)</span></span>
 <span id="cb134-2"><a href="#cb134-2"></a>  <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_248" id="pnum_248">15</a></span> <em>Preconditions:</em> <code class="sourceCode cpp"><em>current_</em><span class="op">.</span>back<span class="op">()</span> <span class="op">+</span> x</code> has well defined behavior.</p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_248" id="pnum_248">15</a></span> <em>Preconditions:</em> <code class="sourceCode cpp"><em>current_</em><span class="op">.</span>back<span class="op">()</span> <span class="op">+</span> x</code> has well-defined behavior.</p>
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_249" id="pnum_249">16</a></span> <em>Postconditions</em>: Each element of <code class="sourceCode cpp"><em>current_</em></code> is equal to <code class="sourceCode cpp"><em>i</em> <span class="op">+</span> x</code>, where <span class="math inline"><em>i</em></span> is the value of that element before the call.</p>
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_250" id="pnum_250">17</a></span> <em>Returns</em>: <code class="sourceCode cpp"><span class="op">*</span><span class="kw">this</span></code>.</p>
 </blockquote>
 <div class="sourceCode" id="cb135"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb135-1"><a href="#cb135-1"></a>  <span class="kw">constexpr</span> <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">-=(</span>difference_type x<span class="op">)</span></span>
 <span id="cb135-2"><a href="#cb135-2"></a>    <span class="kw">requires</span> random_access_range<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span>;</span></code></pre></div>
 <blockquote>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_251" id="pnum_251">18</a></span> <em>Preconditions:</em> <code class="sourceCode cpp"><em>current_</em><span class="op">.</span>front<span class="op">()</span> <span class="op">-</span> x</code> has well defined behavior.</p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_251" id="pnum_251">18</a></span> <em>Preconditions:</em> <code class="sourceCode cpp"><em>current_</em><span class="op">.</span>front<span class="op">()</span> <span class="op">-</span> x</code> has well-defined behavior.</p>
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_252" id="pnum_252">19</a></span> <em>Postconditions</em>: Each element of <code class="sourceCode cpp"><em>current_</em></code> is equal to <code class="sourceCode cpp"><em>i</em> <span class="op">-</span> x</code>, where <span class="math inline"><em>i</em></span> is the value of that element before the call.</p>
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_253" id="pnum_253">20</a></span> <em>Returns</em>: <code class="sourceCode cpp"><span class="op">*</span><span class="kw">this</span></code>.</p>
 </blockquote>
@@ -2705,10 +2704,10 @@ blockquote { background-color: #f6f8fa; }
 <h3 class="unnumbered" data-number id="adjacent-transform-view-range.adjacent.transform">24.7.? Adjacent transform view [range.adjacent.transform]<a href="#adjacent-transform-view-range.adjacent.transform" class="self-link"></a></h3>
 <h4 class="unnumbered" data-number id="overview-range.adjacent.transform.overview">24.7.?.1 Overview [range.adjacent.transform.overview]<a href="#overview-range.adjacent.transform.overview" class="self-link"></a></h4>
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_274" id="pnum_274">1</a></span> <code class="sourceCode cpp">adjacent_transform_view</code> takes an invocable object and a <code class="sourceCode cpp">view</code> and produces a <code class="sourceCode cpp">view</code> whose <em>M <sup>th</sup></em> element is the result of applying the invocable object to the <em>M</em> <sup>th</sup> through (<em>M</em> + <em>N</em> - 1)<sup>th</sup> elements of the original view. If the original view has fewer than <em>N</em> elements, the resulting view is empty.</p>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_275" id="pnum_275">2</a></span> The name <code class="sourceCode cpp">views<span class="op">::</span>adjacent_transform<span class="op">&lt;</span>N<span class="op">&gt;</span></code> denotes a range adaptor object (<span>24.7.2 <a href="https://wg21.link/range.adaptor.object">[range.adaptor.object]</a></span>). Given subexpressions <code class="sourceCode cpp">E</code> and <code class="sourceCode cpp">F</code> and a constant expression <code class="sourceCode cpp">N</code>,</p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_275" id="pnum_275">2</a></span> The name <code class="sourceCode cpp">views<span class="op">::</span>adjacent_transform<span class="op">&lt;</span>N<span class="op">&gt;</span></code> denotes a range adaptor object (<span>24.7.2 <a href="https://wg21.link/range.adaptor.object">[range.adaptor.object]</a></span>). Given subexpressions <code class="sourceCode cpp">E</code> and <code class="sourceCode cpp">F</code> and a constant expression <code class="sourceCode cpp">N</code>:</p>
 <ul>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_276" id="pnum_276">(2.1)</a></span> if <code class="sourceCode cpp">N</code> is equal to 0, <code class="sourceCode cpp">views<span class="op">::</span>adjacent_transform<span class="op">&lt;</span>N<span class="op">&gt;(</span>E, F<span class="op">)</span></code> is expression-equivalent to <code class="sourceCode cpp"><span class="op">(</span><span class="dt">void</span><span class="op">)</span>E, views<span class="op">::</span>zip_transform<span class="op">(</span>F<span class="op">)</span></code>, except that the evaluations of <code class="sourceCode cpp">E</code> and <code class="sourceCode cpp">F</code> are indeterminately sequenced;</li>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_277" id="pnum_277">(2.2)</a></span> otherwise, the expression <code class="sourceCode cpp">views<span class="op">::</span>adjacent_transform<span class="op">&lt;</span>N<span class="op">&gt;(</span>E, F<span class="op">)</span></code> is expression-equivalent to <code class="sourceCode cpp">adjacent_transform_view<span class="op">&lt;</span>views<span class="op">::</span>all_t<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">((</span>E<span class="op">))&gt;</span>, decay_t<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">((</span>F<span class="op">))&gt;</span>, N<span class="op">&gt;(</span>E, F<span class="op">)</span></code>.</li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_276" id="pnum_276">(2.1)</a></span> If <code class="sourceCode cpp">N</code> is equal to 0, <code class="sourceCode cpp">views<span class="op">::</span>adjacent_transform<span class="op">&lt;</span>N<span class="op">&gt;(</span>E, F<span class="op">)</span></code> is expression-equivalent to <code class="sourceCode cpp"><span class="op">((</span><span class="dt">void</span><span class="op">)</span>E, views<span class="op">::</span>zip_transform<span class="op">(</span>F<span class="op">))</span></code>, except that the evaluations of <code class="sourceCode cpp">E</code> and <code class="sourceCode cpp">F</code> are indeterminately sequenced.</li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_277" id="pnum_277">(2.2)</a></span> Otherwise, the expression <code class="sourceCode cpp">views<span class="op">::</span>adjacent_transform<span class="op">&lt;</span>N<span class="op">&gt;(</span>E, F<span class="op">)</span></code> is expression-equivalent to <code class="sourceCode cpp">adjacent_transform_view<span class="op">&lt;</span>views<span class="op">::</span>all_t<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">((</span>E<span class="op">))&gt;</span>, decay_t<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">((</span>F<span class="op">))&gt;</span>, N<span class="op">&gt;(</span>E, F<span class="op">)</span></code>.</li>
 </ul>
 <div class="example">
 <span>[ <em>Example 1:</em> </span>
@@ -2749,43 +2748,42 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb161-27"><a href="#cb161-27"></a></span>
 <span id="cb161-28"><a href="#cb161-28"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> begin<span class="op">()</span> <span class="kw">const</span></span>
 <span id="cb161-29"><a href="#cb161-29"></a>      <span class="kw">requires</span> range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
-<span id="cb161-30"><a href="#cb161-30"></a>              regular_invocable<span class="op">&lt;</span><span class="kw">const</span> F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span><span class="kw">const</span> V<span class="op">&gt;</span>, N<span class="op">)...&gt;</span></span>
+<span id="cb161-30"><a href="#cb161-30"></a>               regular_invocable<span class="op">&lt;</span><span class="kw">const</span> F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span><span class="kw">const</span> V<span class="op">&gt;</span>, N<span class="op">)...&gt;</span></span>
 <span id="cb161-31"><a href="#cb161-31"></a>    <span class="op">{</span></span>
 <span id="cb161-32"><a href="#cb161-32"></a>      <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(*</span><span class="kw">this</span>, <em>inner_</em><span class="op">.</span>begin<span class="op">())</span>;</span>
 <span id="cb161-33"><a href="#cb161-33"></a>    <span class="op">}</span></span>
 <span id="cb161-34"><a href="#cb161-34"></a></span>
 <span id="cb161-35"><a href="#cb161-35"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb161-36"><a href="#cb161-36"></a>      <span class="cf">return</span> <em>sentinel</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(</span><em>inner_</em><span class="op">.</span>end<span class="op">())</span>;</span>
-<span id="cb161-37"><a href="#cb161-37"></a>    <span class="op">}</span></span>
-<span id="cb161-38"><a href="#cb161-38"></a></span>
-<span id="cb161-39"><a href="#cb161-39"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">requires</span> common_range<span class="op">&lt;</span><em>InnerView</em><span class="op">&gt;</span> <span class="op">{</span></span>
-<span id="cb161-40"><a href="#cb161-40"></a>      <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(*</span><span class="kw">this</span>, <em>inner_</em><span class="op">.</span>end<span class="op">())</span>;</span>
-<span id="cb161-41"><a href="#cb161-41"></a>    <span class="op">}</span></span>
-<span id="cb161-42"><a href="#cb161-42"></a></span>
-<span id="cb161-43"><a href="#cb161-43"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">const</span></span>
-<span id="cb161-44"><a href="#cb161-44"></a>      <span class="kw">requires</span> range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
-<span id="cb161-45"><a href="#cb161-45"></a>              regular_invocable<span class="op">&lt;</span><span class="kw">const</span> F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span><span class="kw">const</span> V<span class="op">&gt;</span>, N<span class="op">)...&gt;</span></span>
-<span id="cb161-46"><a href="#cb161-46"></a>    <span class="op">{</span></span>
-<span id="cb161-47"><a href="#cb161-47"></a>      <span class="cf">return</span> <em>sentinel</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(</span><em>inner_</em><span class="op">.</span>end<span class="op">())</span>;</span>
-<span id="cb161-48"><a href="#cb161-48"></a>    <span class="op">}</span></span>
-<span id="cb161-49"><a href="#cb161-49"></a></span>
-<span id="cb161-50"><a href="#cb161-50"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">const</span></span>
-<span id="cb161-51"><a href="#cb161-51"></a>      <span class="kw">requires</span> common_range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
-<span id="cb161-52"><a href="#cb161-52"></a>              regular_invocable<span class="op">&lt;</span><span class="kw">const</span> F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span><span class="kw">const</span> V<span class="op">&gt;</span>, N<span class="op">)...&gt;</span></span>
-<span id="cb161-53"><a href="#cb161-53"></a>    <span class="op">{</span></span>
-<span id="cb161-54"><a href="#cb161-54"></a>      <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(*</span><span class="kw">this</span>, <em>inner_</em><span class="op">.</span>end<span class="op">())</span>;</span>
-<span id="cb161-55"><a href="#cb161-55"></a>    <span class="op">}</span></span>
-<span id="cb161-56"><a href="#cb161-56"></a></span>
-<span id="cb161-57"><a href="#cb161-57"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> size<span class="op">()</span> <span class="kw">requires</span> sized_range<span class="op">&lt;</span><em>InnerView</em><span class="op">&gt;</span> <span class="op">{</span></span>
-<span id="cb161-58"><a href="#cb161-58"></a>      <span class="cf">return</span> <em>inner_</em><span class="op">.</span>size<span class="op">()</span>;</span>
-<span id="cb161-59"><a href="#cb161-59"></a>    <span class="op">}</span></span>
-<span id="cb161-60"><a href="#cb161-60"></a></span>
-<span id="cb161-61"><a href="#cb161-61"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> size<span class="op">()</span> <span class="kw">const</span> <span class="kw">requires</span> sized_range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">{</span></span>
-<span id="cb161-62"><a href="#cb161-62"></a>      <span class="cf">return</span> <em>inner_</em><span class="op">.</span>size<span class="op">()</span>;</span>
-<span id="cb161-63"><a href="#cb161-63"></a>    <span class="op">}</span></span>
-<span id="cb161-64"><a href="#cb161-64"></a>  <span class="op">}</span>;</span>
-<span id="cb161-65"><a href="#cb161-65"></a></span>
-<span id="cb161-66"><a href="#cb161-66"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb161-36"><a href="#cb161-36"></a>      <span class="cf">if</span> <span class="kw">constexpr</span> <span class="op">(</span>common_range<span class="op">&lt;</span><em>InnerView</em><span class="op">&gt;)</span> <span class="op">{</span></span>
+<span id="cb161-37"><a href="#cb161-37"></a>        <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(*</span><span class="kw">this</span>, <em>inner_</em><span class="op">.</span>end<span class="op">())</span>;</span>
+<span id="cb161-38"><a href="#cb161-38"></a>      <span class="op">}</span></span>
+<span id="cb161-39"><a href="#cb161-39"></a>      <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb161-40"><a href="#cb161-40"></a>        <span class="cf">return</span> <em>sentinel</em><span class="op">&lt;</span><span class="kw">false</span><span class="op">&gt;(</span><em>inner_</em><span class="op">.</span>end<span class="op">())</span>;</span>
+<span id="cb161-41"><a href="#cb161-41"></a>      <span class="op">}</span></span>
+<span id="cb161-42"><a href="#cb161-42"></a>    <span class="op">}</span></span>
+<span id="cb161-43"><a href="#cb161-43"></a></span>
+<span id="cb161-44"><a href="#cb161-44"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> end<span class="op">()</span> <span class="kw">const</span></span>
+<span id="cb161-45"><a href="#cb161-45"></a>      <span class="kw">requires</span> range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb161-46"><a href="#cb161-46"></a>               regular_invocable<span class="op">&lt;</span><span class="kw">const</span> F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span><span class="kw">const</span> V<span class="op">&gt;</span>, N<span class="op">)...&gt;</span></span>
+<span id="cb161-47"><a href="#cb161-47"></a>    <span class="op">{</span></span>
+<span id="cb161-48"><a href="#cb161-48"></a>      <span class="cf">if</span> <span class="kw">constexpr</span> <span class="op">(</span>common_range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;)</span> <span class="op">{</span></span>
+<span id="cb161-49"><a href="#cb161-49"></a>        <span class="cf">return</span> <em>iterator</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(*</span><span class="kw">this</span>, <em>inner_</em><span class="op">.</span>end<span class="op">())</span>;</span>
+<span id="cb161-50"><a href="#cb161-50"></a>      <span class="op">}</span></span>
+<span id="cb161-51"><a href="#cb161-51"></a>      <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb161-52"><a href="#cb161-52"></a>        <span class="cf">return</span> <em>sentinel</em><span class="op">&lt;</span><span class="kw">true</span><span class="op">&gt;(</span><em>inner_</em><span class="op">.</span>end<span class="op">())</span>;</span>
+<span id="cb161-53"><a href="#cb161-53"></a>      <span class="op">}</span></span>
+<span id="cb161-54"><a href="#cb161-54"></a>    <span class="op">}</span></span>
+<span id="cb161-55"><a href="#cb161-55"></a></span>
+<span id="cb161-56"><a href="#cb161-56"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> size<span class="op">()</span> <span class="kw">requires</span> sized_range<span class="op">&lt;</span><em>InnerView</em><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb161-57"><a href="#cb161-57"></a>      <span class="cf">return</span> <em>inner_</em><span class="op">.</span>size<span class="op">()</span>;</span>
+<span id="cb161-58"><a href="#cb161-58"></a>    <span class="op">}</span></span>
+<span id="cb161-59"><a href="#cb161-59"></a></span>
+<span id="cb161-60"><a href="#cb161-60"></a>    <span class="kw">constexpr</span> <span class="kw">auto</span> size<span class="op">()</span> <span class="kw">const</span> <span class="kw">requires</span> sized_range<span class="op">&lt;</span><span class="kw">const</span> <em>InnerView</em><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb161-61"><a href="#cb161-61"></a>      <span class="cf">return</span> <em>inner_</em><span class="op">.</span>size<span class="op">()</span>;</span>
+<span id="cb161-62"><a href="#cb161-62"></a>    <span class="op">}</span></span>
+<span id="cb161-63"><a href="#cb161-63"></a>  <span class="op">}</span>;</span>
+<span id="cb161-64"><a href="#cb161-64"></a></span>
+<span id="cb161-65"><a href="#cb161-65"></a><span class="op">}</span></span></code></pre></div>
 <div>
 <div class="sourceCode" id="cb162"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb162-1"><a href="#cb162-1"></a><span class="kw">constexpr</span> <span class="kw">explicit</span> adjacent_transform_view<span class="op">(</span>V base, F fun<span class="op">)</span>;</span></code></pre></div>
 <blockquote>

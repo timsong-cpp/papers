@@ -21,7 +21,7 @@ all as described in section 3.2 of [@P2214R0].
 
 # Revision history
 
-- R2: Incorporated LWG review feedback on 2021-05-21, 2021-05-28 and 2021-06-04.
+- R2: Incorporated LWG review feedback on 2021-05-21, 2021-05-28, 2021-06-04, and 2021-06-11.
   Account for integer-class types in the handling of `difference_type` and `size_type`.
   Rebase to the expected post-2021-06 working draft.
 - R1: Added feature test macro. Expanded discussion regarding 1) `operator==` for
@@ -1800,7 +1800,7 @@ template<copy_constructible F, input_range... Views>
             regular_invocable<F&, range_reference_t<Views>...> &&
             $can-reference$<invoke_result_t<F&, range_reference_t<Views>...>>
 class zip_transform_view : public view_interface<zip_transform_view<F, Views...>> {
-  $copyable-box$<F> $fun_$;               // exposition only
+  $copyable-box$<F> $fun_$;                  // exposition only
   zip_view<Views...> $zip_$;               // exposition only
 
   using $InnerView$ = zip_view<Views...>;  // exposition only
@@ -1829,25 +1829,24 @@ public:
   }
 
   constexpr auto end() {
-    return $sentinel$<false>($zip_$.end());
-  }
-
-  constexpr auto end() requires common_range<$InnerView$> {
-    return $iterator$<false>(*this, $zip_$.end());
+    if constexpr (common_range<$InnerView$>) {
+      return $iterator$<false>(*this, $zip_$.end());
+    }
+    else {
+      return $sentinel$<false>($zip_$.end());
+    }
   }
 
   constexpr auto end() const
     requires range<const $InnerView$> &&
              regular_invocable<const F&, range_reference_t<const Views>...>
   {
-    return $sentinel$<true>($zip_$.end());
-  }
-
-  constexpr auto end() const
-    requires common_range<const $InnerView$> &&
-             regular_invocable<const F&, range_reference_t<const Views>...>
-  {
-    return $iterator$<true>(*this, $zip_$.end());
+    if constexpr (common_range<const $InnerView$>) {
+      return $iterator$<true>(*this, $zip_$.end());
+    }
+    else {
+      return $sentinel$<true>($zip_$.end());
+    }
   }
 
   constexpr auto size() requires sized_range<$InnerView$> {
@@ -2489,7 +2488,7 @@ constexpr $iterator$ operator--(int) requires bidirectional_range<$Base$>;
 constexpr $iterator$& operator+=(difference_type x)
   requires random_access_range<$Base$>;
 ```
-[#]{.pnum} _Preconditions:_ `$current_$.back() + x` has well defined behavior.
+[#]{.pnum} _Preconditions:_ `$current_$.back() + x` has well-defined behavior.
 
 [#]{.pnum} _Postconditions_: Each element of `$current_$` is equal to `$i$ + x`,
 where $i$ is the value of that element before the call.
@@ -2500,7 +2499,7 @@ where $i$ is the value of that element before the call.
   constexpr $iterator$& operator-=(difference_type x)
     requires random_access_range<$Base$>;
 ```
-[#]{.pnum} _Preconditions:_ `$current_$.front() - x` has well defined behavior.
+[#]{.pnum} _Preconditions:_ `$current_$.front() - x` has well-defined behavior.
 
 [#]{.pnum} _Postconditions_: Each element of `$current_$` is equal to `$i$ - x`,
 where $i$ is the value of that element before the call.
@@ -2730,12 +2729,12 @@ the resulting view is empty.
 
 [#]{.pnum} The name `views::adjacent_transform<N>` denotes a range adaptor object
 ([range.adaptor.object]{.sref}). Given subexpressions `E` and `F` and a constant
-expression `N`,
+expression `N`:
 
-- [#.#]{.pnum} if `N` is equal to 0, `views::adjacent_transform<N>(E, F)`
-is expression-equivalent to `(void)E, views::zip_transform(F)`,
-except that the evaluations of `E` and `F` are indeterminately sequenced;
-- [#.#]{.pnum} otherwise, the expression `views::adjacent_transform<N>(E, F)`
+- [#.#]{.pnum} If `N` is equal to 0, `views::adjacent_transform<N>(E, F)`
+is expression-equivalent to `((void)E, views::zip_transform(F))`,
+except that the evaluations of `E` and `F` are indeterminately sequenced.
+- [#.#]{.pnum} Otherwise, the expression `views::adjacent_transform<N>(E, F)`
 is expression-equivalent to
 `adjacent_transform_view<views::all_t<decltype((E))>, decay_t<decltype((F))>, N>(E, F)`.
 
@@ -2783,31 +2782,30 @@ namespace std::ranges {
 
     constexpr auto begin() const
       requires range<const $InnerView$> &&
-              regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
+               regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
     {
       return $iterator$<true>(*this, $inner_$.begin());
     }
 
     constexpr auto end() {
-      return $sentinel$<false>($inner_$.end());
-    }
-
-    constexpr auto end() requires common_range<$InnerView$> {
-      return $iterator$<false>(*this, $inner_$.end());
+      if constexpr (common_range<$InnerView$>) {
+        return $iterator$<false>(*this, $inner_$.end());
+      }
+      else {
+        return $sentinel$<false>($inner_$.end());
+      }
     }
 
     constexpr auto end() const
       requires range<const $InnerView$> &&
-              regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
+               regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
     {
-      return $sentinel$<true>($inner_$.end());
-    }
-
-    constexpr auto end() const
-      requires common_range<const $InnerView$> &&
-              regular_invocable<const F&, $REPEAT$(range_reference_t<const V>, N)...>
-    {
-      return $iterator$<true>(*this, $inner_$.end());
+      if constexpr (common_range<const $InnerView$>) {
+        return $iterator$<true>(*this, $inner_$.end());
+      }
+      else {
+        return $sentinel$<true>($inner_$.end());
+      }
     }
 
     constexpr auto size() requires sized_range<$InnerView$> {
