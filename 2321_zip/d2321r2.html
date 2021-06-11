@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2021-06-04" />
+  <meta name="dcterms.date" content="2021-06-10" />
   <title>zip</title>
   <style>
       code{white-space: pre-wrap;}
@@ -534,7 +534,7 @@ blockquote { background-color: #f6f8fa; }
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2021-06-04</td>
+    <td>2021-06-10</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -649,7 +649,7 @@ blockquote { background-color: #f6f8fa; }
 <p>all as described in section 3.2 of <span class="citation" data-cites="P2214R0">[<a href="#ref-P2214R0" role="doc-biblioref">P2214R0</a>]</span>.</p>
 <h1 data-number="2" style="border-bottom:1px solid #cccccc" id="revision-history"><span class="header-section-number">2</span> Revision history<a href="#revision-history" class="self-link"></a></h1>
 <ul>
-<li>R2: Incorporated LWG review feedback on 2021-05-21, 2021-05-28 and 2021-06-04. Account for integer-class types in the handling of <code class="sourceCode cpp">difference_type</code> and <code class="sourceCode cpp">size_type</code>.</li>
+<li>R2: Incorporated LWG review feedback on 2021-05-21, 2021-05-28 and 2021-06-04. Account for integer-class types in the handling of <code class="sourceCode cpp">difference_type</code> and <code class="sourceCode cpp">size_type</code>. Account for <span class="citation" data-cites="P2325R3">[<a href="#ref-P2325R3" role="doc-biblioref">P2325R3</a>]</span>.</li>
 <li>R1: Added feature test macro. Expanded discussion regarding 1) <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">==</span></code> for forward-or-weaker <code class="sourceCode cpp">zip</code> iterators and 2) <code class="sourceCode cpp">adjacent</code> on input ranges. Miscellaneous wording fixes (thanks to Barry Revzin and Tomasz Kamiński). Added a short example.</li>
 </ul>
 <h1 data-number="3" style="border-bottom:1px solid #cccccc" id="examples"><span class="header-section-number">3</span> Examples<a href="#examples" class="self-link"></a></h1>
@@ -2006,7 +2006,7 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb86-5"><a href="#cb86-5"></a>            regular_invocable<span class="op">&lt;</span>F<span class="op">&amp;</span>, range_reference_t<span class="op">&lt;</span>Views<span class="op">&gt;...&gt;</span> <span class="op">&amp;&amp;</span></span>
 <span id="cb86-6"><a href="#cb86-6"></a>            <em>can-reference</em><span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span>F<span class="op">&amp;</span>, range_reference_t<span class="op">&lt;</span>Views<span class="op">&gt;...&gt;&gt;</span></span>
 <span id="cb86-7"><a href="#cb86-7"></a><span class="kw">class</span> zip_transform_view <span class="op">:</span> <span class="kw">public</span> view_interface<span class="op">&lt;</span>zip_transform_view<span class="op">&lt;</span>F, Views<span class="op">...&gt;&gt;</span> <span class="op">{</span></span>
-<span id="cb86-8"><a href="#cb86-8"></a>  <em>semiregular-box</em><span class="op">&lt;</span>F<span class="op">&gt;</span> <em>fun_</em>;               <span class="co">// exposition only</span></span>
+<span id="cb86-8"><a href="#cb86-8"></a>  <em>copyable-box</em><span class="op">&lt;</span>F<span class="op">&gt;</span> <em>fun_</em>;               <span class="co">// exposition only</span></span>
 <span id="cb86-9"><a href="#cb86-9"></a>  zip_view<span class="op">&lt;</span>Views<span class="op">...&gt;</span> <em>zip_</em>;               <span class="co">// exposition only</span></span>
 <span id="cb86-10"><a href="#cb86-10"></a></span>
 <span id="cb86-11"><a href="#cb86-11"></a>  <span class="kw">using</span> <em>InnerView</em> <span class="op">=</span> zip_view<span class="op">&lt;</span>Views<span class="op">...&gt;</span>;  <span class="co">// exposition only</span></span>
@@ -2086,7 +2086,7 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb88-8"><a href="#cb88-8"></a>    <span class="kw">using</span> <em>Parent</em> <span class="op">=</span> <em>maybe-const</em><span class="op">&lt;</span>Const, zip_transform_view<span class="op">&gt;</span>;      <span class="co">// exposition only</span></span>
 <span id="cb88-9"><a href="#cb88-9"></a>    <span class="kw">using</span> <em>Base</em> <span class="op">=</span> <em>maybe-const</em><span class="op">&lt;</span>Const, <em>InnerView</em><span class="op">&gt;</span>;                 <span class="co">// exposition only</span></span>
 <span id="cb88-10"><a href="#cb88-10"></a>    <em>Parent</em><span class="op">*</span> <em>parent_</em> <span class="op">=</span> <span class="kw">nullptr</span>;                                  <span class="co">// exposition only</span></span>
-<span id="cb88-11"><a href="#cb88-11"></a>    <em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span> <em>inner_</em> <span class="op">=</span> <em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;()</span>;               <span class="co">// exposition only</span></span>
+<span id="cb88-11"><a href="#cb88-11"></a>    <em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span> <em>inner_</em>;                                    <span class="co">// exposition only</span></span>
 <span id="cb88-12"><a href="#cb88-12"></a></span>
 <span id="cb88-13"><a href="#cb88-13"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span><em>Parent</em><span class="op">&amp;</span> parent, <em>ziperator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span> inner<span class="op">)</span>; <span class="co">// exposition only</span></span>
 <span id="cb88-14"><a href="#cb88-14"></a></span>
@@ -2726,7 +2726,7 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb161-4"><a href="#cb161-4"></a>            regular_invocable<span class="op">&lt;</span>F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, N<span class="op">)...&gt;</span> <span class="op">&amp;&amp;</span></span>
 <span id="cb161-5"><a href="#cb161-5"></a>            <em>can-reference</em><span class="op">&lt;</span>invoke_result_t<span class="op">&lt;</span>F<span class="op">&amp;</span>, <em>REPEAT</em><span class="op">(</span>range_reference_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, N<span class="op">)...&gt;&gt;</span></span>
 <span id="cb161-6"><a href="#cb161-6"></a>  <span class="kw">class</span> adjacent_transform_view <span class="op">:</span> <span class="kw">public</span> view_interface<span class="op">&lt;</span>adjacent_transform_view<span class="op">&lt;</span>V, F, N<span class="op">&gt;&gt;</span> <span class="op">{</span></span>
-<span id="cb161-7"><a href="#cb161-7"></a>    <em>semiregular-box</em><span class="op">&lt;</span>F<span class="op">&gt;</span> <em>fun_</em>;                  <span class="co">// exposition only</span></span>
+<span id="cb161-7"><a href="#cb161-7"></a>    <em>copyable-box</em><span class="op">&lt;</span>F<span class="op">&gt;</span> <em>fun_</em>;                     <span class="co">// exposition only</span></span>
 <span id="cb161-8"><a href="#cb161-8"></a>    adjacent_view<span class="op">&lt;</span>V, N<span class="op">&gt;</span> <em>inner_</em>;               <span class="co">// exposition only</span></span>
 <span id="cb161-9"><a href="#cb161-9"></a></span>
 <span id="cb161-10"><a href="#cb161-10"></a>    <span class="kw">using</span> <em>InnerView</em> <span class="op">=</span> adjacent_view<span class="op">&lt;</span>V, N<span class="op">&gt;</span>;    <span class="co">// exposition only</span></span>
@@ -2803,7 +2803,7 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb163-8"><a href="#cb163-8"></a>    <span class="kw">using</span> <em>Parent</em> <span class="op">=</span> <em>maybe-const</em><span class="op">&lt;</span>Const, adjacent_transform_view<span class="op">&gt;</span>;      <span class="co">// exposition only</span></span>
 <span id="cb163-9"><a href="#cb163-9"></a>    <span class="kw">using</span> <em>Base</em> <span class="op">=</span> <em>maybe-const</em><span class="op">&lt;</span>Const, V<span class="op">&gt;</span>;                              <span class="co">// exposition only</span></span>
 <span id="cb163-10"><a href="#cb163-10"></a>    <em>Parent</em><span class="op">*</span> <em>parent_</em> <span class="op">=</span> <span class="kw">nullptr</span>;                                       <span class="co">// exposition only</span></span>
-<span id="cb163-11"><a href="#cb163-11"></a>    <em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span> <em>inner_</em> <span class="op">=</span> <em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;()</span>;          <span class="co">// exposition only</span></span>
+<span id="cb163-11"><a href="#cb163-11"></a>    <em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span> <em>inner_</em>;                                    <span class="co">// exposition only</span></span>
 <span id="cb163-12"><a href="#cb163-12"></a></span>
 <span id="cb163-13"><a href="#cb163-13"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span><em>Parent</em><span class="op">&amp;</span> parent, <em>inner-iterator</em><span class="op">&lt;</span>Const<span class="op">&gt;</span> inner<span class="op">)</span>; <span class="co">// exposition only</span></span>
 <span id="cb163-14"><a href="#cb163-14"></a></span>
@@ -3056,6 +3056,10 @@ blockquote { background-color: #f6f8fa; }
 <div id="ref-P2214R0">
 <p>[P2214R0] Barry Revzin, Conor Hoekstra, Tim Song. 2020-10-15. A Plan for C++23 Ranges. <br />
 <a href="https://wg21.link/p2214r0">https://wg21.link/p2214r0</a></p>
+</div>
+<div id="ref-P2325R3">
+<p>[P2325R3] Barry Revzin. 2021-05-14. Views should not be required to be default constructible. <br />
+<a href="https://wg21.link/p2325r3">https://wg21.link/p2325r3</a></p>
 </div>
 <div id="ref-range-v3.1592">
 <p>[range-v3.1592] kitegi. 2020. <code class="sourceCode cpp">zip</code> does not satisfy the semantic requirements of <code class="sourceCode cpp">bidirectional_iterator</code> when the ranges have different lengths. <br />

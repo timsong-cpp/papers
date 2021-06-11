@@ -23,6 +23,7 @@ all as described in section 3.2 of [@P2214R0].
 
 - R2: Incorporated LWG review feedback on 2021-05-21, 2021-05-28 and 2021-06-04.
   Account for integer-class types in the handling of `difference_type` and `size_type`.
+  Account for [@P2325R3].
 - R1: Added feature test macro. Expanded discussion regarding 1) `operator==` for
   forward-or-weaker `zip` iterators and 2) `adjacent` on input ranges.
   Miscellaneous wording fixes (thanks to Barry Revzin and Tomasz Kamiński).
@@ -1799,7 +1800,7 @@ template<copy_constructible F, input_range... Views>
             regular_invocable<F&, range_reference_t<Views>...> &&
             $can-reference$<invoke_result_t<F&, range_reference_t<Views>...>>
 class zip_transform_view : public view_interface<zip_transform_view<F, Views...>> {
-  $semiregular-box$<F> $fun_$;               // exposition only
+  $copyable-box$<F> $fun_$;               // exposition only
   zip_view<Views...> $zip_$;               // exposition only
 
   using $InnerView$ = zip_view<Views...>;  // exposition only
@@ -1888,7 +1889,7 @@ namespace std::ranges {
     using $Parent$ = $maybe-const$<Const, zip_transform_view>;      // exposition only
     using $Base$ = $maybe-const$<Const, $InnerView$>;                 // exposition only
     $Parent$* $parent_$ = nullptr;                                  // exposition only
-    $ziperator$<Const> $inner_$ = $ziperator$<Const>();               // exposition only
+    $ziperator$<Const> $inner_$;                                    // exposition only
 
     constexpr $iterator$($Parent$& parent, $ziperator$<Const> inner); // exposition only
 
@@ -2759,7 +2760,7 @@ namespace std::ranges {
             regular_invocable<F&, $REPEAT$(range_reference_t<V>, N)...> &&
             $can-reference$<invoke_result_t<F&, $REPEAT$(range_reference_t<V>, N)...>>
   class adjacent_transform_view : public view_interface<adjacent_transform_view<V, F, N>> {
-    $semiregular-box$<F> $fun_$;                  // exposition only
+    $copyable-box$<F> $fun_$;                     // exposition only
     adjacent_view<V, N> $inner_$;               // exposition only
 
     using $InnerView$ = adjacent_view<V, N>;    // exposition only
@@ -2845,7 +2846,7 @@ namespace std::ranges {
     using $Parent$ = $maybe-const$<Const, adjacent_transform_view>;      // exposition only
     using $Base$ = $maybe-const$<Const, V>;                              // exposition only
     $Parent$* $parent_$ = nullptr;                                       // exposition only
-    $inner-iterator$<Const> $inner_$ = $inner-iterator$<Const>();          // exposition only
+    $inner-iterator$<Const> $inner_$;                                    // exposition only
 
     constexpr $iterator$($Parent$& parent, $inner-iterator$<Const> inner); // exposition only
 
