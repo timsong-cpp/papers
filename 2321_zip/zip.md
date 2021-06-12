@@ -1,6 +1,6 @@
 ---
 title: "`zip`"
-document: D2321R2
+document: P2321R2
 date: today
 audience:
   - LWG
@@ -1774,7 +1774,7 @@ and let `Es...` be a pack of subexpressions.
     or if `decay_t<invoke_result_t<FD&>>` is not an object type,
     `views::zip_transform(F, Es...)` is ill-formed.
   - [#.#.#]{.pnum} Otherwise, the expression `views::zip_transform(F, Es...)`
-    is expression-equivalent to `(void)F, $decay-copy$(views::empty<decay_t<invoke_result_t<FD&>>>)`.
+    is expression-equivalent to `((void)F, $decay-copy$(views::empty<decay_t<invoke_result_t<FD&>>>))`.
 - [#.#]{.pnum} Otherwise, the expression `views::zip_transform(F, Es...)` is expression-equivalent to `zip_transform_view(F, Es...)`.
 
 ::: example
@@ -2221,7 +2221,7 @@ view has fewer than _N_ elements, the resulting view is empty.
 ([range.adaptor.object]{.sref}). Given a subexpression `E` and a constant expression `N`,
 the expression `views::adjacent<N>(E)` is expression-equivalent to
 
-- [#.#]{.pnum} `(void)E, $decay-copy$(views::empty<tuple<>>)` if `N` is equal to `0`,
+- [#.#]{.pnum} `((void)E, $decay-copy$(views::empty<tuple<>>))` if `N` is equal to `0`,
 - [#.#]{.pnum} otherwise, `adjacent_view<views::all_t<decltype((E))>, N>(E)`.
 
 ::: example
