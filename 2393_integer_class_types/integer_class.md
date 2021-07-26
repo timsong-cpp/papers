@@ -1,6 +1,6 @@
 ---
 title: "Cleaning up integer-class types"
-document: P2393R0
+document: P2393R1
 date: today
 audience:
   - LWG
@@ -12,7 +12,10 @@ toc: false
 
 # Abstract
 This paper revamps the specification and use of integer-class types to resolve
-a number of issues, including [@LWG3366] and [@LWG3376].
+a number of issues, including [@LWG3366], [@LWG3376], and [@LWG3575].
+
+# Revision history
+- R1: Incorporated LWG review feedback. Updated wording to also resolve LWG3575.
 
 # Discussion
 
@@ -22,7 +25,7 @@ yet required to do that, and the failure to do so leads to a number of issues
 in the library specification. For example:
 
 - Two integer-class types are not required to have a `common_type`, which causes
-  issues in various ranges components such as `zip_view` ([@P2321R1]) and
+  issues in various ranges components such as `zip_view` ([@P2321R2]) and
   `join_view` ([range.join.iterator]{.sref}) that uses `common_type_t` to
   determine the difference type of a range resulting from the composition of
   multiple ranges.
@@ -62,6 +65,7 @@ issues in the process.
 - Permit heterogeneous binary operations between integer-like types where one is
   implicitly convertible to the other; this allows arithmetic and comparison
   on the difference types of different ranges.
+- Tighten the operator specification, which resolves [@LWG3575].
 
 Next, clean up the ranges wording (again) to explicitly cast to the difference
 type where required.
@@ -74,7 +78,7 @@ fully correct implementation would still need to cast, however).
 
 # Wording
 
-This wording is relative to [@N4885] after the application of [@P2367R0].
+This wording is relative to [@N4892].
 
 ::: jwordinglist
 
@@ -83,7 +87,7 @@ This wording is relative to [@N4885] after the application of [@P2367R0].
 [Because _integer-class type_ is only used in this subclause (the rest of the
 standard uses _integer-like_), I did not rename it. Cf. `enum class`.]{.draftnote}
 
-[P2321R2 &sect; 5.4 also contains edits to this subclause. The wording below
+[[@P2321R2] &sect; 5.4 also contains edits to this subclause. The wording below
 subsumes those edits and should be applied instead if both papers are adopted.]{.ednote}
 
 [2]{.pnum} A type `I` is an _integer-class_ type if it is in a set of
@@ -122,7 +126,9 @@ operators are still well-defined.]{.draftnote}
 [4]{.pnum} For every integer-class type `I`, let `B(I)` be a [unique]{.diffins} hypothetical
 extended integer type of the same signedness with [the same width ([basic.fundamental]{.sref}) as `I`
 <-the smallest width ([basic.fundamental]{.sref}) capable of representing the same range of values.
-The width of `I` is equal to the width of `B(I)`]{.indel}. [For every integral
+The width of `I` is equal to the width of `B(I)`]{.indel}. [[The corresponding
+hypothetical specialization `numeric_limits<B(I)>` meets the requirements on
+`numeric_limits` specializations for integral types ([numeric.limits]{.sref}).]{.note-} For every integral
 type `J`, let `B(J)` be the same type as `J`.]{.diffins}
 
 [Reorder paragraph 6 before 5.]{.ednote}
@@ -144,7 +150,21 @@ such that the expression `b` is implicitly convertible to `I`,]{.diffins} let `x
 as described above that represent the same values as `a` and `b` [respectively]{.diffdel},
 and let `c` be an lvalue of any integral type.
 
-- [#.#]{.pnum} For every unary operator `@` for which the expression `@x` is
+::: add
+
+- [#.?]{.pnum} The expressions `a++` and `a--` shall be prvalues of type `I` whose
+  values are equal to that of `a` prior to the evaluation of the expressions.
+  The expression `a++` shall modify the value of `a` by adding `1` to it.
+  The expression `a--` shall modify the value of `a` by subtracting `1` from it.
+- [#.?]{.pnum} The expressions `++a`, `--a`, and `&a` shall be expression-equivalent to
+  `a += 1`, `a -= 1`, and `addressof(a)`, respectively.
+
+:::
+
+[The grammar term _unary-operator_ includes `*  &  +  -  !  ~`.]{.draftnote}
+
+- [#.#]{.pnum} For every [_unary-operator_<-unary operator]{.indel} `@` [other than `&`]{.diffins}
+for which the expression `@x` is
 well-formed, `@a` shall also be well-formed and have the same value,
 effects, and value category as `@x`
 [provided that value is representable by `I`]{.diffdel}.
@@ -153,22 +173,24 @@ type `I`.
 - [#.#]{.pnum} For every assignment operator `@=` for which `c @= x` is well-formed,
 `c @= a` shall also be well-formed and shall have the same value and effects as
 `c @= x`. The expression `c @= a` shall be an lvalue referring to `c`.
+- [#.?]{.pnum} [For every assignment operator `@=` for which `x @= y` is well-formed,
+`a @= b` shall also be well-formed and shall have the same effects as
+`x @= y`, except that the value that would be stored into `x` is stored into `a`.
+The expression `a @= b` shall be an lvalue referring to `a`.]{.diffins}
 - [#.#]{.pnum} For every [non-assignment]{.diffins} binary operator `@` for which
 `x @ y` [and `y @ x` are<-is]{.indel} well-formed,
 `a @ b` [and `b @ a`]{.diffins} shall also be well-formed and shall have the same value, effects, and
 value category as `x @ y` [and `y @ x` respectively]{.diffins}[provided that value is representable by `I`]{.diffdel}.
-If `x @ y` [or `y @ x`]{.diffins} has type `bool`, so too does `a @ b` [or `b @ a`, respectively]{.diffins};
-if `x @ y` [or `y @ x`]{.diffins} has type `B(I)`, then `a @ b`  [or `b @ a`, respectively,]{.diffins} has type `I`[;
-if `x @ y` or `y @ x` has type `B(I2)`, then `a @ b` or `b @ a`, respectively, has type `I2`.]{.diffins}.
-- [#.#]{.pnum} [For every assignment operator `@=` for which `x @= y` is well-formed,
-`a @= b` shall also be well-formed and shall have the same value and effects as
-`x @= y`. The expression `a @= b` shall be an lvalue referring to `a`.]{.diffins}
+If [`x @ y` has type `bool`, so too does `a @ b`; if]{.diffdel}
+`x @ y` [or `y @ x`]{.diffins} has type `B(I)`, then `a @ b`  [or `b @ a`, respectively,]{.diffins} has type `I`[;
+if `x @ y` or `y @ x` has type `B(I2)`, then `a @ b` or `b @ a`, respectively, has type `I2`;
+if `x @ y` or `y @ x` has any other type, then `a @ b` or `b @ a`, respectively, has that type]{.diffins}.
 
 [7]{.pnum} An expression `E` of integer-class type `I` is contextually
 convertible to `bool` as if by `bool(E != I(0))`.
 
 [#]{.pnum} All integer-class types model `regular` ([concepts.object]{.sref}) and
-`totally_ordered` ([concept.totallyordered]{.sref}).
+[`three_way_comparable<strong_ordering>` ([cmp.concept]{.sref})<-`totally_ordered` ([concept.totallyordered]{.sref})]{.indel}.
 
 [#]{.pnum} A value-initialized object of integer-class type has value 0.
 
@@ -179,9 +201,6 @@ trying to fix this piecemeal and maintain an ever-growing list, we can simply
 specify this in terms of `B(I)`.]{.draftnote}
 
 [#]{.pnum} For every (possibly cv-qualified) integer-class type `I`,
-[let `numeric_limits<B(I)>` be a hypothetical specialization that meets the
-requirements for `numeric_limit` specializations for arithmetic types
-([numeric.limits]{.sref}).]{.diffins}
 `numeric_limits<I>` is specialized such that
 [each static data member `$m$` has the same value as `numeric_limits<B(I)>::$m$`,
 and each static member function `$f$` returns `I(numeric_limits<B(I)>::$f$())`.<-:]{.indel}
