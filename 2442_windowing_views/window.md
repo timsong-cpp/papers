@@ -346,7 +346,7 @@ namespace std::ranges {
 ::: itemdecl
 
 ```cpp
-constexpr $outer-iterator$(chunk_view& parent);
+constexpr explicit $outer-iterator$(chunk_view& parent);
 ```
 
 [#]{.pnum} _Effects_: Initializes `$parent_$` with `addressof(parent)`.
@@ -437,7 +437,7 @@ namespace std::ranges {
 ::: itemdecl
 
 ```cpp
-constexpr value_type(chunk_view& parent);
+constexpr explicit value_type(chunk_view& parent);
 ```
 
 [#]{.pnum} _Effects_: Initializes `$parent_$` with `addressof(parent)`.
@@ -500,7 +500,7 @@ namespace std::ranges {
 ::: itemdecl
 
 ```cpp
-constexpr $inner-iterator$(chunk_view& parent);
+constexpr explicit $inner-iterator$(chunk_view& parent);
 ```
 
 [#]{.pnum} _Effects_: Initializes `$parent_$` with `addressof(parent)`.

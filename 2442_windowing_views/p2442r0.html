@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2021-09-13" />
+  <meta name="dcterms.date" content="2021-09-14" />
   <title>Windowing range adaptors: views::chunk and views::slide</title>
   <style>
       code{white-space: pre-wrap;}
@@ -534,7 +534,7 @@ blockquote { background-color: #f6f8fa; }
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2021-09-13</td>
+    <td>2021-09-14</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -817,7 +817,7 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb12-28"><a href="#cb12-28"></a>  <span class="op">}</span>;</span>
 <span id="cb12-29"><a href="#cb12-29"></a><span class="op">}</span></span></code></pre></div>
 <div>
-<div class="sourceCode" id="cb13"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">constexpr</span> <em>outer-iterator</em><span class="op">(</span>chunk_view<span class="op">&amp;</span> parent<span class="op">)</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">constexpr</span> <span class="kw">explicit</span> <em>outer-iterator</em><span class="op">(</span>chunk_view<span class="op">&amp;</span> parent<span class="op">)</span>;</span></code></pre></div>
 <blockquote>
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_8" id="pnum_8">1</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp"><em>parent_</em></code> with <code class="sourceCode cpp">addressof<span class="op">(</span>parent<span class="op">)</span></code>.</p>
 </blockquote>
@@ -881,7 +881,7 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb22-14"><a href="#cb22-14"></a>  <span class="op">}</span>;</span>
 <span id="cb22-15"><a href="#cb22-15"></a><span class="op">}</span></span></code></pre></div>
 <div>
-<div class="sourceCode" id="cb23"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb23-1"><a href="#cb23-1"></a><span class="kw">constexpr</span> value_type<span class="op">(</span>chunk_view<span class="op">&amp;</span> parent<span class="op">)</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb23-1"><a href="#cb23-1"></a><span class="kw">constexpr</span> <span class="kw">explicit</span> value_type<span class="op">(</span>chunk_view<span class="op">&amp;</span> parent<span class="op">)</span>;</span></code></pre></div>
 <blockquote>
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_17" id="pnum_17">1</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp"><em>parent_</em></code> with <code class="sourceCode cpp">addressof<span class="op">(</span>parent<span class="op">)</span></code>.</p>
 </blockquote>
@@ -930,7 +930,7 @@ blockquote { background-color: #f6f8fa; }
 <span id="cb27-28"><a href="#cb27-28"></a>  <span class="op">}</span>;</span>
 <span id="cb27-29"><a href="#cb27-29"></a><span class="op">}</span></span></code></pre></div>
 <div>
-<div class="sourceCode" id="cb28"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb28-1"><a href="#cb28-1"></a><span class="kw">constexpr</span> <em>inner-iterator</em><span class="op">(</span>chunk_view<span class="op">&amp;</span> parent<span class="op">)</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb28-1"><a href="#cb28-1"></a><span class="kw">constexpr</span> <span class="kw">explicit</span> <em>inner-iterator</em><span class="op">(</span>chunk_view<span class="op">&amp;</span> parent<span class="op">)</span>;</span></code></pre></div>
 <blockquote>
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_21" id="pnum_21">1</a></span> <em>Effects</em>: Initializes <code class="sourceCode cpp"><em>parent_</em></code> with <code class="sourceCode cpp">addressof<span class="op">(</span>parent<span class="op">)</span></code>.</p>
 </blockquote>
