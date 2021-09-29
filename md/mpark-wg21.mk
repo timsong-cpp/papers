@@ -9,7 +9,7 @@ $(THIS_DIR)defaults.yaml : $(THIS_DIR)defaults.py
 
 EXTRA_ARGS ?=
 
-%.html : $(DEPS)
+%.html : $(DEPS) $(THIS_DIR)pandoc.css
 	$(PANDOC) \
 	--bibliography $(DATADIR)/csl.json \
 	$(EXTRA_ARGS)

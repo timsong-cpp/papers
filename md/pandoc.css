@@ -135,3 +135,78 @@ code.diff span.va { color: #000000; background-color: var(--diff-ins); }
 code.diff span.st { color: #000000; background-color: var(--diff-del); }
 
 blockquote { background-color: #f6f8fa; }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --diff-ins: #225522;
+    --diff-strongins: #225522;
+    --diff-del: #662222;
+    --diff-strongdel: #662222;
+  }
+
+  body {
+      background-color: #171717;
+      color: #b0b0b0;
+  }
+
+  table tr {
+    background-color: #171717;
+  }
+  table tr:nth-child(2n) {
+      background-color: #252525;
+  }
+
+  #title-block-header > table tr:nth-child(2n) {
+    background-color: #171717;
+  }
+
+  tr.header {
+    border-bottom: 3px solid #b0b0b0;
+    border-bottom-style: double;
+  }
+
+  tr.even, tr.odd {
+    border-bottom: 1px solid #b0b0b0;
+  }
+
+  table th {
+    border-bottom: 1px solid #b0b0b0;
+  }
+
+  table tbody tr:first-child td {
+    border-top: 1px solid #b0b0b0;
+  }
+
+  blockquote { background-color: rgba(255, 255, 255, .03); }
+
+  a { color: #549df2; }
+
+  div.sourceCode
+  {  background-color: rgba(255, 255, 255, .03); }
+
+  table { border-color: #b0b0b0; }
+  td.border { border-color: #b0b0b0; }
+  td.border { border-left-color: #b0b0b0; }
+  tr.rowsep, td.cline { border-top-color: #b0b0b0; }
+  tr.capsep { border-top-color: #b0b0b0; }
+  th { border-bottom-color: #b0b0b0; }
+
+  code span.kw { color: #12cabe; }
+  code span.op { color: #cf1915; }
+  code span.pp { color: #b27c58; }
+  code span.co { color: #35ba00; }
+
+  code.diff span.va {
+    color: #b0b0b0;
+  }
+  code.diff span.vd {
+    color: #b0b0b0;
+  }
+  div.add {
+    color: #d0fddd !important
+  }
+  div.rm {
+    color: #8f3131 !important
+  }
+  div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
+}
