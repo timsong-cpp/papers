@@ -1,9 +1,8 @@
 ---
 title: A type trait to detect reference binding to temporary
-document: P2255R1
+document: P2255R2
 date: today
 audience:
-  - EWG
   - LEWG
 author:
   - name: Tim Song
@@ -19,6 +18,9 @@ and changing several standard library components to make such binding ill-formed
 when it would inevitably produce a dangling reference. This would resolve [@LWG2813].
 
 # Revision history
+- R2: Approved by 2021-05-12 EWG telecon. Added a feature test macro.
+      Also modify `make_from_tuple` and add a note to the piecewise constructor of
+      `pair`. Rebase wording to post-2021-10 virtual plenary working draft.
 - R1: Define the affected constructor of `tuple` and `pair` as deleted instead
   of removing them from overload resolution.
 
@@ -145,16 +147,17 @@ but the declaration isn't valid, which is the case if `R` is  _cv_ `void`), so
 generic code already cannot use `is_invocable_r` for this purpose.
 
 More importantly, actual usage of _`INVOKE<R>`_ in the standard clearly suggests that
-changing its definition is the right thing to do. It is currently used in four places:
+changing its definition is the right thing to do. It is currently used in six places:
 
 - `std::function`
 - `std::visit<R>`
 - `std::bind<R>`
 - `std::packaged_task`
+- `std::invoke_r`
+- `std::move_only_function`
 
 In none of them is producing a temporary-bound reference ever correct. Nor would
-it be correct for the proposed `std::invoke_r` ([@P2136R1]),
-`std::any_invocable` ([@P0288R7]), or `std::function_ref` ([@P0792R5]).
+it be correct for the proposed `std::function_ref` ([@P0792R5]).
 
 ## `tuple`/`pair` constructors: deletion vs. constraints
 
@@ -194,7 +197,8 @@ However, that part can be done in the library if required, by checking that
 - `is_convertible_v<remove_cvref_t<U>*, remove_cvref_t<T>*>` is `true`.
 
 # Wording
-This wording is relative to [@N4868].
+This wording is relative to [@N4892] after the application of [@P2321R2]
+and [@LWG3121].
 
 ::: wordinglist
 
@@ -298,53 +302,42 @@ lifetime is extended ([class.temporary]{.sref}).
 ::: itemdecl
 
 ```c++
-template<class U1, class U2> constexpr explicit(@_see below_@) pair(U1&& x, U2&& y);
+template<class U1 = T1, class U2 = T2> constexpr explicit($see below$) pair(U1&& x, U2&& y);
 ```
 
 [11]{.pnum} _Constraints:_
 
-- [11.1]{.pnum} `is_constructible_v<first_type, U1>` is `true` and
-- [11.2]{.pnum} `is_constructible_v<second_type, U2>` is `true`.
+- [#.#]{.pnum} `is_constructible_v<first_type, U1>` is `true` and
+- [#.#]{.pnum} `is_constructible_v<second_type, U2>` is `true`.
 
-[12]{.pnum} _Effects:_ Initializes `first` with `std::forward<U1>(x)` and `second` with `std::forward<U2>(y)`.
+[#]{.pnum} _Effects:_ Initializes `first` with `std::forward<U1>(x)` and `second` with `std::forward<U2>(y)`.
 
-[13]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
+[#]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!is_convertible_v<U1, first_type> || !is_convertible_v<U2, second_type>`. [
 This constructor is defined as deleted if `reference_constructs_from_temporary_v<first_type, U1&&>` is `true`
 or `reference_constructs_from_temporary_v<second_type, U2&&>` is `true`.]{.diffins}
 
-```c++
-template<class U1, class U2> constexpr explicit(@_see below_@) pair(const pair<U1, U2>& p);
-```
-[14]{.pnum} _Constraints:_
-
-- [14.1]{.pnum} `is_constructible_v<first_type, const U1&>` is `true` and
-- [14.2]{.pnum} `is_constructible_v<second_type, const U2&>` is `true`.
-
-[15]{.pnum} _Effects:_  Initializes members from the corresponding members of the argument.
-
-[16]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
-`!is_convertible_v<const U1&, first_type> || !is_convertible_v<const U2&, second_type>`. [
-This constructor is defined as deleted if `reference_constructs_from_temporary_v<first_type, const U1&>` is `true`
-or `reference_constructs_from_temporary_v<second_type, const U2&>` is `true`.]{.diffins}
-
 
 ```c++
-template<class U1, class U2> constexpr explicit(@_see below_@) pair(pair<U1, U2>&& p);
+template<class U1, class U2> constexpr explicit($see below$) pair(pair<U1, U2>& p);
+template<class U1, class U2> constexpr explicit($see below$) pair(const pair<U1, U2>& p);
+template<class U1, class U2> constexpr explicit($see below$) pair(pair<U1, U2>&& p);
+template<class U1, class U2> constexpr explicit($see below$) pair(const pair<U1, U2>&& p);
 ```
 
-[17]{.pnum} _Constraints:_
+[#]{.pnum} Let `$FWD$(u)` be `static_cast<decltype(u)>(u)`.
 
-- [17.1]{.pnum} `is_constructible_v<first_type, U1>` is `true` and
-- [17.2]{.pnum} `is_constructible_v<second_type, U2>` is `true`.
+[#]{.pnum} _Constraints_:
 
-[18]{.pnum} _Effects:_ Initializes `first` with `std::forward<U1>(p.first)` and `second` with `std::forward<U2>(p.second)`.
+- [#.#]{.pnum} `is_constructible_v<first_type, decltype(get<0>($FWD$(p)))>` is `true` and
+- [#.#]{.pnum} `is_constructible_v<second_type, decltype(get<1>($FWD$(p)))>` is `true`.
 
-[19]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
-`!is_convertible_v<U1, first_type> || !is_convertible_v<U2, second_type>`. [
-This constructor is defined as deleted if `reference_constructs_from_temporary_v<first_type, U1&&>` is `true`
-or `reference_constructs_from_temporary_v<second_type, U2&&>` is `true`.]{.diffins}
+[#]{.pnum} _Effects:_  Initializes `first` with `get<0>($FWD$(p))` and `second` with `get<1>($FWD$(p))`.
 
+[#]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
+`!is_convertible_v<decltype(get<0>($FWD$(p))), first_type> || !is_convertible_v<decltype(get<1>($FWD$(p))), second_type>`.
+[The constructor is defined as deleted if `reference_constructs_from_temporary_v<first_type, decltype(get<0>($FWD$(p)))>` is `true`
+or `reference_constructs_from_temporary_v<second_type, decltype(get<1>($FWD$(p)))>` is `true`.]{.diffins}
 
 ```c++
 template<class... Args1, class... Args2>
@@ -352,20 +345,24 @@ template<class... Args1, class... Args2>
                  tuple<Args1...> first_args, tuple<Args2...> second_args);
 ```
 
-[No changes are needed here because this is a _Mandates:_ and the initialization is ill-formed under [@CWG1696].]{.draftnote}
+[No changes are needed here because this is a _Mandates:_ and
+the initialization is ill-formed under [@CWG1696]. However, a note is added to
+make this explicit]{.draftnote}
 
-[20]{.pnum} _Mandates:_
+[#]{.pnum} _Mandates:_
 
-- [20.1]{.pnum} `is_constructible_v<first_type, Args1...>` is `true` and
-- [20.2]{.pnum} `is_constructible_v<second_type, Args2...>` is `true`.
+- [#.#]{.pnum} `is_constructible_v<first_type, Args1...>` is `true` and
+- [#.#]{.pnum} `is_constructible_v<second_type, Args2...>` is `true`.
 
-[21]{.pnum} _Effects:_ Initializes `first` with arguments of types `Args1...`
+[#]{.pnum} _Effects:_ Initializes `first` with arguments of types `Args1...`
 obtained by forwarding the elements of `first_args` and initializes `second`
 with arguments of types `Args2...` obtained by forwarding the elements of
 `second_args`. (Here, forwarding an element `x` of type `U` within a tuple
 object means calling `std::forward<U>(x)`.) This form of construction,
 whereby constructor arguments for `first` and `second` are each provided in a
-separate `tuple` object, is called _piecewise construction_.
+separate `tuple` object, is called _piecewise construction_. [[If a data member
+of `pair` is of reference type and its initialization binds it to a temporary
+object, the program is ill-formed ([class.base.init]{.sref}).]{.note-}]{.diffins}
 
 :::
 
@@ -374,16 +371,23 @@ separate `tuple` object, is called _piecewise construction_.
 ::: itemdecl
 
 ```c++
-template<class... UTypes> constexpr explicit(@_see below_@) tuple(UTypes&&... u);
+template<class... UTypes> constexpr explicit($see below$) tuple(UTypes&&... u);
 ```
+[12]{.pnum} Let `$disambiguating-constraint$` be:
 
-[11]{.pnum} _Constraints:_ `sizeof...(Types)` equals `sizeof...(UTypes)` and
-`sizeof...(Types)` &ge; 1 and
-`is_constructible_v<T@_<sub>i</sub>_@, U@_<sub>i</sub>_@>` is `true` for all _i_.
+- [#.#]{.pnum} `negation<is_same<remove_cvref_t<U@<sub>0</sub>@>, tuple>>` if `sizeof...(Types)` is 1;
+- [#.#]{.pnum} otherwise, `bool_constant<!is_same_v<remove_cvref_t<U@<sub>0</sub>@>, allocator_arg_t> || is_same_v<remove_cvref_t<T@<sub>0</sub>@>, allocator_arg_t>>` if `sizeof...(Types)` is 2 or 3;
+- [#.#]{.pnum} otherwise, `true_type`.
 
-[12]{.pnum} _Effects:_ Initializes the elements in the tuple with the corresponding value in `std::forward<UTypes>(u)`.
+[#]{.pnum} _Constraints:_
 
-[13]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
+- [#.#]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes)`,
+- [#.#]{.pnum} `sizeof...(Types)` &ge; 1, and
+- [#.#]{.pnum} `conjunction_v<$disambiguating-constraint$, is_constructible<Types, UTypes>...>` is `true`.
+
+[#]{.pnum} _Effects:_ Initializes the elements in the tuple with the corresponding value in `std::forward<UTypes>(u)`.
+
+[#]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
 `!conjunction_v<is_convertible<UTypes, Types>...>`. [This constructor is
 defined as deleted if `(reference_constructs_from_temporary_v<Types, UTypes&&> || ...)` is `true`.]{.diffins}
 
@@ -392,81 +396,107 @@ defined as deleted if `(reference_constructs_from_temporary_v<Types, UTypes&&> |
 [...]
 
 ::: itemdecl
-```c++
-template<class... UTypes> constexpr explicit(@_see below_@) tuple(const tuple<UTypes...>& u);
-```
-
-[18]{.pnum} _Constraints:_
-
-- [18.1]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes`)[,]{.diffins} and
-- [18.2]{.pnum}`is_constructible_v<T@_<sub>i</sub>_@, const U@_<sub>i</sub>_@&>` is `true` for all _i_, and
-- [18.3]{.pnum} either `sizeof...(Types)` is not 1, or (when `Types...` expands to `T` and `UTypes...` expands to `U`)
-  `is_convertible_v<const tuple<U>&, T>`, `is_constructible_v<T, const tuple<U>&>`, and `is_same_v<T, U>` are all `false`.
-
-[19]{.pnum} _Effects:_ Initializes each element of `*this` with the corresponding element of `u`.
-
-[20]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
-`!conjunction_v<is_convertible<const UTypes&, Types>...>`. [This constructor is
-defined as deleted if `(reference_constructs_from_temporary_v<Types, const UTypes&> || ...)` is `true`.]{.diffins}
 
 ```c++
-template<class... UTypes> constexpr explicit(@_see below_@) tuple(tuple<UTypes...>&& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(tuple<UTypes...>& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(const tuple<UTypes...>& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(tuple<UTypes...>&& u);
+template<class... UTypes> constexpr explicit($see below$) tuple(const tuple<UTypes...>&& u);
 ```
-[21]{.pnum} _Constraints:_
 
-- [21.1]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes`), and
-- [21.2]{.pnum}`is_constructible_v<T@_<sub>i</sub>_@, U@_<sub>i</sub>_@>` is `true` for all _i_, and
-- [21.3]{.pnum} either `sizeof...(Types)` is not 1, or (when `Types...` expands to `T` and `UTypes...` expands to `U`)
-  `is_convertible_v<tuple<U>, T>`, `is_constructible_v<T, tuple<U>>`, and `is_same_v<T, U>` are all `false`.
+[19]{.pnum} Let `I` be the pack `0, 1, ..., (sizeof...(Types) - 1)`. Let `$FWD$(u)` be `static_cast<decltype(u)>(u)`.
 
-[22]{.pnum} _Effects:_ For all _i_, initializes the _i_<sup>th</sup> element of `*this` with `std::forward<U@_<sub>i</sub>_@>(get<@_i_@>(u))`.
+[#]{.pnum} _Constraints_:
 
-[23]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
-`!conjunction_v<is_convertible<UTypes, Types>...>`. [This constructor is
-defined as deleted if `(reference_constructs_from_temporary_v<Types, UTypes&&> || ...)` is `true`.]{.diffins}
+- [#.#]{.pnum} `sizeof...(Types)` equals `sizeof...(UTypes)`, and
+- [#.#]{.pnum} `(is_constructible_v<Types, decltype(get<I>($FWD$(u)))> && ...)` is `true`, and
+- [#.#]{.pnum} either `sizeof...(Types)` is not `1`, or (when `Types...` expands to `T` and
+  `UTypes...` expands to `U`) `is_convertible_v<decltype(u), T>`,
+   `is_constructible_v<T, decltype(u)>`, and `is_same_v<T, U>` are all `false`.
+
+[#]{.pnum} _Effects:_ For all _i_, initializes the _i_<sup>th</sup> element of `*this` with `get<$i$>($FWD$(u))`.
+
+[#]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
+`!(is_convertible_v<decltype(get<I>($FWD$(u))), Types> && ...)`. [The constructor is
+defined as deleted if `(reference_constructs_from_temporary_v<Types, decltype(get<I>($FWD$(u)))> || ...)` is `true`.]{.diffins}
 
 ```c++
-template<class U1, class U2> constexpr explicit(@_see below_@) tuple(const pair<U1, U2>& u);
+template<class U1, class U2> constexpr explicit($see below$) tuple(pair<U1, U2>& u);
+template<class U1, class U2> constexpr explicit($see below$) tuple(const pair<U1, U2>& u);
+template<class U1, class U2> constexpr explicit($see below$) tuple(pair<U1, U2>&& u);
+template<class U1, class U2> constexpr explicit($see below$) tuple(const pair<U1, U2>&& u);
 ```
 
-[24]{.pnum} _Constraints:_
+[#]{.pnum} Let `$FWD$(u)` be `static_cast<decltype(u)>(u)`.
 
-- [24.1]{.pnum} `sizeof...(Types)` is 2,
-- [24.2]{.pnum} `is_constructible_v<T@<sub>0</sub>@, const U1&>` is `true`, and
-- [24.3]{.pnum} `is_constructible_v<T@<sub>1</sub>@, const U2&>` is `true`.
+[#]{.pnum} _Constraints_:
 
-[25]{.pnum} _Effects:_ Initializes the first element with `u.first` and the second element with `u.second`.
+- [#.#]{.pnum} `sizeof...(Types)` is 2 and
+- [#.#]{.pnum} `is_constructible_v<T@<sub>0</sub>@, decltype(get<0>($FWD$(u)))>` is `true` and
+- [#.#]{.pnum} `is_constructible_v<T@<sub>1</sub>@, decltype(get<1>($FWD$(u)))>` is `true`.
 
-[26]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
-`!is_convertible_v<const U1&, T@<sub>0</sub>@> || !is_convertible_v<const U2&, T@<sub>1</sub>@>`.
- [This constructor is defined as deleted if `reference_constructs_from_temporary_v<T@<sub>0</sub>@, const U1&>` is `true`
- or `reference_constructs_from_temporary_v<T@<sub>1</sub>@, const U2&>` is `true`.]{.diffins}
+[#]{.pnum} _Effects:_ Initializes the first element with `get<0>($FWD$(u))` and the second element with `get<1>($FWD$(u))`.
 
-```c++
-template<class U1, class U2> constexpr explicit(@_see below_@) tuple(pair<U1, U2>&& u);
+[#]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
+`!is_convertible_v<decltype(get<0>($FWD$(u))), T@<sub>0</sub>@> || !is_convertible_v<decltype(get<1>($FWD$(u))), T@<sub>1</sub>@>`
+[The constructor is defined as deleted if
+`reference_constructs_from_temporary_v<T@<sub>0</sub>@, decltype(get<0>($FWD$(u)))>` is `true` or
+`reference_constructs_from_temporary_v<T@<sub>1</sub>@, decltype(get<1>($FWD$(u)))>` is `true`.]{.diffins}
+
+:::
+
+- Edit [tuple.apply]{.sref} as indicated:
+
+:::itemdecl
+
+```cpp
+template<class T, class Tuple>
+  constexpr T make_from_tuple(Tuple&& t);
 ```
 
-[27]{.pnum} _Constraints:_
+[[?]{.pnum} _Mandates:_ If `tuple_size_v<remove_reference_t<Tuple>>` is `1`, then
+`reference_constructs_from_temporary_v<T, decltype(get<0>(declval<Tuple>()))>`
+is `false`.]{.diffins}
 
-- [27.1]{.pnum} `sizeof...(Types)` is 2,
-- [27.2]{.pnum} `is_constructible_v<T@<sub>0</sub>@, U1>` is `true`, and
-- [27.3]{.pnum} `is_constructible_v<T@<sub>1</sub>@, U2>` is `true`.
+[2]{.pnum} _Effects:_ Given the exposition-only function:
 
-[28]{.pnum} _Effects:_ Initializes the first element with `std::forward<U1>(u.first)` and the second element with `std::forward<U2>(u.second)`.
+:::bq
+```cpp
+template<class T, class Tuple, size_t... I>
+  requires is_constructible_v<T, decltype(get<I>(declval<Tuple>()))...>
+constexpr T $make-from-tuple-impl$(Tuple&& t, index_sequence<I...>) {     // exposition only
+  return T(get<I>(std::forward<Tuple>(t))...);
+}
+```
+:::
 
-[29]{.pnum} _Remarks:_ The expression inside `explicit` is equivalent to:
-`!is_convertible_v<U1, T@<sub>0</sub>@> || !is_convertible_v<U2, T@<sub>1</sub>@>`.
- [This constructor is defined as deleted if `reference_constructs_from_temporary_v<T@<sub>0</sub>@, U1&&>` is `true` or
- `reference_constructs_from_temporary_v<T@<sub>1</sub>@, U2&&>` is `true`.]{.diffins}
+Equivalent to:
+
+:::bq
+```cpp
+return $make-from-tuple-impl$<T>(
+           std::forward<Tuple>(t),
+           make_index_sequence<tuple_size_v<remove_reference_t<Tuple>>>{});
+```
+:::
+
+[The type of `T` must be supplied as an explicit template parameter,
+as it cannot be deduced from the argument list.]{.note1}
+
 :::
 
 - Edit [func.require]{.sref} p2 as indicated:
 
-[2]{.pnum} Define `INVOKE<R>(f, t1, t2, ... , tN )` as `static_cast<void>(INVOKE(f, t1, t2, ... , tN ))` if R is
-_cv_ `void`, otherwise `INVOKE(f, t1, t2, ... , tN )` implicitly converted to `R`.
-[If `reference_converts_from_temporary_v<R, decltype(INVOKE(f, t1, t2, ... , tN))>` is `true`,
-`INVOKE<R>(f, t1, t2, ... , tN )` is ill-formed. ]{.diffins}
+[2]{.pnum} Define `$INVOKE$<R>(f, t1, t2, ... , tN )` as `static_cast<void>($INVOKE$(f, t1, t2, ... , tN ))` if `R` is
+_cv_ `void`, otherwise `$INVOKE$(f, t1, t2, ... , tN )` implicitly converted to `R`.
+[If `reference_converts_from_temporary_v<R, decltype($INVOKE$(f, t1, t2, ... , tN))>` is `true`,
+`$INVOKE$<R>(f, t1, t2, ... , tN )` is ill-formed. ]{.diffins}
 
+- Add the following feature-test macro to [version.syn]{.sref}, header `<version>` synopsis:
+
+```cpp
+#define __cpp_lib_reference_from_temporary 20XXXXL // also in <type_traits>
+```
 :::
 
 ---
