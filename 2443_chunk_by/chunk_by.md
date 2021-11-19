@@ -1,14 +1,18 @@
 ---
 title: "`views::chunk_by`"
-document: P2443R0
+document: P2443R1
 date: today
 audience:
-  - LEWG
+  - LWG
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
 toc: true
 ---
+
+# Revision history
+
+- R1: Incorporated LWG review feedback.
 
 # Abstract
 This paper proposes the range adaptor `views::chunk_by` as described in
@@ -202,23 +206,26 @@ else {
 :::
 
 ```cpp
-constexpr iterator_t<V> $find-next$(iterator_t<V> cur); // exposition only
+constexpr iterator_t<V> $find-next$(iterator_t<V> current); // exposition only
 ```
 
 [#]{.pnum} _Preconditions:_ `$pred_$.has_value()` is `true`.
 
-[#]{.pnum} _Returns_: `ranges::next(ranges::adjacent_find(cur, ranges::end($base_$), not_fn(ref(*$pred_$))), 1, ranges::end($base_$))`.
+[#]{.pnum} _Returns_: `ranges::next(ranges::adjacent_find(current, ranges::end($base_$), not_fn(ref(*$pred_$))), 1, ranges::end($base_$))`.
 
 
 ```cpp
-constexpr iterator_t<V> $find-prev$(iterator_t<V> cur) requires bidirectional_range<V>; // exposition only
+constexpr iterator_t<V> $find-prev$(iterator_t<V> current) requires bidirectional_range<V>; // exposition only
 ```
-[#]{.pnum} _Preconditions:_ `cur` is not equal to `ranges::begin($base_$)`. `$pred_$.has_value()` is `true`.
+[#]{.pnum} _Preconditions:_
 
-[#]{.pnum} _Returns_: An iterator `i` in the range `[ranges::begin($base_$), cur)` such that:
+- [#.#]{.pnum} `current` is not equal to `ranges::begin($base_$)`.
+- [#.#]{.pnum} `$pred_$.has_value()` is `true`.
 
-- [#.#]{.pnum} `ranges::adjacent_find(i, cur, not_fn(ref(*$pred_$)))` is equal to `cur`; and
-- [#.#]{.pnum} if `i` is not equal to `ranges::begin($base_$)`, then `bool((*$pred_$)(*ranges::prev(i), *i))` is `false`.
+[#]{.pnum} _Returns_: An iterator `i` in the range `[ranges::begin($base_$), current)` such that:
+
+- [#.#]{.pnum} `ranges::adjacent_find(i, current, not_fn(ref(*$pred_$)))` is equal to `current`; and
+- [#.#]{.pnum} if `i` is not equal to `ranges::begin($base_$)`, then `bool(invoke(*$pred_$, *ranges::prev(i), *i))` is `false`.
 
 ::: draftnote
 
@@ -226,7 +233,7 @@ Reference implementation:
 
 ```cpp
   using namespace std::placeholders;
-  reverse_view rv(subrange(ranges::begin(base_), cur));
+  reverse_view rv(subrange(ranges::begin(base_), current));
   return ranges::prev(ranges::adjacent_find(rv, not_fn(bind(ref(*pred_), _2, _1))).base(),
                       1, ranges::begin(base_));
 ```
