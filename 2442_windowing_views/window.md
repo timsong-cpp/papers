@@ -1,9 +1,9 @@
 ---
 title: "Windowing range adaptors: `views::chunk` and `views::slide`"
-document: P2442R0
+document: P2442R1
 date: today
 audience:
-  - LEWG
+  - LWG
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
@@ -13,6 +13,12 @@ toc: true
 # Abstract
 This paper proposes two range adaptors, `views::chunk` and `views::slide`,
 as described in section 3.5 of [@P2214R0].
+
+# Revision history
+
+- R1:
+  - Split feature test macro into two as requested by LEWG.
+  - Incorporated LWG review feedback on 2021-11-19 and 2021-11-26.
 
 # Example
 
@@ -93,7 +99,7 @@ that we start at the next N-element chunk even if the inner view isn't iterated
 to end, and then sets `$remainder_$` to the chunk size.
 
 For forward and stronger ranges, `chunk_view`'s `$iterator$` stores an
-exposition-only data member `$offset_$`. This data member can only be nonzero
+exposition-only data member `$missing_$`. This data member can only be nonzero
 when the iterator is the past-the-end iterator, in which case it represents
 the difference between _N_ and the size of the last chunk.
 
@@ -198,7 +204,7 @@ Add the following subclause to [range.adaptors]{.sref}.
 #### 24.7.?.1 Overview [range.chunk.overview] {-}
 
 [#]{.pnum} `chunk_view` takes a `view` and a number _N_ and produces a range of views
-that are _N_-sized non-overlapping contiguous chunks of the elements of the
+that are _N_-sized non-overlapping successive chunks of the elements of the
 original view, in order. The last view in the range can have fewer than _N_ elements.
 
 [#]{.pnum} The name `views::chunk` denotes a range adaptor object
@@ -230,6 +236,15 @@ for (auto r : v | views::chunk(2)) {
 ```cpp
 namespace std::ranges {
 
+template<class I>
+constexpr I $div-ceil$(I num, I denom) {  // exposition only
+  I r = num / denom;
+  if (num % denom) {
+    ++r;
+  }
+  return r;
+}
+
 template<view V>
   requires input_range<V>
 class chunk_view : public view_interface<chunk_view<V>>{
@@ -252,7 +267,7 @@ public:
   constexpr V base() && { return std::move($base_$); }
 
   constexpr $outer-iterator$ begin();
-  constexpr default_sentinel_t end();
+  constexpr default_sentinel_t end() noexcept;
 
   constexpr auto size() requires sized_range<V>;
   constexpr auto size() const requires sized_range<const V>;
@@ -289,7 +304,7 @@ return $outer-iterator$(*this);
 :::
 
 ```cpp
-constexpr default_sentinel_t end();
+constexpr default_sentinel_t end() noexcept;
 ```
 
 [#]{.pnum} _Returns_: `default_sentinel`.
@@ -303,8 +318,7 @@ constexpr auto size() const requires sized_range<const V>;
 
 ::: bq
 ```cpp
-auto sz = (ranges::distance($base_$) + $n_$ - 1) / $n_$;
-return $to-unsigned-like$(sz);
+return $to-unsigned-like$($div-ceil$(ranges::distance($base_$), $n_$));
 ```
 :::
 :::
@@ -386,7 +400,8 @@ constexpr void operator++(int);
 friend constexpr bool operator==(const $outer-iterator$& x, default_sentinel_t);
 ```
 
-[#]{.pnum} _Returns:_ `*x.$parent_$->$current_$ == ranges::end(x.$parent_$->$base_$) && x.$parent_$->$remainder_$ != 0`.
+[#]{.pnum} _Effects_: Equivalent to:
+`return *x.$parent_$->$current_$ == ranges::end(x.$parent_$->$base_$) && x.$parent_$->$remainder_$ != 0;`
 
 ```cpp
 friend constexpr difference_type operator-(default_sentinel_t y, const $outer-iterator$& x)
@@ -402,7 +417,7 @@ if (dist < x.$parent_$->$remainder_$) {
   return dist == 0 ? 0 : 1;
 }
 
-return (dist - x.$parent_$->$remainder_$ + x.$parent_$->$n_$ - 1) / x.$parent_$->$n_$ + 1;
+return $div-ceil$(dist - x.$parent_$->$remainder_$, x.$parent_$->$n_$) + 1;
 ```
 :::
 
@@ -425,8 +440,8 @@ namespace std::ranges {
 
     constexpr explicit value_type(chunk_view& parent);    // exposition only
   public:
-    constexpr $inner-iterator$ begin() const;
-    constexpr default_sentinel_t end() const;
+    constexpr $inner-iterator$ begin() const noexcept;
+    constexpr default_sentinel_t end() const noexcept;
 
     constexpr auto size() const
       requires sized_sentinel_for<sentinel_t<V>, iterator_t<V>>;
@@ -443,13 +458,13 @@ constexpr explicit value_type(chunk_view& parent);
 [#]{.pnum} _Effects_: Initializes `$parent_$` with `addressof(parent)`.
 
 ```cpp
-constexpr $inner-iterator$ begin() const;
+constexpr $inner-iterator$ begin() const noexcept;
 ```
 
 [#]{.pnum} _Returns_: `$inner-iterator$(*$parent_$)`.
 
 ```cpp
-constexpr default_sentinel_t end() const;
+constexpr default_sentinel_t end() const noexcept;
 ```
 
 [#]{.pnum} _Returns_: `default_sentinel`.
@@ -459,7 +474,7 @@ constexpr auto size() const
   requires sized_sentinel_for<sentinel_t<V>, iterator_t<V>>;
 ```
 
-[#]{.pnum} _Returns_: `ranges::min($parent_$->$remainder_$, ranges::end($parent_$->$base_$) - *$parent_$->$current_$)`.
+[#]{.pnum} _Effects_: Equivalent to: `return ranges::min($parent_$->$remainder_$, ranges::end($parent_$->$base_$) - *$parent_$->$current_$);`
 
 :::
 
@@ -472,7 +487,7 @@ namespace std::ranges {
   class chunk_view<V>::$inner-iterator$ {
     chunk_view* $parent_$;                                // exposition only
 
-    constexpr explicit $inner-iterator$(chunk_view& parent);    // exposition only
+    constexpr explicit $inner-iterator$(chunk_view& parent) noexcept;    // exposition only
   public:
     using iterator_concept  = input_iterator_tag;
     using difference_type = range_difference_t<V>;
@@ -500,16 +515,16 @@ namespace std::ranges {
 ::: itemdecl
 
 ```cpp
-constexpr explicit $inner-iterator$(chunk_view& parent);
+constexpr explicit $inner-iterator$(chunk_view& parent) noexcept;
 ```
 
 [#]{.pnum} _Effects_: Initializes `$parent_$` with `addressof(parent)`.
 
 ```cpp
-const iterator_t<V>& base() const &;
+constexpr const iterator_t<V>& base() const &;
 ```
 
-[#]{.pnum} _Returns_: `*$parent_$->$current_$`.
+[#]{.pnum} _Effects_: Equivalent to: `return *$parent_$->$current_$;`
 
 ```cpp
 constexpr range_reference_t<V> operator*() const;
@@ -557,7 +572,7 @@ friend constexpr bool operator==(const $inner-iterator$& x, default_sentinel_t);
 friend constexpr difference_type operator-(default_sentinel_t y, const $inner-iterator$& x)
   requires sized_sentinel_for<sentinel_t<V>, iterator_t<V>>;
 ```
-[#]{.pnum} _Returns:_ `ranges::min(x.parent_->remainder_, ranges::end(x.$parent_$->$base_$) - *x.$parent_$->$current_$)`.
+[#]{.pnum}  _Effects_: Equivalent to: `return ranges::min(x.$parent_$->$remainder_$, ranges::end(x.$parent_$->$base_$) - *x.$parent_$->$current_$);`
 
 
 ```cpp
@@ -576,7 +591,7 @@ namespace std::ranges {
 
 template<view V>
   requires forward_range<V>
-class chunk_view<V> : public view_interface<chunk_view<V>>{
+class chunk_view<V> : public view_interface<chunk_view<V>> {
   V $base_$ = V();                     // exposition only
   range_difference_t<V> $n_$ = 0;      // exposition only
   template<bool> class $iterator$;     // exposition only
@@ -598,8 +613,8 @@ public:
 
   constexpr auto end() requires (!$simple-view$<V>) {
     if constexpr (common_range<V> && sized_range<V>) {
-      auto offset = ($n_$ - ranges::distance($base_$) % $n_$) % $n_$;
-      return $iterator$<false>(this, ranges::end($base_$), offset);
+      auto missing = ($n_$ - ranges::distance($base_$) % $n_$) % $n_$;
+      return $iterator$<false>(this, ranges::end($base_$), missing);
     }
     else if constexpr (common_range<V> && !bidirectional_range<V>) {
       return $iterator$<false>(this, ranges::end($base_$));
@@ -611,8 +626,8 @@ public:
 
   constexpr auto end() const requires forward_range<const V> {
     if constexpr (common_range<const V> && sized_range<const V>) {
-      auto offset = ($n_$ - ranges::distance($base_$) % $n_$) % $n_$;
-      return $iterator$<true>(this, ranges::end($base_$), offset);
+      auto missing = ($n_$ - ranges::distance($base_$) % $n_$) % $n_$;
+      return $iterator$<true>(this, ranges::end($base_$), missing);
     }
     else if constexpr (common_range<const V> && !bidirectional_range<const V>) {
       return $iterator$<true>(this, ranges::end($base_$));
@@ -647,8 +662,7 @@ constexpr auto size() const requires sized_range<const V>;
 
 ::: bq
 ```cpp
-auto sz = (ranges::distance($base_$) + $n_$ - 1) / $n_$;
-return to-unsigned-like(sz);
+return $to-unsigned-like$($div-ceil$(ranges::distance($base_$), $n_$));
 ```
 :::
 :::
@@ -667,10 +681,10 @@ namespace std::ranges {
     iterator_t<$Base$> $current_$ = iterator_t<$Base$>();             // exposition only
     sentinel_t<$Base$> $end_$ = sentinel_t<$Base$>();                 // exposition only
     range_difference_t<$Base$> $n_$ = 0;                            // exposition only
-    range_difference_t<$Base$> $offset_$ = 0;                       // exposition only
+    range_difference_t<$Base$> $missing_$ = 0;                       // exposition only
 
     constexpr $iterator$($Parent$* parent, iterator_t<$Base$> current,  // exposition only
-                       range_difference_t<$Base$> offset = 0);
+                       range_difference_t<$Base$> missing = 0);
   public:
     using iterator_category = input_iterator_tag;
     using iterator_concept  = $see below$;
@@ -741,13 +755,13 @@ namespace std::ranges {
 
 ```cpp
 constexpr $iterator$($Parent$* parent, iterator_t<$Base$> current,
-                     range_difference_t<$Base$> offset = 0);
+                   range_difference_t<$Base$> missing = 0);
 ```
 
 [#]{.pnum} _Effects_: Initializes `$current_$` with `current`,
 `$end_$` with `ranges::end(parent->$base_$)`,
 `$n_$` with `parent->$n_$`,
-and `$offset_$` with `offset`.
+and `$missing_$` with `missing`.
 
 ```cpp
 constexpr $iterator$($iterator$<!Const> i)
@@ -756,7 +770,7 @@ constexpr $iterator$($iterator$<!Const> i)
 ```
 
 [#]{.pnum} _Effects_: Initializes `$current_$` with `std::move(i.$current_$)`,
-`$end_$` with `std::move(i.$end_$)`, `$n_$` with `i.$n_$`, and `$offset_$` with `i.$offset_$`.
+`$end_$` with `std::move(i.$end_$)`, `$n_$` with `i.$n_$`, and `$missing_$` with `i.$missing_$`.
 
 ```cpp
 constexpr iterator_t<$Base$> base() const;
@@ -779,7 +793,7 @@ constexpr $iterator$& operator++();
 
 ::: bq
 ```cpp
-   $offset_$ = ranges::advance($current_$, $n_$, $end_$);
+   $missing_$ = ranges::advance($current_$, $n_$, $end_$);
    return *this;
 ```
 :::
@@ -807,8 +821,8 @@ constexpr $iterator$& operator--() requires bidirectional_range<$Base$>;
 
 ::: bq
 ```cpp
-   ranges::advance($current_$, $offset_$ - $n_$);
-   $offset_$ = 0;
+   ranges::advance($current_$, $missing_$ - $n_$);
+   $missing_$ = 0;
    return *this;
 ```
 :::
@@ -833,17 +847,18 @@ constexpr $iterator$& operator+=(difference_type x)
 
 [#]{.pnum} _Preconditions_: If `x` is positive,
 `ranges::distance($current_$, $end_$) > $n_$ * (x - 1)` is `true`.
+[If `x` is negative, the _Effects:_ paragraph implies a precondition.]{.note}
 
 [#]{.pnum} _Effects:_ Equivalent to:
 
 :::bq
 ```cpp
 if (x > 0) {
-  offset_ = ranges::advance($current_$, $n_$ * x, $end_$);
+  $missing_$ = ranges::advance($current_$, $n_$ * x, $end_$);
 }
 else if (x < 0) {
-  ranges::advance($current_$, $n_$ * x + $offset_$);
-  offset_ = 0;
+  ranges::advance($current_$, $n_$ * x + $missing_$);
+  $missing_$ = 0;
 }
 return *this;
 ```
@@ -944,13 +959,13 @@ friend constexpr $iterator$ operator-(const $iterator$& i, difference_type n)
 friend constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
   requires sized_sentinel_for<iterator_t<$Base$>, iterator_t<$Base$>>;
 ```
-[#]{.pnum} _Returns:_ `(x.$current_$ - y.$current_$ + x.$offset_$ - y.$offset_$) / x.$n_$`.
+[#]{.pnum} _Returns:_ `(x.$current_$ - y.$current_$ + x.$missing_$ - y.$missing_$) / x.$n_$`.
 
 ```cpp
 friend constexpr difference_type operator-(default_sentinel_t y, const $iterator$& x)
   requires sized_sentinel_for<sentinel_t<$Base$>, iterator_t<$Base$>>;
 ```
-[#]{.pnum} _Returns_: `(x.$end_$ - x.$current_$ + x.$n_$ - 1)  / x.$n_$`.
+[#]{.pnum} _Returns_: `$div-ceil$(x.$end_$ - x.$current_$, x.$n_$)`.
 
 ```cpp
 friend constexpr difference_type operator-(const $iterator$& x, default_sentinel_t y)
@@ -969,7 +984,7 @@ Add the following subclause to [range.adaptors]{.sref}.
 #### 24.7.?.1 Overview [range.slide.overview] {-}
 
 [#]{.pnum} `slide_view` takes a `view` and a number _N_ and produces a `view` whose
-_M_ <sup>th</sup> element is a view over the M <sup>th</sup> through
+_M_ <sup>th</sup> element is a view over the _M_ <sup>th</sup> through
 (_M_ + _N_ - 1)<sup>th</sup> elements of the original view. If the original
 view has fewer than _N_ elements, the resulting view is empty.
 
@@ -1193,7 +1208,7 @@ constexpr $iterator$(iterator_t<$Base$> current, range_difference_t<$Base$> n)
 [#]{.pnum} _Effects_: Initializes `$current_$` with `current` and `$n_$` with `n`.
 
 ```cpp
-constexpr $iterator$(iterator_t<$Base$> current, iterator_t<$Base$> last_ele, range_difference_t<$Base$> n); // exposition only
+constexpr $iterator$(iterator_t<$Base$> current, iterator_t<$Base$> last_ele, range_difference_t<$Base$> n)
   requires $slide-caches-first$<$Base$>;
 ```
 
@@ -1271,7 +1286,7 @@ constexpr $iterator$ operator--(int) requires bidirectional_range<$Base$>;
 constexpr $iterator$& operator+=(difference_type x)
   requires random_access_range<$Base$>;
 ```
-[#]{.pnum} _Preconditions:_ `$current_$ + x` and `$last_ele_$ + x` (if present) has well-defined behavior.
+[#]{.pnum} _Preconditions:_ `$current_$ + x` and `$last_ele_$ + x` (if present) have well-defined behavior.
 
 [#]{.pnum} _Postconditions_:  `$current_$` and `$last_ele_$` (if present) are each
 equal to `$i$ + x`, where $i$ is the value of that data member before the call.
@@ -1283,7 +1298,7 @@ equal to `$i$ + x`, where $i$ is the value of that data member before the call.
     requires random_access_range<$Base$>;
 ```
 
-[#]{.pnum} _Preconditions:_ `$current_$ - x` and `$last_ele_$ - x` (if present) has well-defined behavior.
+[#]{.pnum} _Preconditions:_ `$current_$ - x` and `$last_ele_$ - x` (if present) have well-defined behavior.
 
 [#]{.pnum} _Postconditions_:  `$current_$` and `$last_ele_$` (if present) are each
 equal to `$i$ - x`, where $i$ is the value of that data member before the call.
@@ -1438,10 +1453,11 @@ friend constexpr range_difference_t<V>
 
 ## Feature-test macro
 
-Add the following macro definition to [version.syn]{.sref}, header `<version>`
+Add the following macro definitions to [version.syn]{.sref}, header `<version>`
 synopsis, with the value selected by the editor to reflect the date of adoption
 of this paper:
 
 ```cpp
-#define __cpp_lib_ranges_chunk_slide 20XXXXL // also in <ranges>
+#define __cpp_lib_ranges_chunk 20XXXXL // also in <ranges>
+#define __cpp_lib_ranges_slide 20XXXXL // also in <ranges>
 ```
