@@ -192,6 +192,7 @@ blockquote { background-color: #f6f8fa; }
   th { border-bottom-color: #b0b0b0; }
 
   code span.kw { color: #12cabe; }
+  code span.cf { color: #12cabe; }
   code span.op { color: #cf1915; }
   code span.pp { color: #b27c58; }
   code span.co { color: #35ba00; }
