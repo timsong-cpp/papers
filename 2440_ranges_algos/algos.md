@@ -1,9 +1,9 @@
 ---
 title: "`ranges::iota`, `ranges::shift_left`, and `ranges::shift_right`"
-document: P2440R0
+document: P2440R1
 date: today
 audience:
-  - LEWG
+  - LWG
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
@@ -13,6 +13,10 @@ toc: true
 # Abstract
 This paper proposes adding the algorithms `ranges::iota`, `ranges::shift_left`,
 and `ranges::shift_right`, to match their `std` counterparts.
+
+# Revision history
+
+- R1: Incorporated LWG review feedback on 2021-11-26.
 
 # Discussion
 
@@ -130,13 +134,13 @@ namespace std::ranges {
 
     template<class O2, class T2>
       requires convertible_to<const O&, O2> && convertible_to<const T&, T2>
-    constexpr operator out_value_result<T2, O2>() const & {
+    constexpr operator out_value_result<O2, T2>() const & {
       return {out, value};
     }
 
     template<class O2, class T2>
       requires convertible_to<O, O2> && convertible_to<T, T2>
-    constexpr operator out_value_result<T2, O2>() && {
+    constexpr operator out_value_result<O2, T2>() && {
       return {std::move(out), std::move(value)};
     }
   };
@@ -315,7 +319,8 @@ proceeding to `i = 0` [if:<-.]{.indel}
 - [#.#]{.pnum} for the overload in namespace `std` without an `ExecutionPolicy`
   template parameter, `ForwardIterator` meets the  _Cpp17BidirectionalIterator_
   requirements.
-- [#.#]{.pnum} for the overloads in namespace `ranges`, `decltype(first)` models `bidirectional_iterator`.
+- [#.#]{.pnum} for the overloads in namespace `ranges`, `I` models
+  `bidirectional_iterator`.
 
 :::
 
