@@ -23,7 +23,7 @@ should be adopted for C++23.
 
 ## R2
 
-* Wording updates.
+* Rewrite wording to match `chunk` from [@P2442R1].
 
 ## R1
 
@@ -154,46 +154,24 @@ stdr::copy(stdv::stride(y, 3), std::ostream_iterator<int>(std::cout, " "));
 stdr::copy(stdv::stride(y, 3) | stdv::reverse, std::ostream_iterator<int>(std::cout, " "));
 ```
 
-The problem here is that the range has lost all information by the time we've reached the end of the
-sequence. In order to correctly iterate backwards, we need to cache our step value and do some fancy
-computation:
+The problem here is that going from the one-before-past-the-end iterator to the
+past-the-end iterator may involve iterating fewer than `stride` steps, so to
+correctly iterate backwards, we need to know that distance.
 
-```cpp
-// `stride_` is the number of elements we're supposed to skip over
-// `n` is the number of strides we take
-if (moving_forward) {
-  auto remaining = ranges::advance(current_, n * stride_, ranges::end(underlying_range_));
-  step_ = stride_ - remaining;
-  return *this;
-}
-```
+This is the same problem as `chunk` ([@P2442R1]) and can be solved in the same
+way. After all, `stride(n)` is basically a more efficient version of
+`chunk(n) | transform(ranges::front)` (if we actually had a `ranges::front`).
 
-When moving forward, we update our `step_` cache. In most cases, this will be zero, since we'll
-usually be taking a stride of length `stride_`. The only case where this `step_` is a number is when
-there are fewer elements left to skip than our stride length. This is important for preserving the
-range when iterating backward.
+## Properties
 
-```cpp
-if (moving_backward) {
-  auto stride = step_ == 0 ? n * stride_
-                           : (n + 1) * stride_ - step_;
-  step_ = ranges::advance(current_, stride, ranges::begin(underlying_range_));
-}
-```
-
-When we move backward, we consider the value of `step_`. If it's zero, then we skip over `n * stride_`
-elements in the same way as moving forward. If `step_` is nonzero, then we need to skip over fewer
-elements in its first step, to make up the distance. In the example above, to print out `9 6 3 0`,
-`y`'s iterator needs to pretend there's one extra value between the end of the underlying range and
-`10` so that the first value of our `stdv::stride(y, 3) | stdv::reverse` is `9`.
+`stride_view` is borrowed if the underlying view is. It is a common range if
+the underlying range is common and either sized or non-bidirectional.
 
 # Proposed wording
 
-## Range adaptors [range.adaptors]
+## Addition to `<ranges>`
 
-### Header `<ranges>` synopsis [ranges.syn]
-
-Add the following to [ranges.syn]{.sref}:
+Add the following to [ranges.syn]{.sref}, header `<ranges>` synopsis:
 
 ```cpp
 
@@ -201,14 +179,14 @@ Add the following to [ranges.syn]{.sref}:
 namespace std::ranges {
   // [...]
 
-  // [range.stride]
-  template<input_range R>
-    requires view<R>
+  // [range.stride], stride view
+  template<input_range V>
+    requires view<V>
   class stride_view;
 
-  template<class R>
-    inline constexpr bool enable_borrowed_range<stride_view<R>> =
-      forward_range<R> && enable_borrowed_range<R>;
+  template<class V>
+    inline constexpr bool enable_borrowed_range<stride_view<V>> =
+      enable_borrowed_range<V>;
 
   namespace views { inline constexpr $unspecified$ stride = $unspecified$; }
 
@@ -216,20 +194,25 @@ namespace std::ranges {
 }
 ```
 
-### Stride view [range.stride]
+## `stride`
 
-Add the contents of this subsection as a subclause to [range.adaptors]{.sref}.
+Add the following subclause to [range.adaptors]{.sref}.
 
-#### Overview [range.stride.overview]
+[This wording assumes the exposition-only `$div-ceil$` function template introduced in
+[@P2442R1].]{.ednote}
 
-[1]{.pnum} `stride_view` presents a view of an underlying sequence, advancing over `n` elements at a
+### 24.7.? Stride view [range.stride] {-}
+
+#### 24.7.?.1 Overview [range.stride.overview] {-}
+
+[#]{.pnum} `stride_view` presents a view of an underlying sequence, advancing over `n` elements at a
 time, as opposed to the usual single-step succession.
 
-[2]{.pnum} The name `views::stride` denotes a range adaptor object [range.adaptor.object]{.sref}.
+[#]{.pnum} The name `views::stride` denotes a range adaptor object [range.adaptor.object]{.sref}.
 Given subexpressions `E` and `N`, the expression `views::stride(E, N)` is expression-equivalent to
 `stride_view(E, N)`.
 
-[3]{.pnum} [_Example_:
+[#]{.pnum} [_Example_:
 ```cpp
 auto input = views::iota(0, 12) | views::stride(3);
 ranges::copy(input, ostream_iterator<int>(cout, " ")); // prints 0 3 6 9
@@ -237,61 +220,61 @@ ranges::copy(input | views::reverse, ostream_iterator<int>(cout, " ")); // print
 ```
 --- _end example_]
 
-#### Class `stride_view` [range.stride.view]
+#### 24.7.?.2 Class template `stride_view` [range.stride.view]  {-}
 
 ```cpp
 namespace std::ranges {
-  template<input_range R>
-    requires view<R>
-  class stride_view : public view_interface<stride_view<R>> {
-    template<bool Const> class $iterator$; // exposition only
+  template<input_range V>
+    requires view<V>
+  class stride_view : public view_interface<stride_view<V>> {
+    V $base_$ = V();                           // exposition only
+    range_difference_t<V> $stride_$ = 1;       // exposition only
+    template<bool> class $iterator$;           // exposition only
   public:
-    stride_view() = default;
-    constexpr stride_view(R base, range_difference_t<R> stride);
+    stride_view() requires default_initializable<V> = default;
+    constexpr explicit stride_view(V base, range_difference_t<V> stride);
 
-    constexpr R base() const& requires copy_constructible<R> { return base_; }
-    constexpr R base() && { return std::move(base_); }
+    constexpr V base() const& requires copy_constructible<V> { return $base_$; }
+    constexpr V base() && { return std::move($base_$); }
 
-    constexpr range_difference_t<R> stride() const noexcept;
+    constexpr range_difference_t<V> stride() const noexcept;
 
-    constexpr $iterator$<false> begin() requires (!$simple-view$<R>);
-    constexpr $iterator$<true> begin() const requires range<const R>;
+    constexpr auto begin() requires (!$simple-view$<V>) {
+      return $iterator$<false>(this, ranges::begin($base_$));
+    }
 
-    constexpr auto end() requires (!$simple-view$<R>) {
-      if constexpr (!bidirectional_range<R> || (sized_range<R> && common_range<R>)) {
-        return $iterator$<false>(*this, ranges::end(base_), ranges::distance(base_) % stride_);
+    constexpr auto begin() const requires range<const V> {
+      return $iterator$<true>(this, ranges::begin($base_$));
+    }
+
+    constexpr auto end() requires (!$simple-view$<V>) {
+      if constexpr (common_range<V> && sized_range<V> && forward_range<V>) {
+        auto missing = ($stride_$ - ranges::distance($base_$) % $stride_$) % $stride_$;
+        return $iterator$<false>(this, ranges::end($base_$), missing);
+      }
+      else if constexpr (common_range<V> && !bidirectional_range<V>) {
+        return $iterator$<false>(this, ranges::end($base_$));
       }
       else {
         return default_sentinel;
       }
     }
 
-    constexpr auto end() const requires range<const R> {
-      if constexpr (!bidirectional_range<R> || (sized_range<R> && common_range<R>)) {
-        return $iterator$<true>(*this, ranges::end(base_), ranges::distance(base_) % stride_);
+    constexpr auto end() const requires range<const V> {
+      if constexpr (common_range<const V> && sized_range<const V> && forward_range<const V>) {
+        auto missing = ($stride_$ - ranges::distance($base_$) % $stride_$) % $stride_$;
+        return $iterator$<true>(this, ranges::end($base_$), missing);
+      }
+      else if constexpr (common_range<const V> && !bidirectional_range<const V>) {
+        return $iterator$<true>(this, ranges::end($base_$));
       }
       else {
         return default_sentinel;
       }
     }
 
-    constexpr auto size() requires (sized_range<R> && !$simple-view$<R>) {
-      return $compute-distance$(ranges::size(base_));
-    }
-
-    constexpr auto size() const requires sized_range<const R> {
-      return $compute-distance$(ranges::size(base_));
-    }
-  private:
-    R base_;                           // exposition only
-    range_difference_t<R> stride_ = 1; // exposition only
-
-    template<class I>
-    constexpr I $compute-distance$(I distance) const { // exposition only
-      const auto quotient = distance / static_cast<I>(stride_);
-      const auto remainder = distance % static_cast<I>(stride_);
-      return quotient + static_cast<I>(remainder > 0);
-    }
+    constexpr auto size() requires sized_range<V>;
+    constexpr auto size() const requires sized_range<const V>;
   };
 
   template<class R>
@@ -299,337 +282,397 @@ namespace std::ranges {
 }
 ```
 
-```cpp
-constexpr stride_view(R base, range_difference_t<R> stride);
-```
+[`end()` cannot compute `missing` for input-only ranges because `ranges::size`
+(and `ranges::distance` by extension) is not required to be valid after `ranges::begin`
+is called, but `end()` must remain callable.]{.draftnote}
 
-[1]{.pnum} _Preconditions_: `stride > 0`.
-
-[2]{.pnum} _Effects_: Initializes `base_` with `base` and `stride_` with `stride`.
+::: itemdecl
 
 ```cpp
-constexpr R base() const;
+constexpr stride_view(V base, range_difference_t<V> stride);
 ```
 
-[3]{.pnum} _Effects_: Equivalent to `return base_;`
+[#]{.pnum} _Preconditions_: `stride > 0` is `true`.
+
+[#]{.pnum} _Effects_: Initializes `$base_$` with  `std::move(base)` and `$stride_$` with `stride`.
 
 ```cpp
-constexpr range_difference_t<R> stride() const;
+constexpr range_difference_t<V> stride() const;
 ```
 
-[4]{.pnum} _Effects_: Equivalent to `return stride_;`
+[#]{.pnum} _Returns_: `$stride_$`.
 
 ```cpp
-constexpr $iterator$<false> begin() requires (!$simple-view$<R>);
+constexpr auto size() requires sized_range<V>;
+constexpr auto size() const requires sized_range<const V>;
 ```
 
-[5]{.pnum} _Effects_: Equivalent to `return $iterator$<false>(*this);`
+[#]{.pnum} _Effects_: Equivalent to:
 
+::: bq
 ```cpp
-constexpr $iterator$<true> begin() requires (!$simple-view$<R>);
+return $to-unsigned-like$($div-ceil$(ranges::distance($base_$), $stride_$));
 ```
+:::
+:::
 
-[6]{.pnum} _Effects_: Equivalent to `return $iterator$<true>(*this);`
-
-#### Class `stride_view::iterator` [range.stride.iterator]
+#### 24.7.?.3 Class template `stride_view::$iterator$` [range.stride.iterator] {-}
 
 ```cpp
 namespace std::ranges {
-  template<input_range R>
-    requires view<R>
+  template<input_range V>
+    requires view<V>
   template<bool Const>
-  class stride_view<R>::$iterator$ {
-    using Parent = conditional_t<Const, const stride_view, stride_view>; // exposition only
-    using Base = conditional_t<Const, const R, R>;                       // exposition only
+  class stride_view<V>::$iterator$ {
+    using $Parent$ = $maybe-const$<Const, chunk_view>;                // exposition only
+    using $Base$ = $maybe-const$<Const, V>;                           // exposition only
 
-    friend $iterator$<!Const>;
+    iterator_t<$Base$> $current_$ = iterator_t<$Base$>();               // exposition only
+    sentinel_t<$Base$> $end_$ = sentinel_t<$Base$>();                   // exposition only
+    range_difference_t<$Base$> $stride_$ = 0;                         // exposition only
+    range_difference_t<$Base$> $missing_$ = 0;                        // exposition only
 
-    Parent* parent_;                // exposition only
-    iterator_t<Base> current_;      // exposition only
-    range_difference_t<Base> step_; // exposition only
+    constexpr $iterator$($Parent$* parent, iterator_t<$Base$> current,  // exposition only
+                       range_difference_t<$Base$> missing = 0);
   public:
-    using difference_type = range_difference_t<Base>;
-    using value_type = range_value_t<Base>;
+    using difference_type = range_difference_t<$Base$>;
+    using value_type = range_value_t<$Base$>;
     using iterator_concept = $see below$;
     using iterator_category = $see below$; // not always present
 
-    $iterator$() = default;
+    $iterator$() requires default_initializable<iterator_t<$Base$>>= default;
 
-    constexpr explicit $iterator$(Parent& parent);
-    constexpr $iterator$(Parent& parent, iterator_t<Base> end, difference_type step);
-    constexpr explicit $iterator$($iterator$<!Const> other)
-      requires Const && convertible_to<iterator_t<R>, iterator_t<Base>>;
+    constexpr $iterator$($iterator$<!Const> other)
+      requires Const && convertible_to<iterator_t<V>, iterator_t<$Base$>>
+                     && convertible_to<sentinel_t<V>, sentinel_t<$Base$>>;
 
-    constexpr iterator_t<Base> base() const;
+    constexpr iterator_t<$Base$> base() &&;
+    constexpr const iterator_t<$Base$>& base() const & noexcept;
 
-    constexpr decltype(auto) operator*() const { return *current_; }
+    constexpr decltype(auto) operator*() const { return *$current_$; }
 
     constexpr $iterator$& operator++();
 
     constexpr void operator++(int);
-    constexpr $iterator$ operator++(int) requires forward_range<Base>;
+    constexpr $iterator$ operator++(int) requires forward_range<$Base$>;
 
-    constexpr $iterator$& operator--() requires bidirectional_range<Base>;
-    constexpr $iterator$ operator--(int) requires bidirectional_range<Base>;
+    constexpr $iterator$& operator--() requires bidirectional_range<$Base$>;
+    constexpr $iterator$ operator--(int) requires bidirectional_range<$Base$>;
 
-    constexpr $iterator$& operator+=(difference_type n) requires random_access_range<Base>;
-    constexpr $iterator$& operator-=(difference_type n) requires random_access_range<Base>;
+    constexpr $iterator$& operator+=(difference_type n) requires random_access_range<$Base$>;
+    constexpr $iterator$& operator-=(difference_type n) requires random_access_range<$Base$>;
 
     constexpr decltype(auto) operator[](difference_type n) const
-      requires random_access_range<Base>
+      requires random_access_range<$Base$>
     { return *(*this + n); }
 
-    constexpr $iterator$& operator+(const $iterator$& x, difference_type n)
-      requires random_access_range<Base>;
+    friend constexpr bool operator==(const $iterator$& x, default_sentinel);
 
-    constexpr $iterator$& operator+(difference_type n, const $iterator$& x)
-      requires random_access_range<Base>;
+    friend constexpr bool operator==(const $iterator$& x, const $iterator$& y)
+      requires equality_comparable<iterator_t<$Base$>>;
 
-    constexpr $iterator$& operator-(const $iterator$& x, difference_type n)
-      requires random_access_range<Base>;
+    friend constexpr bool operator<(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
 
-    constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
-      requires random_access_range<Base>;
+    friend constexpr bool operator>(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
 
-    constexpr friend bool operator==(const $iterator$& x, default_sentinel);
+    friend constexpr bool operator<=(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
 
-    constexpr friend bool operator==(const $iterator$& x, const $iterator$& y)
-      requires equality_comparable<iterator_t<Base>>;
+    friend constexpr bool operator>=(const $iterator$& x, const $iterator$& y)
+      requires random_access_range<$Base$>;
 
-    constexpr friend bool operator<(const $iterator$& x, const $iterator$& y)
-      requires random_access_range<Base>;
+    friend constexpr auto operator<=>(const $iterator$& x, const $iterator$& y)
+        requires random_access_range<$Base$> && three_way_comparable<iterator_t<$Base$>>;
 
-    constexpr friend bool operator>(const $iterator$& x, const $iterator$& y)
-      requires random_access_range<Base>;
+    friend constexpr $iterator$& operator+(const $iterator$& x, difference_type n)
+      requires random_access_range<$Base$>;
+    friend constexpr $iterator$& operator+(difference_type n, const $iterator$& x)
+      requires random_access_range<$Base$>;
+    friend constexpr $iterator$& operator-(const $iterator$& x, difference_type n)
+      requires random_access_range<$Base$>;
+    friend constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
+      requires sized_sentinel_for<iterator_t<$Base$>, iterator_t<$Base$>>;
 
-    constexpr friend bool operator<=(const $iterator$& x, const $iterator$& y)
-      requires random_access_range<Base>;
+    friend constexpr difference_type operator-(default_sentinel_t y, const $iterator$& x)
+      requires sized_sentinel_for<sentinel_t<$Base$>, iterator_t<$Base$>>;
+    friend constexpr difference_type operator-(const $iterator$& x, default_sentinel_t y)
+      requires sized_sentinel_for<sentinel_t<$Base$>, iterator_t<$Base$>>;
 
-    constexpr friend bool operator>=(const $iterator$& x, const $iterator$& y)
-      requires random_access_range<Base>;
+    friend constexpr range_rvalue_reference_t<$Base$> iter_move(const $iterator$& i)
+      noexcept(noexcept(ranges::iter_move(i.$current_$)));
 
-    constexpr friend compare_three_way_result_t<iterator_t<Base>>
-      operator<=>(const $iterator$& x, const $iterator$& y)
-        requires random_access_range<Base> && three_way_comparable<iterator_t<Base>>;
-
-    constexpr friend range_rvalue_reference_t<R> iter_move(const $iterator$& i)
-      noexcept(noexcept(ranges::iter_move(i.current_)));
-
-    constexpr friend void iter_swap(const $iterator$& x, const $iterator$& y)
-      noexcept(noexcept(ranges::iter_swap(x.current_, y.current_)))
-      requires indirectly_swappable<iterator_t<R>>;
-  private:
-    constexpr $iterator&$ advance(difference_type n) { // exposition only
-      if constexpr (!bidirectional_range<Parent>) {
-        ranges::advance(current_, n * parent_->stride_, ranges::end(parent_->base_));
-        return *this;
-      }
-      else {
-        if (n > 0) {
-          auto remaining = ranges::advance(current_, n * parent_->stride_, ranges::end(parent_->base_));
-          step_ = parent_->stride_ - remaining;
-          return *this;
-        }
-
-        if (n < 0) {
-          auto stride = step_ == 0 ? n * parent_->stride_
-                                   : (n + 1) * parent_->stride_ - step_;
-          ranges::advance(current_, stride);
-          stride_ = 0;
-          return *this;
-        }
-
-        return *this;
-      }
-    }
+    friend constexpr void iter_swap(const $iterator$& x, const $iterator$& y)
+      noexcept(noexcept(ranges::iter_swap(x.$current_$, y.$current_$)))
+      requires indirectly_swappable<iterator_t<$Base$>>;
   };
 }
 ```
 
-[1]{.pnum} `$iterator$::iterator_concept` is defined as follows:
+[#]{.pnum} `$iterator$::iterator_concept` is defined as follows:
 
-- [1.1]{.pnum} If `R` models `random_access_range`, then `iterator_concept` denotes `random_access_iterator_tag`.
+- [#.#]{.pnum} If `$Base$` models `random_access_range`, then `iterator_concept` denotes `random_access_iterator_tag`.
 
-- [1.2]{.pnum} Otherwise, if `R` models `bidirectional_range`, then `iterator_concept` denotes `bidirectional_iterator_tag`.
+- [#.#]{.pnum} Otherwise, if `$Base$` models `bidirectional_range`, then `iterator_concept` denotes `bidirectional_iterator_tag`.
 
-- [1.3]{.pnum} Otherwise, if `R` models `forward_range`, then `iterator_concept` denotes `forward_iterator_tag`.
+- [#.#]{.pnum} Otherwise, if `$Base$` models `forward_range`, then `iterator_concept` denotes `forward_iterator_tag`.
 
-- [1.3]{.pnum} Otherwise, `iterator_concept` denotes `input_iterator_tag`.
+- [#.#]{.pnum} Otherwise, `iterator_concept` denotes `input_iterator_tag`.
 
-[2]{.pnum} The member _typedef-name_ `iterator_category` is defined if and only if `R` models `forward_range`.
+[#]{.pnum} The member _typedef-name_ `iterator_category` is defined if and only if `$Base$` models `forward_range`.
 In that case, `$iterator$::iterator_category` is defined as follows:
 
-- [2.1]{.pnum} Let `C` denote the type `iterator_traits<iterator_t<R>>::iterator_category`.
+- [#.#]{.pnum} Let `C` denote the type `iterator_traits<iterator_t<$Base$>>::iterator_category`.
 
-- [2.2]{.pnum} If `C` models `derived_from<random_access_iterator_tag>`, then `iterator_category` denotes `random_access_iterator_tag`.
+- [#.#]{.pnum} If `C` models `derived_from<random_access_iterator_tag>`, then `iterator_category` denotes `random_access_iterator_tag`.
 
-- [2.3]{.pnum} Otherwise, `iterator_category` denotes `C`.
+- [#.#]{.pnum} Otherwise, `iterator_category` denotes `C`.
 
-```cpp
-constexpr explicit $iterator$(Parent& parent);
-```
-
-[3]{.pnum} _Effects_: Initializes `parent_` with `addressof(parent)` and `current_` with `ranges::begin(parent)`.
+::: itemdecl
 
 ```cpp
-constexpr $iterator$(Parent& parent, iterator_t<Base> end, difference_type step);
+constexpr $iterator$($Parent$* parent, iterator_t<$Base$> current,
+                   range_difference_t<$Base$> missing = 0);
 ```
 
-[4]{.pnum} _Effects_: Initializes `parent_` with `addressof(parent)` and `current_` with `std::move(end)`,
-and `step_` with `step`.
+[#]{.pnum} _Effects_: Initializes `$current_$` with `std::move(current)`,
+`$end_$` with `ranges::end(parent->$base_$)`,
+`$stride_$` with `parent->$stride_$`,
+and `$missing_$` with `missing`.
 
 ```cpp
-constexpr explicit $iterator$($iterator$<!Const> other)
-  requires Const && convertible_to<iterator_t<R>, iterator_t<Base>>;
+constexpr $iterator$($iterator$<!Const> i)
+  requires Const && convertible_to<iterator_t<V>, iterator_t<$Base$>>
+                 && convertible_to<sentinel_t<V>, sentinel_t<$Base$>>;
 ```
 
-[5]{.pnum} _Effects_: Initializes `parent_` with `other.parent_` and `current_` with `std::move(other.current_)`,
-and `step_` with `other.step_`.
+[#]{.pnum} _Effects_: Initializes `$current_$` with `std::move(i.$current_$)`,
+`$end_$` with `std::move(i.$end_$)`, `$stride_$` with `i.$stride_$`, and `$missing_$` with `i.$missing_$`.
+
+```cpp
+constexpr iterator_t<$Base$> base() &&;
+```
+[#]{.pnum} _Returns_: `std::move($current_$)`.
+
+```cpp
+constexpr const iterator_t<$Base$>& base() const & noexcept;
+```
+[#]{.pnum} _Returns_: `$current_$`.
 
 ```cpp
 constexpr $iterator$& operator++();
 ```
 
-[6]{.pnum} _Effects_: Equivalent to: `return advance(1);`
+[#]{.pnum} _Preconditions:_ `$current_$ != $end_$` is `true`.
+
+[#]{.pnum} _Effects:_ Equivalent to:
+
+::: bq
+```cpp
+   $missing_$ = ranges::advance($current_$, $stride_$, $end_$);
+   return *this;
+```
+:::
 
 ```cpp
 constexpr void operator++(int);
 ```
 
-[7]{.pnum} _Effects_: Equivalent to: `advance(1);`
+[#]{.pnum} _Effects_: Equivalent to: `++*this;`
 
 ```cpp
-constexpr $iterator$ operator++(int) requires forward_range<Base>;
+constexpr $iterator$ operator++(int) requires forward_range<$Base$>;
 ```
 
-[8]{.pnum} _Effects_: Equivalent to:
+[#]{.pnum} _Effects_: Equivalent to:
+
+::: bq
+```cpp
+  auto tmp = *this;
+  ++*this;
+  return tmp;
+```
+:::
 
 ```cpp
-auto temp = *this;
-++*this;
-return temp;
+constexpr $iterator$& operator--() requires bidirectional_range<$Base$>;
 ```
+
+[#]{.pnum} _Effects:_ Equivalent to:
+
+::: bq
+```cpp
+   ranges::advance($current_$, $missing_$ - $stride_$);
+   $missing_$ = 0;
+   return *this;
+```
+:::
 
 ```cpp
-constexpr $iterator$& operator--() requires bidirectional_range<Base>;
+constexpr $iterator$ operator--(int) requires bidirectional_range<$Base$>;
 ```
 
-[9]{.pnum} _Effects_: Equivalent to: `return advance(-1);`
+::: bq
+```cpp
+  auto tmp = *this;
+  --*this;
+  return tmp;
+```
+:::
 
 ```cpp
-constexpr $iterator$ operator--(int) requires bidirectional_range<Base>;
+constexpr $iterator$& operator+=(difference_type n) requires random_access_range<$Base$>;
 ```
+
+[#]{.pnum} _Preconditions_: If `n` is positive,
+`ranges::distance($current_$, $end_$) > $stride_$ * (n - 1)` is `true`.
+[If `n` is negative, the _Effects:_ paragraph implies a precondition.]{.note}
+
+[#]{.pnum} _Effects:_ Equivalent to:
+
+:::bq
+```cpp
+if (n > 0) {
+  $missing_$ = ranges::advance($current_$, $stride_$ * n, $end_$);
+}
+else if (n < 0) {
+  ranges::advance($current_$, $stride_$ * n + $missing_$);
+  $missing_$ = 0;
+}
+return *this;
+```
+:::
 
 ```cpp
-auto temp = *this;
---*this;
-return temp;
+constexpr $iterator$& operator-=(difference_type x)
+  requires random_access_range<$Base$>;
 ```
+[#]{.pnum} _Effects:_ Equivalent to: `return *this += -x;`
 
 ```cpp
-constexpr $iterator$& operator+=(difference_type n) requires random_access_range<Base>;
+friend constexpr bool operator==(const $iterator$& x, default_sentinel);
 ```
 
-[10]{.pnum} _Effects_: Equivalent to: `return advance(n);`
+[#]{.pnum} _Returns:_ `x.$current_$ == x.$end_$;`
 
 ```cpp
-constexpr $iterator$& operator-=(difference_type n) requires random_access_range<Base>;
+friend constexpr bool operator==(const $iterator$& x, const $iterator$& y)
+      requires equality_comparable<iterator_t<$Base$>>;
 ```
 
-[11]{.pnum} _Effects_: Equivalent to: `return advance(-n);`
+[#]{.pnum} _Returns:_ `x.$current_$ == y.$current_$`.
 
 ```cpp
-constexpr $iterator$& operator+($iterator$ x, difference_type n)
-  requires random_access_range<Base>;
+friend constexpr bool operator<(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
 ```
 
-[12]{.pnum} _Effects_: Equivalent to: `return x += n;`
+[#]{.pnum} _Returns_: `x.$current_$ < y.$current_$`.
 
 ```cpp
-constexpr $iterator$& operator+(difference_type n, $iterator$ x)
-  requires random_access_range<Base>;
+friend constexpr bool operator>(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
 ```
 
-[13]{.pnum} _Effects_: Equivalent to: `return x += n;`
+[#]{.pnum} _Effects_: Equivalent to: `return y < x;`
 
 ```cpp
-constexpr $iterator$& operator-(const $iterator$& x, difference_type n)
-  requires random_access_range<Base>;
+friend constexpr bool operator<=(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
 ```
 
-[14]{.pnum} _Effects_: Equivalent to: `return x -= n;`
+[#]{.pnum} _Effects_: Equivalent to: `return !(y < x);`
 
 ```cpp
-constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
-  requires random_access_range<Base>;
+friend constexpr bool operator>=(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$>;
 ```
 
-[15]{.pnum} _Effects_: Equivalent to: `return x.parent_->$compute-distance$(x.current_ - y.current_);`
+[#]{.pnum} _Effects_: Equivalent to: `return !(x < y);`
 
 ```cpp
-constexpr friend bool operator==(const $iterator$& x, default_sentinel);
+friend constexpr auto operator<=>(const $iterator$& x, const $iterator$& y)
+  requires random_access_range<$Base$> &&
+           three_way_comparable<iterator_t<$Base$>>;
 ```
 
-[16]{.pnum} _Effects_: Equivalent to: `return x.current_ == ranges::end(x.parent_->base_);`
+[#]{.pnum} _Returns_: `x.$current_$ <=> y.$current_$`.
+
 
 ```cpp
-constexpr friend bool operator==(const $iterator$& x, const $iterator$& y)
-      requires equality_comparable<iterator_t<Base>>;
+friend constexpr $iterator$ operator+(const $iterator$& i, difference_type n)
+  requires random_access_range<$Base$>;
+friend constexpr $iterator$ operator+(difference_type n, const $iterator$& i)
+  requires random_access_range<$Base$>;
 ```
 
-[16]{.pnum} _Effects_: Equivalent to: `return x.current_ == y.current_;`
+[#]{.pnum} _Effects_: Equivalent to:
+
+::: bq
+```cpp
+  auto r = i;
+  r += n;
+  return r;
+```
+:::
 
 ```cpp
-constexpr friend bool operator<(const $iterator$& x, const $iterator$& y)
-  requires random_access_range<Base>;
+friend constexpr $iterator$ operator-(const $iterator$& i, difference_type n)
+  requires random_access_range<$Base$>;
 ```
 
-[17]{.pnum} _Effects_: Equivalent to: `return x.current_ < y.current_;`
+[#]{.pnum} _Effects_: Equivalent to:
+
+::: bq
+```cpp
+  auto r = i;
+  r -= n;
+  return r;
+```
+:::
 
 ```cpp
-constexpr friend bool operator>(const $iterator$& x, const $iterator$& y)
-  requires random_access_range<Base>;
+friend constexpr difference_type operator-(const $iterator$& x, const $iterator$& y)
+  requires sized_sentinel_for<iterator_t<$Base$>, iterator_t<$Base$>>;
 ```
 
-[18]{.pnum} _Effects_: Equivalent to: `return y < x;`
+[#]{.pnum} _Returns:_ Let `N` be `x.$current_$ - y.$current_$`.
+
+- [#.#]{.pnum} If `$Base$` models `forward_range`, `(N + x.$missing_$ - y.$missing_$) / x.$stride_$`.
+- [#.#]{.pnum} Otherwise, if `N` is negative, `-$div-ceil$(-N, x.$stride_$)`.
+- [#.#]{.pnum} Otherwise, `$div-ceil$(N, x.$stride_$)`.
+
+[When `$Base$` is input-only, the value of `$missing_$` is unreliable.]{.draftnote}
 
 ```cpp
-constexpr friend bool operator<=(const $iterator$& x, const $iterator$& y)
-  requires random_access_range<Base>;
+friend constexpr difference_type operator-(default_sentinel_t y, const $iterator$& x)
+  requires sized_sentinel_for<sentinel_t<$Base$>, iterator_t<$Base$>>;
 ```
-
-[19]{.pnum} _Effects_: Equivalent to: `return !(y < x);`
+[#]{.pnum} _Returns_: `$div-ceil$(x.$end_$ - x.$current_$, x.$stride_$)`.
 
 ```cpp
-constexpr friend bool operator>=(const $iterator$& x, const $iterator$& y)
-  requires random_access_range<Base>;
+friend constexpr difference_type operator-(const $iterator$& x, default_sentinel_t y)
+  requires sized_sentinel_for<sentinel_t<$Base$>, iterator_t<$Base$>>;
 ```
-
-[20]{.pnum} _Effects_: Equivalent to: `return !(x < y);`
+[#]{.pnum} _Effects_: Equivalent to: `return -(y - x);`
 
 ```cpp
-constexpr friend compare_three_way_result_t<iterator_t<Base>>
-  operator<=>(const $iterator$& x, const $iterator$& y)
-    requires random_access_range<Base> && three_way_comparable<iterator_t<Base>>;
+friend constexpr range_rvalue_reference_t<$Base$> iter_move(const $iterator$& i)
+  noexcept(noexcept(ranges::iter_move(i.$current_$)));
 ```
 
-[21]{.pnum} _Effects_: Equivalent to: `return x.current_ <=> y.current_;`
+[#]{.pnum} _Effects_: Equivalent to: `return ranges::iter_move(i.$current_$);`
 
 ```cpp
-constexpr friend range_rvalue_reference_t<R> iter_move(const $iterator$& i)
-  noexcept(noexcept(ranges::iter_move(i.current_)));
+friend constexpr void iter_swap(const $iterator$& x, const $iterator$& y)
+  noexcept(noexcept(ranges::iter_swap(x.$current_$, y.$current_$)))
+  requires indirectly_swappable<iterator_t<$Base$>>;
 ```
 
-[22]{.pnum} _Effects_: Equivalent to: `return ranges::iter_move(i);`
+[#]{.pnum} _Effects_: Equivalent to: `ranges::iter_swap(x.$current_$, y.$current_$);`
 
-```cpp
-constexpr friend void iter_swap(const $iterator$& x, const $iterator$& x)
-  noexcept(noexcept(ranges::iter_swap(x.current_, y.current_)))
-  requires indirectly_swappable<iterator_t<R>>;
-```
-
-[23]{.pnum} _Effects_: Equivalent to: `ranges::iter_swap(x.current_, y.current_);`
-
+:::
 ## Feature-test macro
 
 Add the following macro definition to [version.syn]{.sref}, header `<version>` synopsis, with the
@@ -644,3 +687,15 @@ value selected by the editor to reflect the date of adoption of this paper:
 The author would like to thank Tristan Brindle for providing editorial commentary on P1899, and also
 those who reviewed material for, or attended the aforementioned CppCon session or post-conference
 class, for their input on the design of the proposed `stride_view`.
+
+---
+references:
+    - id: P2442R1
+      citation-label: P2442R1
+      title: "Windowing range adaptors: `views::chunk` and `views::slide`"
+      author:
+        - family: Tim Song
+      issued:
+        year: 2021
+      URL: https://wg21.link/P2442R1
+---

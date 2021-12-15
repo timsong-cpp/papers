@@ -1,2 +1,4 @@
-d2440r2.html : stride.md
+d1899r2.html : stride.md
+d1899r2.html : EXTRA_ARGS=--toc-depth=4
+
 include $(shell git rev-parse --show-toplevel)/md/mpark-wg21.mk
