@@ -1,6 +1,6 @@
 ---
 title: "`stride_view`"
-document: D1899R2
+document: P1899R2
 date: today
 audience:
   - SG9
