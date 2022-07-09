@@ -1,10 +1,9 @@
 ---
 title: "`stride_view`"
-document: P1899R2
+document: P1899R3
 date: today
 audience:
-  - SG9
-  - LEWG
+  - LWG
 author:
   - name: Christopher Di Bella
     email: <cjdb.ns@gmail.com>
@@ -20,6 +19,11 @@ a quarter of a century. Given that there's no way to compose a strided range ada
 should be adopted for C++23.
 
 # Revision history
+
+## R3
+* Incorporated LWG review feedback.
+  * Removed the default constructor of `stride_view`.
+  * Fixed typos.
 
 ## R2
 
@@ -198,9 +202,6 @@ namespace std::ranges {
 
 Add the following subclause to [range.adaptors]{.sref}.
 
-[This wording assumes the exposition-only `$div-ceil$` function template introduced in
-[@P2442R1].]{.ednote}
-
 ### 24.7.? Stride view [range.stride] {-}
 
 #### 24.7.?.1 Overview [range.stride.overview] {-}
@@ -227,11 +228,10 @@ namespace std::ranges {
   template<input_range V>
     requires view<V>
   class stride_view : public view_interface<stride_view<V>> {
-    V $base_$ = V();                           // exposition only
-    range_difference_t<V> $stride_$ = 1;       // exposition only
+    V $base_$;                                 // exposition only
+    range_difference_t<V> $stride_$;           // exposition only
     template<bool> class $iterator$;           // exposition only
   public:
-    stride_view() requires default_initializable<V> = default;
     constexpr explicit stride_view(V base, range_difference_t<V> stride);
 
     constexpr V base() const& requires copy_constructible<V> { return $base_$; }
@@ -297,7 +297,7 @@ constexpr stride_view(V base, range_difference_t<V> stride);
 [#]{.pnum} _Effects_: Initializes `$base_$` with  `std::move(base)` and `$stride_$` with `stride`.
 
 ```cpp
-constexpr range_difference_t<V> stride() const;
+constexpr range_difference_t<V> stride() const noexcept;
 ```
 
 [#]{.pnum} _Returns_: `$stride_$`.
@@ -324,7 +324,7 @@ namespace std::ranges {
     requires view<V>
   template<bool Const>
   class stride_view<V>::$iterator$ {
-    using $Parent$ = $maybe-const$<Const, chunk_view>;                // exposition only
+    using $Parent$ = $maybe-const$<Const, stride_view>;               // exposition only
     using $Base$ = $maybe-const$<Const, V>;                           // exposition only
 
     iterator_t<$Base$> $current_$ = iterator_t<$Base$>();               // exposition only
@@ -340,7 +340,7 @@ namespace std::ranges {
     using iterator_concept = $see below$;
     using iterator_category = $see below$; // not always present
 
-    $iterator$() requires default_initializable<iterator_t<$Base$>>= default;
+    $iterator$() requires default_initializable<iterator_t<$Base$>> = default;
 
     constexpr $iterator$($iterator$<!Const> other)
       requires Const && convertible_to<iterator_t<V>, iterator_t<$Base$>>
@@ -366,7 +366,7 @@ namespace std::ranges {
       requires random_access_range<$Base$>
     { return *(*this + n); }
 
-    friend constexpr bool operator==(const $iterator$& x, default_sentinel);
+    friend constexpr bool operator==(const $iterator$& x, default_sentinel_t);
 
     friend constexpr bool operator==(const $iterator$& x, const $iterator$& y)
       requires equality_comparable<iterator_t<$Base$>>;
@@ -513,6 +513,8 @@ constexpr $iterator$& operator--() requires bidirectional_range<$Base$>;
 constexpr $iterator$ operator--(int) requires bidirectional_range<$Base$>;
 ```
 
+[#]{.pnum} _Effects:_ Equivalent to:
+
 ::: bq
 ```cpp
   auto tmp = *this;
@@ -551,7 +553,7 @@ constexpr $iterator$& operator-=(difference_type x)
 [#]{.pnum} _Effects:_ Equivalent to: `return *this += -x;`
 
 ```cpp
-friend constexpr bool operator==(const $iterator$& x, default_sentinel);
+friend constexpr bool operator==(const $iterator$& x, default_sentinel_t);
 ```
 
 [#]{.pnum} _Returns:_ `x.$current_$ == x.$end_$;`
