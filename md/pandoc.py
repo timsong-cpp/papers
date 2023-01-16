@@ -25,7 +25,7 @@ def bq(elem, doc):
     if elem.classes == ['bq']:
         return pf.BlockQuote(*elem.content)
 
-def itemdecl(elem, doc):
+def itemdecl(elem, doc, nested=False):
     """
     Item decls.
 
@@ -38,29 +38,37 @@ def itemdecl(elem, doc):
     if not isinstance(elem, pf.Div):
         return None
 
-    if not 'itemdecl' in elem.classes:
+    if not nested and not 'itemdecl' in elem.classes:
         return None
 
     content = []
     current_bq = []
 
+    def wrap_up():
+        nonlocal current_bq
+        if current_bq:
+            content.append(pf.BlockQuote(*current_bq))
+            current_bq = []
+
     for e in elem.content:
-        if isinstance(e, pf.CodeBlock) or isinstance(e, pf.RawBlock):
-            if current_bq:
-                content.append(pf.BlockQuote(*current_bq))
-                current_bq = []
+        if isinstance(e, pf.CodeBlock) or isinstance(e, pf.RawBlock) and 'nonitem' not in e.text:
+            wrap_up()
+            content.append(e)
+        elif isinstance(e, pf.Div) and ('add' in e.classes or 'rm' in e.classes):
+            wrap_up()
+            content.append(itemdecl(e, doc, nested=True))
+        elif isinstance(e, pf.Div) and 'nonitem' in e.classes:
+            wrap_up()
             content.append(e)
         else:
             current_bq.append(e)
 
-    if current_bq:
-        content.append(pf.BlockQuote(*current_bq))
-        current_bq = []
+    wrap_up()
 
     if 'bq' in elem.classes:
         return pf.BlockQuote(*content)
     else:
-        return pf.Div(*content)
+        return pf.Div(*content, classes=[c for c in elem.classes if c != 'itemdecl'])
 
 
 def wordinglist(elem, doc):

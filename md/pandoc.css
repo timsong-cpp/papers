@@ -203,6 +203,9 @@ blockquote { background-color: #f6f8fa; }
   code.diff span.vd {
     color: #b0b0b0;
   }
+  code.diff span.st {
+    color: #b0b0b0;
+  }
   div.add {
     color: #d0fddd !important
   }
