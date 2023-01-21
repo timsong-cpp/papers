@@ -18,6 +18,11 @@ and NB comment [US 61-126](https://github.com/cplusplus/nbballot/issues/539).
 
 # Discussion
 
+A _stashing iterator_ is an iterator that returns a reference to something within
+itself (or more generally, _something_ that is tied to the lifetime of the iterator).
+Such iterators can only be of the input category; forward iterators are not allowed
+to be stashing ([iterator.concept.forward]{.sref} p3; [forward.iterators]{.sref} p6).
+
 There are two parts to [@LWG3698]:
 
 - `regex_iterator` and `regex_token_iterator`
@@ -29,17 +34,29 @@ concepts.
 
 - `join` and `join_with`
 
-These don't handle stashing iterator properly. When the outer iterator is stashing,
-the inner iterator refers into the outer iterator. In such cases we cannot store
-the outer iterator inside `join`'s iterator, because copying/moving that iterator
-results in an inner iterator that points into the original outer iterator rather
-than the new one. Instead, we need to cache the outer iterator within the view,
-similar to what we do for a number of other views (`lazy_split`, for instance).
+These don't handle stashing iterators properly.
 
-There is no dedicated "stashing" trait; we therefore need to do this for all
-input iterators. Forward iterators are already required to be non-stashing.
+As currently specified, the `join_view` iterator holds a) an iterator `outer` into the
+range being joined and b) an iterator `inner` into the current element that is
+being iterated over (that is, `*outer`).
 
-While in the vincinity, this paper also resolves [@LWG3700] and [@LWG3791],
+When `outer` is stashing, then, `inner` actually refers into `*outer`. In such a
+case, making a copy of the `join_view` iterator would produce an iterator that
+holds:
+
+- a copy of `outer`, and
+- a copy of `inner`, but this copy is pointing into the original `outer`, not
+  the copy.
+
+Hilarity ensues when we try to continue to iterate using this copy.
+
+The fix is to cache the outer iterator within the view, similar to what we do
+for a number of other views (`lazy_split`, for instance). This way, copying the
+`join_view` iterator only copies the inner iterator. Because there is no
+dedicated "stashing" trait, we need to do this for all
+input iterators.
+
+While in the vicinity, this paper also resolves [@LWG3700] and [@LWG3791],
 two relatively minor issues concerning `join_view` and `join_with_view`.
 
 The wording below has been implemented and tested on top of libstdc++ master.

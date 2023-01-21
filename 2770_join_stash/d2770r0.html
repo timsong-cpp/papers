@@ -625,6 +625,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <h1 data-number="1" style="border-bottom:1px solid #cccccc" id="abstract"><span class="header-section-number">1</span> Abstract<a href="#abstract" class="self-link"></a></h1>
 <p>This paper provides wording to resolve <span class="citation" data-cites="LWG3698">[<a href="#ref-LWG3698" role="doc-biblioref">LWG3698</a>]</span>, <span class="citation" data-cites="LWG3700">[<a href="#ref-LWG3700" role="doc-biblioref">LWG3700</a>]</span>, <span class="citation" data-cites="LWG3791">[<a href="#ref-LWG3791" role="doc-biblioref">LWG3791</a>]</span>, and NB comment <a href="https://github.com/cplusplus/nbballot/issues/539">US 61-126</a>.</p>
 <h1 data-number="2" style="border-bottom:1px solid #cccccc" id="discussion"><span class="header-section-number">2</span> Discussion<a href="#discussion" class="self-link"></a></h1>
+<p>A <em>stashing iterator</em> is an iterator that returns a reference to something within itself (or more generally, <em>something</em> that is tied to the lifetime of the iterator). Such iterators can only be of the input category; forward iterators are not allowed to be stashing (<span>25.3.4.11 <a href="https://wg21.link/iterator.concept.forward">[iterator.concept.forward]</a></span> p3; <span>25.3.5.5 <a href="https://wg21.link/forward.iterators">[forward.iterators]</a></span> p6).</p>
 <p>There are two parts to <span class="citation" data-cites="LWG3698">[<a href="#ref-LWG3698" role="doc-biblioref">LWG3698</a>]</span>:</p>
 <ul>
 <li><code class="sourceCode cpp">regex_iterator</code> and <code class="sourceCode cpp">regex_token_iterator</code></li>
@@ -633,9 +634,16 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <ul>
 <li><code class="sourceCode cpp">join</code> and <code class="sourceCode cpp">join_with</code></li>
 </ul>
-<p>These don’t handle stashing iterator properly. When the outer iterator is stashing, the inner iterator refers into the outer iterator. In such cases we cannot store the outer iterator inside <code class="sourceCode cpp">join</code>’s iterator, because copying/moving that iterator results in an inner iterator that points into the original outer iterator rather than the new one. Instead, we need to cache the outer iterator within the view, similar to what we do for a number of other views (<code class="sourceCode cpp">lazy_split</code>, for instance).</p>
-<p>There is no dedicated “stashing” trait; we therefore need to do this for all input iterators. Forward iterators are already required to be non-stashing.</p>
-<p>While in the vincinity, this paper also resolves <span class="citation" data-cites="LWG3700">[<a href="#ref-LWG3700" role="doc-biblioref">LWG3700</a>]</span> and <span class="citation" data-cites="LWG3791">[<a href="#ref-LWG3791" role="doc-biblioref">LWG3791</a>]</span>, two relatively minor issues concerning <code class="sourceCode cpp">join_view</code> and <code class="sourceCode cpp">join_with_view</code>.</p>
+<p>These don’t handle stashing iterators properly.</p>
+<p>As currently specified, the <code class="sourceCode cpp">join_view</code> iterator holds a) an iterator <code class="sourceCode cpp">outer</code> into the range being joined and b) an iterator <code class="sourceCode cpp">inner</code> into the current element that is being iterated over (that is, <code class="sourceCode cpp"><span class="op">*</span>outer</code>).</p>
+<p>When <code class="sourceCode cpp">outer</code> is stashing, then, <code class="sourceCode cpp">inner</code> actually refers into <code class="sourceCode cpp"><span class="op">*</span>outer</code>. In such a case, making a copy of the <code class="sourceCode cpp">join_view</code> iterator would produce an iterator that holds:</p>
+<ul>
+<li>a copy of <code class="sourceCode cpp">outer</code>, and</li>
+<li>a copy of <code class="sourceCode cpp">inner</code>, but this copy is pointing into the original <code class="sourceCode cpp">outer</code>, not the copy.</li>
+</ul>
+<p>Hilarity ensues when we try to continue to iterate using this copy.</p>
+<p>The fix is to cache the outer iterator within the view, similar to what we do for a number of other views (<code class="sourceCode cpp">lazy_split</code>, for instance). This way, copying the <code class="sourceCode cpp">join_view</code> iterator only copies the inner iterator. Because there is no dedicated “stashing” trait, we need to do this for all input iterators.</p>
+<p>While in the vicinity, this paper also resolves <span class="citation" data-cites="LWG3700">[<a href="#ref-LWG3700" role="doc-biblioref">LWG3700</a>]</span> and <span class="citation" data-cites="LWG3791">[<a href="#ref-LWG3791" role="doc-biblioref">LWG3791</a>]</span>, two relatively minor issues concerning <code class="sourceCode cpp">join_view</code> and <code class="sourceCode cpp">join_with_view</code>.</p>
 <p>The wording below has been implemented and tested on top of libstdc++ master.</p>
 <h1 data-number="3" style="border-bottom:1px solid #cccccc" id="wording"><span class="header-section-number">3</span> Wording<a href="#wording" class="self-link"></a></h1>
 <p>This wording is relative to <span class="citation" data-cites="N4928">[<a href="#ref-N4928" role="doc-biblioref">N4928</a>]</span>.</p>
