@@ -1,7 +1,7 @@
 ---
 title: Stashing stashing iterators for proper flattening
 subtitle: Resolving LWG 3698
-document: D2770R0
+document: P2770R0
 date: today
 audience:
   - LWG
@@ -230,8 +230,8 @@ namespace std::ranges {
 
      constexpr void $satisfy$();                                   // exposition only
 
-+    constexpr auto& $outer$();                                    // exposition only
-+    constexpr auto& $outer$() const;                              // exposition only
++    constexpr $OuterIter$& $outer$();                               // exposition only
++    constexpr const $OuterIter$& $outer$() const;                   // exposition only
 
 +    constexpr $iterator$($Parent$& parent, $OuterIter$ outer)
 +      requires forward_range<$Base$>;                             // exposition only
@@ -268,8 +268,8 @@ namespace std::ranges {
 ::: add
 
 ```cpp
-    constexpr auto& $outer$();
-    constexpr auto& $outer$() const;
+    constexpr $OuterIter$& $outer$();
+    constexpr const $OuterIter$& $outer$() const;
 ```
 
 [?]{.pnum} _Returns:_ `$outer_$` if `$Base$` models `forward_range`; otherwise, `*$parent_$->$outer_$`.
@@ -325,7 +325,11 @@ constexpr $iterator$($iterator$<!Const> i)
 [#]{.pnum} _Effects:_ Initializes `$outer_$` with `std::move(i.$outer_$)`,
 `$inner_$` with `std::move(i.$inner_$)`, and `$parent_$` with `i.$parent_$`.
 
-[`Const` can only be `true` if the outer range is forward.]{.draftnote}
+::: add
+
+[?]{.pnum} [`Const` can only be `true` when `$Base$` models `forward_range`.]{.note-}
+
+:::
 
 ```cpp
 constexpr $InnerIter$ operator->() const
@@ -543,8 +547,8 @@ friend constexpr bool operator==(const $iterator$<OtherConst>& x, const $sentine
 +      requires forward_range<$Base$>;                                     // exposition only
 +    constexpr explicit $iterator$($Parent$& parent)
 +      requires (!forward_range<$Base$>);                                  // exposition only
-+    constexpr auto& $outer$();                                            // exposition only
-+    constexpr auto& $outer$() const;                                      // exposition only
++    constexpr $OuterIter$& $outer$();                                       // exposition only
++    constexpr const $OuterIter$& $outer$() const;                           // exposition only
      constexpr auto&@[&]{.diffdel}@ $update-inner$(@[const $OuterIter$&]{.diffdel}@);                    // exposition only
      constexpr auto&@[&]{.diffdel}@ $get-inner$(@[const $OuterIter$&]{.diffdel}@);                       // exposition only
      constexpr void $satisfy$();                                           // exposition only
@@ -578,8 +582,8 @@ friend constexpr bool operator==(const $iterator$<OtherConst>& x, const $sentine
 ::: add
 
 ```cpp
-    constexpr auto& $outer$();
-    constexpr auto& $outer$() const;
+    constexpr $OuterIter$& $outer$();
+    constexpr const $OuterIter$& $outer$() const;
 ```
 
 [?]{.pnum} _Returns:_ `$outer_it_$` if `$Base$` models `forward_range`; otherwise, `*$parent_$->$outer_it_$`.
@@ -673,8 +677,11 @@ if (i.$inner_it_$.index() == 0)
 else
   $inner_it_$.emplace<1>(std::get<1>(std::move(i.$inner_it_$)));
 ```
+::: add
 
-[`Const` can only be `true` if the outer range is forward.]{.draftnote}
+[?]{.pnum} [`Const` can only be `true` when `$Base$` models `forward_range`.]{.note-}
+
+:::
 
 ::: nonitem
 
@@ -710,16 +717,3 @@ friend constexpr bool operator==(const $iterator$<OtherConst>& x, const $sentine
 :::
 
 :::
-
-
----
-references:
-    - id: N4928
-      citation-label: N4928
-      title: "Working Draft, Standard for Programming Language C++"
-      author:
-        - family: Thomas K&#246;ppe
-      issued:
-        year: 2022
-      URL: https://wg21.link/N4928
----
