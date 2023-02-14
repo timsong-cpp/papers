@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2023-02-12" />
+  <meta name="dcterms.date" content="2023-02-14" />
   <title>Closed ranges may be a problem; breaking counted_iterator is not the solution</title>
   <style>
       code{white-space: pre-wrap;}
@@ -599,7 +599,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2023-02-12</td>
+    <td>2023-02-14</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -674,7 +674,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <h1 data-number="5" style="border-bottom:1px solid #cccccc" id="adapting-a-closed-range-into-a-half-open-range"><span class="header-section-number">5</span> Adapting a closed range into a half-open range<a href="#adapting-a-closed-range-into-a-half-open-range" class="self-link"></a></h1>
 <p>But let’s say we have a closed range of <em>N</em> elements for whatever reason and want to adapt it to a half-open range that everything else in C++ expects. What do we need to do?</p>
 <p>Well, we have <em>N</em> iterator values to start with and have to come up with <em>N + 1</em> ones for the half-open range. In other words, we need to invent a new iterator value out of thin air. The adapted iterator has a single type that needs to represent both the original positions and this past-the-end value everything else expects - it is effectively a <code class="sourceCode cpp">variant<span class="op">&lt;</span>OriginalIterator, PastTheEndSentinel<span class="op">&gt;</span></code> - though perhaps not literally that.</p>
-<p>It should be unsurprising that such an adaptation necessarily adds overhead and limits functionality - every increment needs to check “did I become the sentinel”; every decrement - if supported at all - would need to check “am I the sentinel”. And supporting decrement at all requires the <code class="sourceCode cpp">PastTheEndSentinel</code> to contain an <code class="sourceCode cpp">OriginalIterator</code> value. Postfix increment on input or output iterators cannot be supported - those can return a proxy, and we can’t invent one out of thin air. And since output iterators require <code class="sourceCode cpp"><span class="op">*</span>o<span class="op">++</span></code> to work, we lose support for those iterators entirely.</p>
+<p>It should be unsurprising that such an adaptation necessarily adds overhead and limits functionality - every increment needs to check “did I become the sentinel”; every decrement - if supported at all - would need to check “am I the sentinel”. And supporting decrement at all requires the <code class="sourceCode cpp">PastTheEndSentinel</code> to contain an <code class="sourceCode cpp">OriginalIterator</code> value. Returning non-<code class="sourceCode cpp"><span class="dt">void</span></code> from postfix increment on input or output iterators cannot be supported - those can return a proxy, and we can’t invent one out of thin air. And since output iterators require <code class="sourceCode cpp"><span class="op">*</span>o<span class="op">++</span></code> to work, we lose support for those iterators entirely.</p>
 <p>It’s worth emphasizing that this problem has nothing to do with having a count. Adapting a closed range to a half-open range can be done without one. Presumably the reason this first arose in the <code class="sourceCode cpp">counted_iterator</code> context is that having a decrementing count alongside the iterator happens to provide a natural representation for the <code class="sourceCode cpp">PastTheEndSentinel</code> state. On the other hand, having a count also leads to a confusing iterator construction API if decrement is to be supported - especially if the adaptor can be used with normal C++ iterators where support for past-the-end values is the norm.</p>
 <p>As a concrete example, consider range-v3’s <a href="https://github.com/ericniebler/range-v3/blob/21b70bee785cabd3ca5e3da173bf3bdbb9df1344/include/range/v3/view/iota.hpp#L181-L310"><code class="sourceCode cpp">closed_iota</code></a>, which represents an integer range <code class="sourceCode cpp"><span class="op">[</span>first, last<span class="op">]</span></code>. Its iterator is basically</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">struct</span> iterator <span class="op">{</span></span>

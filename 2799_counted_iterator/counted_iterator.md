@@ -134,8 +134,8 @@ past-the-end value everything else expects - it is effectively a
 It should be unsurprising that such an adaptation necessarily adds overhead and limits functionality -
 every increment needs to check "did I become the sentinel"; every decrement - if supported at all -
 would need to check "am I the sentinel". And supporting decrement at all requires the
-`PastTheEndSentinel` to contain an `OriginalIterator` value. Postfix increment on input or
-output iterators cannot be supported - those can return a proxy, and we can't invent one
+`PastTheEndSentinel` to contain an `OriginalIterator` value. Returning non-`void` from postfix
+increment on input or output iterators cannot be supported - those can return a proxy, and we can't invent one
 out of thin air. And since output iterators require `*o++` to work, we lose support for those
 iterators entirely.
 
