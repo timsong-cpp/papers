@@ -1,6 +1,6 @@
 ---
 title: "`views::cache_last`"
-document: D3138R0
+document: P3138R0
 date: today
 audience:
   - SG9
@@ -142,11 +142,22 @@ a reason to force an independent copy of the `value_type`. So long as the
 underlying iterator is not modified, the reference obtained from `operator*`
 should remain valid.
 
-This paper therefore proposes `range_reference_t<V>&`.
+This paper therefore proposes `range_reference_t<V>&`. Note that even if the
+reference type is a real reference, it can be an _expensive-to-compute_ reference,
+so caching could still make sense.
 
 ## Properties
 
 `cache_last` is never borrowed, input-only, never common, and not const-iterable.
+
+## `iter_move` and `iter_swap`
+
+`indirectly_readable` and `indirectly_swappable` requires `iter_move` and `iter_swap`
+to respectively not modify `i` (in the [concepts.equality]{.sref} sense).
+Moreover, `indirectly_readable` requires `*i` to be equality-preserving. So
+the cache should not be invalidated by either operation. (The underlying element
+might be modified, but the reference itself, obtained from dereferencing the
+iterator, cannot.)
 
 # Wording
 
@@ -207,7 +218,7 @@ already a `cache_last_view`.]{.draftnote}
 ```cpp
 template<input_range V>
   requires view<V>
-class cache_last_view : public view_interface<cache_last_view<V, Pred>>{
+class cache_last_view : public view_interface<cache_last_view<V>>{
   V $base_$ = V();                                                       // exposition only
   using $cache_t$ = conditional_t<is_reference_v<range_reference_t<V>>,  // exposition only
                                 add_pointer_t<range_reference_t<V>>,
@@ -391,17 +402,8 @@ friend constexpr range_rvalue_reference_t<V> iter_move(const $iterator$& i)
   noexcept(noexcept(ranges::iter_move(i.$current_$)));
 ```
 
-[#]{.pnum} _Effects_: Equivalent to:
+[#]{.pnum} _Effects_: Equivalent to: `return ranges::iter_move(i.$current_$);`
 
-::: bq
-```cpp
-if constexpr(!is_reference_v<range_reference_t<V>>) {
-  i.$parent_$->$cache_$.reset();
-}
-
-return ranges::iter_move(i.$current_$);
-```
-:::
 
 ```cpp
 friend constexpr void iter_swap(const $iterator$& x, const $iterator$& y)
@@ -409,18 +411,7 @@ friend constexpr void iter_swap(const $iterator$& x, const $iterator$& y)
   requires indirectly_swappable<iterator_t<V>>;
 ```
 
-[#]{.pnum} _Effects_: Equivalent to:
-
-::: bq
-```cpp
-if constexpr(!is_reference_v<range_reference_t<V>>) {
-  x.$parent_$->$cache_$.reset();
-  y.$parent_$->$cache_$.reset();
-}
-
-ranges::iter_swap(x.$current_$, y.$current_$);
-```
-:::
+[#]{.pnum} _Effects_: Equivalent to: `ranges::iter_swap(x.$current_$, y.$current_$);`
 
 :::
 
