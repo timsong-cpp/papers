@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2024-02-11" />
+  <meta name="dcterms.date" content="2024-02-14" />
   <title>Retiring niebloids</title>
   <style>
       code{white-space: pre-wrap;}
@@ -595,11 +595,11 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <table style="border:none;float:right">
   <tr>
     <td>Document #:</td>
-    <td>D3136R0</td>
+    <td>P3136R0</td>
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2024-02-11</td>
+    <td>2024-02-14</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -655,7 +655,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <span id="cb2-2"><a href="#cb2-2"></a><span class="kw">auto</span> y <span class="op">=</span> std<span class="op">::</span>views<span class="op">::</span>transform<span class="op">(</span>std<span class="op">::</span>ranges<span class="op">::</span>distance<span class="op">)</span>;</span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="kw">auto</span> z <span class="op">=</span> std<span class="op">::</span>views<span class="op">::</span>transform<span class="op">(</span>std<span class="op">::</span>ref<span class="op">(</span>std<span class="op">::</span>ranges<span class="op">::</span>distance<span class="op">))</span>;</span>
 <span id="cb2-4"><a href="#cb2-4"></a><span class="kw">auto</span> w <span class="op">=</span> std<span class="op">::</span>views<span class="op">::</span>transform<span class="op">([](</span><span class="kw">auto</span><span class="op">&amp;&amp;</span> r<span class="op">)</span> <span class="op">{</span> <span class="cf">return</span> std<span class="op">::</span>ranges<span class="op">::</span>distance<span class="op">(</span>r<span class="op">)</span>; <span class="op">})</span>;</span></code></pre></div>
-<p><code class="sourceCode cpp">x</code> is valid because <code class="sourceCode cpp">size</code> is a CPO. <code class="sourceCode cpp">y</code> might not be, because <code class="sourceCode cpp">distance</code> is a niebloid, and until last October, at least one major implementation disallowed copying niebloids. <code class="sourceCode cpp">z</code> is de-facto valid. <code class="sourceCode cpp">w</code> is valid but excessively verbose.</p>
+<p><code class="sourceCode cpp">x</code> is valid because <code class="sourceCode cpp">size</code> is a CPO. <code class="sourceCode cpp">y</code> might not be, because <code class="sourceCode cpp">distance</code> is a niebloid, and until last October, at least one major implementation disallowed copying niebloids. <code class="sourceCode cpp">z</code> is de-facto valid - as long as <code class="sourceCode cpp">std<span class="op">::</span>ranges<span class="op">::</span>distance</code> is an object, <code class="sourceCode cpp">std<span class="op">::</span>ref</code> should work on it, and then <code class="sourceCode cpp">reference_wrapper</code>’s call operator kicks in. <code class="sourceCode cpp">w</code> is valid but excessively verbose.</p>
 <p>There’s nothing inherently objectionable about <code class="sourceCode cpp">y</code>; we are not doing our users a service by disallowing it on paper. There’s no reason to insist on writing a lambda.</p>
 <h2 data-number="3.4" id="unresolved-wording-issues"><span class="header-section-number">3.4</span> Unresolved wording issues<a href="#unresolved-wording-issues" class="self-link"></a></h2>
 <p>The difference between a function object and a set of function templates goes beyond the suppression of ADL and the inability to specify a template argument list. For example, function objects do not overload. The current wording is therefore technically insufficient to permit the function-object implementation. Instead of trying to further weasel-word this, I think we should just admit that niebloids are function objects.</p>
@@ -678,7 +678,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <div class="add" style="color: #006e28">
 
 <h3 id="algorithm-function-objects-niebloid" class="unnumbered">16.3.3.? Algorithm function objects [niebloid]<a href="#algorithm-function-objects-niebloid" class="self-link"></a></h3>
-<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_4" id="pnum_4">1</a></span> For clarity of exposition, this document depicts certain customization point objects (<span>16.3.3.3.5 <a href="https://wg21.link/customization.point.object">[customization.point.object]</a></span>) as a set of one or more overloaded function templates. These function objects are termed <em>algorithm function objects</em>. The name of these function templates designates the corresponding algorithm function object.</p>
+<p><span class="marginalizedparent"><a class="marginalized" href="#pnum_4" id="pnum_4">1</a></span> For clarity of exposition, this document depicts certain customization point objects (<span>16.3.3.3.5 <a href="https://wg21.link/customization.point.object">[customization.point.object]</a></span>) as sets of one or more overloaded function templates. These customization point objects are termed <em>algorithm function objects</em>. The name of these function templates designates the corresponding algorithm function object.</p>
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_5" id="pnum_5">2</a></span> For an algorithm function object <code class="sourceCode default">o</code>, let <em><code class="sourceCode default">S</code></em> be the corresponding set of function templates shown in this document. Then for any sequence of arguments <code class="sourceCode default">args...</code>, <code class="sourceCode default">o(args...)</code> is expression-equivalent to <code class="sourceCode default">s(args...)</code>, where the result of name lookup for <code class="sourceCode default">s</code> is the overload set <em><code class="sourceCode default">S</code></em>.</p>
 <div class="note">
 <p><span>[ <em>Note 1:</em> </span>Algorithm function objects are not found by argument-dependent name lookup (<span>6.5.4 <a href="https://wg21.link/basic.lookup.argdep">[basic.lookup.argdep]</a></span>). When found by unqualified (<span>6.5.3 <a href="https://wg21.link/basic.lookup.unqual">[basic.lookup.unqual]</a></span>) name lookup for the <em>postfix-expression</em> in a function call (<span>7.6.1.3 <a href="https://wg21.link/expr.call">[expr.call]</a></span>), they inhibit argument-dependent name lookup.</p>

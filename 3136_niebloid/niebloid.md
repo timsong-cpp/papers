@@ -1,6 +1,6 @@
 ---
 title: Retiring niebloids
-document: D3136R0
+document: P3136R0
 date: today
 audience:
   - SG9
@@ -99,7 +99,9 @@ auto w = std::views::transform([](auto&& r) { return std::ranges::distance(r); }
 
 `x` is valid because `size` is a CPO. `y` might not be, because `distance` is a niebloid,
 and until last October, at least one major implementation disallowed copying niebloids.
-`z` is de-facto valid. `w` is valid but excessively verbose.
+`z` is de-facto valid - as long as `std::ranges::distance` is an object, `std::ref`
+should work on it, and then `reference_wrapper`'s call operator kicks in.
+`w` is valid but excessively verbose.
 
 There's nothing inherently objectionable about `y`; we are not doing our users
 a service by disallowing it on paper. There's no reason to insist on writing
@@ -140,8 +142,8 @@ to model a particular concept.
 ### 16.3.3.? Algorithm function objects [niebloid] {-}
 
 [#]{.pnum} For clarity of exposition, this document depicts certain customization
-point objects ([customization.point.object]{.sref}) as a set of one or more overloaded
-function templates. These function objects are termed _algorithm function objects_.
+point objects ([customization.point.object]{.sref}) as sets of one or more overloaded
+function templates. These customization point objects are termed _algorithm function objects_.
 The name of these function templates designates the corresponding algorithm function
 object.
 
