@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2024-02-11" />
+  <meta name="dcterms.date" content="2024-02-14" />
   <title>views::to_input</title>
   <style>
       code{white-space: pre-wrap;}
@@ -595,11 +595,11 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <table style="border:none;float:right">
   <tr>
     <td>Document #:</td>
-    <td>D3137R0</td>
+    <td>P3137R0</td>
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2024-02-11</td>
+    <td>2024-02-14</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -641,6 +641,8 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <p>P2760R1 proposes <code class="sourceCode cpp">as_input</code>, but the two <code class="sourceCode cpp">as_<em>meow</em></code> views we have (<code class="sourceCode cpp">as_const</code> and <code class="sourceCode cpp">as_rvalue</code>) are element-wise operations rather than operations on the view itself. So this paper proposes the name <code class="sourceCode cpp">to_input</code>.</p>
 <h2 data-number="3.2" id="properties"><span class="header-section-number">3.2</span> Properties<a href="#properties" class="self-link"></a></h2>
 <p><code class="sourceCode cpp">to_input</code> is conditionally borrowed, input-only (that’s its whole point), non-common, and conditionally const-iterable. As usual, wrapping is avoided if possible. The iterator only provides the minimal interface needed for an input iterator.</p>
+<h2 data-number="3.3" id="additional-operations"><span class="header-section-number">3.3</span> Additional operations?<a href="#additional-operations" class="self-link"></a></h2>
+<p>In theory, we could provide all the operations supported by the underlying iterator, and limit our change to the iterator concept. Such operations would be unlikely to see much use: <code class="sourceCode cpp">to_input</code> is a facility for influencing generic algorithms, and generic algorithms generally have to rely on the concept to determine if an operation can be used. So we do not try to do so here.</p>
 <h1 data-number="4" style="border-bottom:1px solid #cccccc" id="wording"><span class="header-section-number">4</span> Wording<a href="#wording" class="self-link"></a></h1>
 <p>This wording is relative to <span class="citation" data-cites="N4971">[<a href="#ref-N4971" role="doc-biblioref">N4971</a>]</span>.</p>
 <h2 data-number="4.1" id="addition-to-ranges"><span class="header-section-number">4.1</span> Addition to <code class="sourceCode cpp"><span class="op">&lt;</span>ranges<span class="op">&gt;</span></code><a href="#addition-to-ranges" class="self-link"></a></h2>
@@ -676,7 +678,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <h4 class="unnumbered" data-number id="class-template-to_input_view-range.to.input.view">26.7.?.2 Class template <code class="sourceCode cpp">to_input_view</code> [range.to.input.view]<a href="#class-template-to_input_view-range.to.input.view" class="self-link"></a></h4>
 <div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">template</span><span class="op">&lt;</span>input_range V<span class="op">&gt;</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>  <span class="kw">requires</span> view<span class="op">&lt;</span>V<span class="op">&gt;</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="kw">class</span> to_input_view <span class="op">:</span> <span class="kw">public</span> view_interface<span class="op">&lt;</span>to_input_view<span class="op">&lt;</span>V, Pred<span class="op">&gt;&gt;{</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="kw">class</span> to_input_view <span class="op">:</span> <span class="kw">public</span> view_interface<span class="op">&lt;</span>to_input_view<span class="op">&lt;</span>V<span class="op">&gt;&gt;{</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a>  V <em>base_</em> <span class="op">=</span> V<span class="op">()</span>;                          <span class="co">// exposition only</span></span>
 <span id="cb2-5"><a href="#cb2-5"></a></span>
 <span id="cb2-6"><a href="#cb2-6"></a>  <span class="kw">template</span><span class="op">&lt;</span><span class="dt">bool</span> Const<span class="op">&gt;</span></span>
@@ -759,7 +761,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <span id="cb12-19"><a href="#cb12-19"></a>    <em>iterator</em><span class="op">(</span><em>iterator</em><span class="op">&amp;&amp;)</span> <span class="op">=</span> <span class="cf">default</span>;</span>
 <span id="cb12-20"><a href="#cb12-20"></a>    <em>iterator</em><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">=(</span><em>iterator</em><span class="op">&amp;&amp;)</span> <span class="op">=</span> <span class="cf">default</span>;</span>
 <span id="cb12-21"><a href="#cb12-21"></a></span>
-<span id="cb12-22"><a href="#cb12-22"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span><em>iterator</em><span class="op">&lt;!</span>Const<span class="op">&gt;</span> other<span class="op">)</span></span>
+<span id="cb12-22"><a href="#cb12-22"></a>    <span class="kw">constexpr</span> <em>iterator</em><span class="op">(</span><em>iterator</em><span class="op">&lt;!</span>Const<span class="op">&gt;</span> i<span class="op">)</span></span>
 <span id="cb12-23"><a href="#cb12-23"></a>      <span class="kw">requires</span> Const <span class="op">&amp;&amp;</span> convertible_to<span class="op">&lt;</span>iterator_t<span class="op">&lt;</span>V<span class="op">&gt;</span>, iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;&gt;</span>;</span>
 <span id="cb12-24"><a href="#cb12-24"></a></span>
 <span id="cb12-25"><a href="#cb12-25"></a>    <span class="kw">constexpr</span> iterator_t<span class="op">&lt;</span><em>Base</em><span class="op">&gt;</span> base<span class="op">()</span> <span class="op">&amp;&amp;</span>;</span>

@@ -1,6 +1,6 @@
 ---
 title: "`views::to_input`"
-document: D3137R0
+document: P3137R0
 date: today
 audience:
   - SG9
@@ -73,6 +73,13 @@ non-common, and conditionally const-iterable. As usual, wrapping is avoided if
 possible. The iterator only provides the minimal interface needed for an input
 iterator.
 
+## Additional operations?
+In theory, we could provide all the operations supported by the underlying
+iterator, and limit our change to the iterator concept. Such operations would be
+unlikely to see much use: `to_input` is a facility for influencing generic
+algorithms, and generic algorithms generally have to rely on the concept to
+determine if an operation can be used. So we do not try to do so here.
+
 # Wording
 
 This wording is relative to [@N4971].
@@ -128,7 +135,7 @@ The expression `views​::to_input(E)` is expression-equivalent to:
 ```cpp
 template<input_range V>
   requires view<V>
-class to_input_view : public view_interface<to_input_view<V, Pred>>{
+class to_input_view : public view_interface<to_input_view<V>>{
   V $base_$ = V();                          // exposition only
 
   template<bool Const>
@@ -241,7 +248,7 @@ namespace std::ranges {
     $iterator$($iterator$&&) = default;
     $iterator$& operator=($iterator$&&) = default;
 
-    constexpr $iterator$($iterator$<!Const> other)
+    constexpr $iterator$($iterator$<!Const> i)
       requires Const && convertible_to<iterator_t<V>, iterator_t<$Base$>>;
 
     constexpr iterator_t<$Base$> base() &&;
