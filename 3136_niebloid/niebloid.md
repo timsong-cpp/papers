@@ -81,7 +81,7 @@ function-object based implementation works just as well.
 ## Implementations have converged
 
 While there were originally implementation divergence on whether niebloids should
-be CPO-like `semirgular` function objects or noncopyable ones to more closely
+be CPO-like `semiregular` function objects or noncopyable ones to more closely
 emulate function templates, the major implementations
 [have now converged](https://github.com/microsoft/STL/issues/4097) on
 semiregularity. We should standardize this existing practice.
