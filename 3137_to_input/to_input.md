@@ -1,6 +1,6 @@
 ---
 title: "`views::to_input`"
-document: P3137R0
+document: D3137R1
 date: today
 audience:
   - SG9
@@ -14,6 +14,11 @@ toc: false
 
 This paper proposes the `views::to_input` adaptor that downgrades a source
 range to an input-only, non-common range.
+
+# Revision history
+
+- R1: Added `operator-` for `sized_sentinel_for` cases per SG9 feedback. Added
+  additional discussion on the feasibility of splitting this adaptor.
 
 # Motivation
 
@@ -58,7 +63,29 @@ This situation was originally noted in [@range-v3#704].
 
 :::
 
+During the SG9 discussion, it was also pointed out that adaptors on 
+input-only views never need to cache `begin()` as that can be called only
+once, which can reduce the space overhead of view pipelines in certain
+constrained environments when that is not needed.
+
 # Design
+
+## One adaptor, not two
+
+During the 2024-03-19 SG9 review, the room voted 1/5/7/0/0 in favor of suggestion
+to split this adaptor into two pieces: one for demoting-to-input and one for
+make-uncommon, principally on the basis that uses of the two can have distinct
+rationales and so can benefit from separate annotations.
+
+This direction does not appear viable, however, because the demote-to-input adaptor
+should have a move-only iterator to discourage misuse. That means that it _cannot_
+be common because sentinels are required to be semiregular. Losing the opportuntity
+to diagnose misuses at compile-time does not appear to this author to be worth
+the marginal benefit in encouraging annotation.
+
+While a separate make-uncommon adaptor is possible, this paper doesn't propose it;
+the performance benefit from that change alone may not justify a separate adaptor in 
+in the standard.
 
 ## Naming
 
@@ -261,6 +288,11 @@ namespace std::ranges {
 
     friend constexpr bool operator==(const $iterator$& x, const sentinel_t<$Base$>& y);
 
+    friend constexpr difference_type operator-(const sentinel_t<$Base$>& y, const $iterator$& x)
+      requires sized_sentinel_for<sentinel_t<$Base$>, iterator_t<$Base$>>;
+    friend constexpr difference_type operator-(const $iterator$& x, const sentinel_t<$Base$>& y)
+      requires sized_sentinel_for<sentinel_t<$Base$>, iterator_t<$Base$>>;
+
     friend constexpr range_rvalue_reference_t<$Base$> iter_move(const $iterator$& i)
       noexcept(noexcept(ranges::iter_move(i.$current_$)));
 
@@ -320,8 +352,21 @@ constexpr void operator++(int);
 friend constexpr bool operator==(const $iterator$& x, const sentinel_t<$Base$>& y);
 ```
 
-[#]{.pnum} _Returns:_ `x.$current_$ == y;`
+[#]{.pnum} _Returns:_ `x.$current_$ == y`.
 
+```cpp
+friend constexpr difference_type operator-(const sentinel_t<$Base$>& y, const $iterator$& x)
+  requires sized_sentinel_for<sentinel_t<$Base$>, iterator_t<$Base$>>;
+```
+
+[#]{.pnum} _Returns:_ `y - x.$current_$`.
+
+```cpp
+friend constexpr difference_type operator-(const $iterator$& x, const sentinel_t<$Base$>& y)
+      requires sized_sentinel_for<sentinel_t<$Base$>, iterator_t<$Base$>>;
+```
+
+[#]{.pnum} _Returns:_ `x.$current_$ - y`.
 
 ```cpp
 friend constexpr range_rvalue_reference_t<$Base$> iter_move(const $iterator$& i)
