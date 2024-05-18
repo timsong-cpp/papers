@@ -1,9 +1,9 @@
 ---
 title: "`views::cache_last`"
-document: P3138R0
+document: D3138R1
 date: today
 audience:
-  - SG9
+  - LEWG
   - SG1
 author:
   - name: Tim Song
@@ -15,8 +15,11 @@ toc: false
 
 This paper proposes the `views::cache_last` adaptor that caches the result of
 the last dereference of the underlying iterator. To support this adaptor,
-it also proposes a relaxation of [res.on.data.races]{.sref} for operations on
-input-only iterators.
+it also proposes an exception and a clarification to [res.on.data.races]{.sref}.
+
+# Revision history
+
+- R1: Limited the [res.on.data.races]{.sref} carve-out to this adaptor per SG1 feedback.
 
 # Motivation
 
@@ -134,6 +137,13 @@ but adding synchronization to an adaptor whose primary purpose is to improve
 performance seems particularly dissatisfying when that synchronization will
 almost never be actually necessary.
 
+During the Tokyo SG1 meeting, the room favored a limited carve-out to
+[res.on.data.races]{.sref} for this adaptor only. As it turns out, p1 of that
+subclause already has "unless otherwise specified", so we don't need to
+make any additional modification there. However, the wording is unclear how
+it applies to templated functions in the standard library, so this paper
+proposes a clarification.
+
 ## What's the reference type?
 
 range-v3 uses `range_value_t<V>&&`, but this somewhat defeats the purpose of
@@ -163,13 +173,19 @@ iterator, cannot.)
 
 This wording is relative to [@N4971].
 
-## Carve-out for input iterators from [res.on.data.races]
+## Clarifying [res.on.data.races]
 
-Edit [res.on.data.races]{.sref} p3 as indicated:
+Edit [res.on.data.races]{.sref} p1 as indicated:
 
-[3]{.pnum} A C++ standard library function [other than a member or friend function
-of a non-forward input iterator ([iterator.concepts]{.sref}, [iterator.cpp17]{.sref})]{.diffins}
-shall not directly or indirectly modify objects ([intro.multithread]{.sref})
+[1]{.pnum} This subclause specifies requirements that implementations shall meet to prevent data races. Every standard library function shall meet each requirement unless otherwise specified. Implementations may prevent data races in cases other than those specified below.
+[For the purpose of applying these requirements to standard library templated functions, each
+operation on types dependent on a template argument is assumed to meet these requirements. 
+[If a supplied operation does not meet these requirements, a data race can result, but the behavior is otherwise well-defined.]{.note}]{.diffins}
+
+[2]{.pnum} A C++ standard library function shall not directly or indirectly access objects ([intro.multithread]) accessible by threads other than the current thread unless the objects are accessed directly or indirectly via the function's arguments, including this.
+
+[3]{.pnum} A C++ standard library function shall not directly or indirectly 
+modify objects ([intro.multithread]{.sref})
 accessible by threads other than the current thread unless the objects are
 accessed directly or indirectly via the function's non-const arguments,
 including `this`.
@@ -396,6 +412,8 @@ constexpr range_reference_t<V>& operator*() const;
 ```
 :::
 
+[#]{.pnum} [Evaluations of `operator*` on the same iterator object, or on iterator objects
+referring to the same `cache_last_view` object, may conflict ([intro.races]{.sref}).]{.note}
 
 ```cpp
 friend constexpr range_rvalue_reference_t<V> iter_move(const $iterator$& i)
