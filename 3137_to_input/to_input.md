@@ -1,6 +1,6 @@
 ---
 title: "`views::to_input`"
-document: D3137R1
+document: P3137R1
 date: today
 audience:
   - SG9
@@ -63,7 +63,7 @@ This situation was originally noted in [@range-v3#704].
 
 :::
 
-During the SG9 discussion, it was also pointed out that adaptors on 
+During the SG9 discussion, it was also pointed out that adaptors on
 input-only views never need to cache `begin()` as that can be called only
 once, which can reduce the space overhead of view pipelines in certain
 constrained environments when that is not needed.
@@ -84,7 +84,7 @@ to diagnose misuses at compile-time does not appear to this author to be worth
 the marginal benefit in encouraging annotation.
 
 While a separate make-uncommon adaptor is possible, this paper doesn't propose it;
-the performance benefit from that change alone may not justify a separate adaptor in 
+the performance benefit from that change alone may not justify a separate adaptor in
 in the standard.
 
 ## Naming
