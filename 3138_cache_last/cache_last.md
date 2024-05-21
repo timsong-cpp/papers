@@ -1,10 +1,10 @@
 ---
 title: "`views::cache_last`"
-document: D3138R1
+document: P3138R1
 date: today
 audience:
-  - LEWG
   - SG1
+  - LEWG
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
@@ -177,14 +177,20 @@ This wording is relative to [@N4971].
 
 Edit [res.on.data.races]{.sref} p1 as indicated:
 
-[1]{.pnum} This subclause specifies requirements that implementations shall meet to prevent data races. Every standard library function shall meet each requirement unless otherwise specified. Implementations may prevent data races in cases other than those specified below.
+[1]{.pnum} This subclause specifies requirements that implementations shall meet
+to prevent data races. Every standard library function shall meet each requirement
+unless otherwise specified. Implementations may prevent data races in cases other than those specified below.
 [For the purpose of applying these requirements to standard library templated functions, each
-operation on types dependent on a template argument is assumed to meet these requirements. 
-[If a supplied operation does not meet these requirements, a data race can result, but the behavior is otherwise well-defined.]{.note}]{.diffins}
+operation on types dependent on a template argument is assumed to meet these requirements.
+[If a supplied operation does not meet these requirements, a data race can result,
+but the behavior is otherwise well-defined.]{.note}]{.diffins}
 
-[2]{.pnum} A C++ standard library function shall not directly or indirectly access objects ([intro.multithread]) accessible by threads other than the current thread unless the objects are accessed directly or indirectly via the function's arguments, including this.
+[2]{.pnum} A C++ standard library function shall not directly or indirectly access
+objects ([intro.multithread]) accessible by threads other than the current thread
+unless the objects are accessed directly or indirectly via the function's arguments,
+including `this`.
 
-[3]{.pnum} A C++ standard library function shall not directly or indirectly 
+[3]{.pnum} A C++ standard library function shall not directly or indirectly
 modify objects ([intro.multithread]{.sref})
 accessible by threads other than the current thread unless the objects are
 accessed directly or indirectly via the function's non-const arguments,
@@ -412,8 +418,7 @@ constexpr range_reference_t<V>& operator*() const;
 ```
 :::
 
-[#]{.pnum} [Evaluations of `operator*` on the same iterator object, or on iterator objects
-referring to the same `cache_last_view` object, may conflict ([intro.races]{.sref}).]{.note}
+[#]{.pnum} [Evaluations of `operator*` on the same iterator object may conflict ([intro.races]{.sref}).]{.note}
 
 ```cpp
 friend constexpr range_rvalue_reference_t<V> iter_move(const $iterator$& i)
