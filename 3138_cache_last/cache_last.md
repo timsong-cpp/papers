@@ -1,9 +1,8 @@
 ---
 title: "`views::cache_last`"
-document: P3138R1
+document: D3138R2
 date: today
 audience:
-  - SG1
   - LEWG
 author:
   - name: Tim Song
@@ -14,11 +13,12 @@ toc: false
 # Abstract
 
 This paper proposes the `views::cache_last` adaptor that caches the result of
-the last dereference of the underlying iterator. To support this adaptor,
-it also proposes an exception and a clarification to [res.on.data.races]{.sref}.
+the last dereference of the underlying iterator.
 
 # Revision history
 
+- R2: Remove the quasi-drive-by fix to [res.on.data.races]{.sref} per St. Louis SG1 feedback;
+  it will be addressed as an LWG issue.
 - R1: Limited the [res.on.data.races]{.sref} carve-out to this adaptor per SG1 feedback.
 
 # Motivation
@@ -113,7 +113,7 @@ relaxing that requirement would be prohibitive as it affects every iterator and 
 yet we want to have it perform a potentially-modifying operation, our options
 are basically:
 
-- Relax [res.on.data.races]{.sref} p3
+- Make this an exception to [res.on.data.races]{.sref} p3
 - Require synchronization.
 
 This paper proposes the former. Input-only iterators, in general, are poor
@@ -140,9 +140,9 @@ almost never be actually necessary.
 During the Tokyo SG1 meeting, the room favored a limited carve-out to
 [res.on.data.races]{.sref} for this adaptor only. As it turns out, p1 of that
 subclause already has "unless otherwise specified", so we don't need to
-make any additional modification there. However, the wording is unclear how
-it applies to templated functions in the standard library, so this paper
-proposes a clarification.
+make any additional modification there.  However, the wording is unclear how
+any of the requirements apply to templated functions in the standard library; 
+this will be addressed separately as an issue.
 
 ## What's the reference type?
 
@@ -172,29 +172,6 @@ iterator, cannot.)
 # Wording
 
 This wording is relative to [@N4971].
-
-## Clarifying [res.on.data.races]
-
-Edit [res.on.data.races]{.sref} p1 as indicated:
-
-[1]{.pnum} This subclause specifies requirements that implementations shall meet
-to prevent data races. Every standard library function shall meet each requirement
-unless otherwise specified. Implementations may prevent data races in cases other than those specified below.
-[For the purpose of applying these requirements to standard library templated functions, each
-operation on types dependent on a template argument is assumed to meet these requirements.
-[If a supplied operation does not meet these requirements, a data race can result,
-but the behavior is otherwise well-defined.]{.note}]{.diffins}
-
-[2]{.pnum} A C++ standard library function shall not directly or indirectly access
-objects ([intro.multithread]) accessible by threads other than the current thread
-unless the objects are accessed directly or indirectly via the function's arguments,
-including `this`.
-
-[3]{.pnum} A C++ standard library function shall not directly or indirectly
-modify objects ([intro.multithread]{.sref})
-accessible by threads other than the current thread unless the objects are
-accessed directly or indirectly via the function's non-const arguments,
-including `this`.
 
 ## Addition to `<ranges>`
 
