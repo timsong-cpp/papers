@@ -126,7 +126,7 @@ namespace std::ranges {
   class to_input_view;
 
   template<class V>
-  inline constexpr bool enable_borrowed_range<to_input_view<V>> =
+  constexpr bool enable_borrowed_range<to_input_view<V>> =
       enable_borrowed_range<V>;
 
   namespace views {
@@ -384,6 +384,16 @@ friend constexpr void iter_swap(const $iterator$& x, const $iterator$& y)
 [#]{.pnum} _Effects_: Equivalent to: `ranges::iter_swap(x.$current_$, y.$current_$);`
 
 :::
+
+## Feature-test macro
+
+Add the following macro definition to [version.syn]{.sref}, header `<version>`
+synopsis, with the value selected by the editor to reflect the date of adoption
+of this paper:
+
+```cpp
+#define __cpp_lib_ranges_to_input 20XXXXL // also in <ranges>
+```
 
 ---
 references:

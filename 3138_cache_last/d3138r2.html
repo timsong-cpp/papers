@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2024-06-24" />
+  <meta name="dcterms.date" content="2024-06-28" />
   <title>views::cache_last</title>
   <style>
       code{white-space: pre-wrap;}
@@ -599,7 +599,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2024-06-24</td>
+    <td>2024-06-28</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -625,7 +625,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <p>This paper proposes the <code class="sourceCode cpp">views<span class="op">::</span>cache_last</code> adaptor that caches the result of the last dereference of the underlying iterator.</p>
 <h1 data-number="2" style="border-bottom:1px solid #cccccc" id="revision-history"><span class="header-section-number">2</span> Revision history<a href="#revision-history" class="self-link"></a></h1>
 <ul>
-<li>R2: Remove the quasi-drive-by fix to <span>16.4.6.10 <a href="https://wg21.link/res.on.data.races">[res.on.data.races]</a></span> per St. Louis SG1 feedback; it will be addressed as an LWG issue.</li>
+<li>R2: Remove the quasi-drive-by fix to <span>16.4.6.10 <a href="https://wg21.link/res.on.data.races">[res.on.data.races]</a></span> per St. Louis SG1 feedback; it will be addressed as an LWG issue. Add feature-test macro</li>
 <li>R1: Limited the <span>16.4.6.10 <a href="https://wg21.link/res.on.data.races">[res.on.data.races]</a></span> carve-out to this adaptor per SG1 feedback.</li>
 </ul>
 <h1 data-number="3" style="border-bottom:1px solid #cccccc" id="motivation"><span class="header-section-number">3</span> Motivation<a href="#motivation" class="self-link"></a></h1>
@@ -903,6 +903,9 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <p><span class="marginalizedparent"><a class="marginalized" href="#pnum_18" id="pnum_18">3</a></span> <em>Returns:</em> <code class="sourceCode cpp">x<span class="op">.</span><em>current_</em> <span class="op">==</span> y<span class="op">.</span><em>end_</em>;</code></p>
 </blockquote>
 </div>
+<h2 data-number="5.3" id="feature-test-macro"><span class="header-section-number">5.3</span> Feature-test macro<a href="#feature-test-macro" class="self-link"></a></h2>
+<p>Add the following macro definition to <span>17.3.2 <a href="https://wg21.link/version.syn">[version.syn]</a></span>, header <code class="sourceCode cpp"><span class="op">&lt;</span>version<span class="op">&gt;</span></code> synopsis, with the value selected by the editor to reflect the date of adoption of this paper:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb28-1"><a href="#cb28-1"></a><span class="pp">#define __cpp_lib_ranges_cache_last </span><span class="dv">20</span><span class="er">XXXXL</span><span class="pp"> </span><span class="co">// also in &lt;ranges&gt;</span></span></code></pre></div>
 <h1 data-number="6" style="border-bottom:1px solid #cccccc" id="bibliography"><span class="header-section-number">6</span> References<a href="#bibliography" class="self-link"></a></h1>
 <div id="refs" class="references hanging-indent" role="doc-bibliography">
 <div id="ref-N4971">

@@ -18,7 +18,7 @@ the last dereference of the underlying iterator.
 # Revision history
 
 - R2: Remove the quasi-drive-by fix to [res.on.data.races]{.sref} per St. Louis SG1 feedback;
-  it will be addressed as an LWG issue.
+  it will be addressed as an LWG issue. Add feature-test macro
 - R1: Limited the [res.on.data.races]{.sref} carve-out to this adaptor per SG1 feedback.
 
 # Motivation
@@ -457,6 +457,16 @@ friend constexpr bool operator==(const $iterator$& x, const $sentinel$& y);
 [#]{.pnum} _Returns:_ `x.$current_$ == y.$end_$;`
 
 :::
+
+## Feature-test macro
+
+Add the following macro definition to [version.syn]{.sref}, header `<version>`
+synopsis, with the value selected by the editor to reflect the date of adoption
+of this paper:
+
+```cpp
+#define __cpp_lib_ranges_cache_last 20XXXXL // also in <ranges>
+```
 
 ---
 references:
