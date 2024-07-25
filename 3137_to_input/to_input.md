@@ -1,9 +1,9 @@
 ---
 title: "`views::to_input`"
-document: P3137R1
+document: P3137R2
 date: today
 audience:
-  - SG9
+  - LEWG
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
@@ -17,6 +17,7 @@ range to an input-only, non-common range.
 
 # Revision history
 
+- R2: Added a feature-test macro.
 - R1: Added `operator-` for `sized_sentinel_for` cases per SG9 feedback. Added
   additional discussion on the feasibility of splitting this adaptor.
 

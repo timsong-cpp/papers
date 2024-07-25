@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2024-06-28" />
+  <meta name="dcterms.date" content="2024-07-16" />
   <title>views::to_input</title>
   <style>
       code{white-space: pre-wrap;}
@@ -595,11 +595,11 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <table style="border:none;float:right">
   <tr>
     <td>Document #:</td>
-    <td>P3137R1</td>
+    <td>P3137R2</td>
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2024-06-28</td>
+    <td>2024-07-16</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -608,7 +608,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
   <tr>
     <td style="vertical-align:top">Audience:</td>
     <td>
-      SG9<br>
+      LEWG<br>
     </td>
   </tr>
   <tr>
@@ -625,6 +625,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <p>This paper proposes the <code class="sourceCode cpp">views<span class="op">::</span>to_input</code> adaptor that downgrades a source range to an input-only, non-common range.</p>
 <h1 data-number="2" style="border-bottom:1px solid #cccccc" id="revision-history"><span class="header-section-number">2</span> Revision history<a href="#revision-history" class="self-link"></a></h1>
 <ul>
+<li>R2: Added a feature-test macro.</li>
 <li>R1: Added <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">-</span></code> for <code class="sourceCode cpp">sized_sentinel_for</code> cases per SG9 feedback. Added additional discussion on the feasibility of splitting this adaptor.</li>
 </ul>
 <h1 data-number="3" style="border-bottom:1px solid #cccccc" id="motivation"><span class="header-section-number">3</span> Motivation<a href="#motivation" class="self-link"></a></h1>
