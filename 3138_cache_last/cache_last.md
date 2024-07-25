@@ -1,6 +1,6 @@
 ---
 title: "`views::cache_last`"
-document: D3138R2
+document: P3138R2
 date: today
 audience:
   - LEWG
@@ -17,8 +17,8 @@ the last dereference of the underlying iterator.
 
 # Revision history
 
-- R2: Remove the quasi-drive-by fix to [res.on.data.races]{.sref} per St. Louis SG1 feedback;
-  it will be addressed as an LWG issue. Add feature-test macro
+- R2: Removed the quasi-drive-by fix to [res.on.data.races]{.sref} per St. Louis SG1 feedback;
+  it will be addressed as an LWG issue. Added feature-test macro.
 - R1: Limited the [res.on.data.races]{.sref} carve-out to this adaptor per SG1 feedback.
 
 # Motivation
@@ -141,7 +141,7 @@ During the Tokyo SG1 meeting, the room favored a limited carve-out to
 [res.on.data.races]{.sref} for this adaptor only. As it turns out, p1 of that
 subclause already has "unless otherwise specified", so we don't need to
 make any additional modification there.  However, the wording is unclear how
-any of the requirements apply to templated functions in the standard library; 
+any of the requirements apply to templated functions in the standard library;
 this will be addressed separately as an issue.
 
 ## What's the reference type?
