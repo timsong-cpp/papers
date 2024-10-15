@@ -1,6 +1,6 @@
 ---
-title: "`views::cache_last`"
-document: P3138R2
+title: "`views::cache_latest`"
+document: D3138R3
 date: today
 audience:
   - LEWG
@@ -12,19 +12,20 @@ toc: false
 
 # Abstract
 
-This paper proposes the `views::cache_last` adaptor that caches the result of
+This paper proposes the `views::cache_latest` adaptor that caches the result of
 the last dereference of the underlying iterator.
 
 # Revision history
 
+- R3: Rename to `cache_latest` per SG9 feedback.
 - R2: Removed the quasi-drive-by fix to [res.on.data.races]{.sref} per St. Louis SG1 feedback;
   it will be addressed as an LWG issue. Added feature-test macro.
 - R1: Limited the [res.on.data.races]{.sref} carve-out to this adaptor per SG1 feedback.
 
 # Motivation
 
-The motivation for this view is given in [@P2760R1] and quoted below for
-convenience:
+The motivation for this view is given in [@P2760R1] (under the name `cache_last`)
+and quoted below for convenience:
 
 ::: bq
 
@@ -158,7 +159,7 @@ so caching could still make sense.
 
 ## Properties
 
-`cache_last` is never borrowed, input-only, never common, and not const-iterable.
+`cache_latest` is never borrowed, input-only, never common, and not const-iterable.
 
 ## `iter_move` and `iter_swap`
 
@@ -182,42 +183,42 @@ Add the following to [ranges.syn]{.sref}, header `<ranges>` synopsis:
 namespace std::ranges {
   // [...]
 
-  // [range.cache.last], to input view
+  // [range.cache.latest], cache latest view
   template<input_range V>
     requires view<V>
-  class cache_last_view;
+  class cache_latest_view;
 
   namespace views {
-    inline constexpr $unspecified$ cache_last = $unspecified$;
+    inline constexpr $unspecified$ cache_latest = $unspecified$;
   }
 
 }
 
 ```
 
-## `cache_last`
+## `cache_latest`
 
 Add the following subclause to [range.adaptors]{.sref}:
 
-### 26.7.? Cache last view [range.cache.last] {-}
+### 26.7.? Cache latest view [range.cache.latest] {-}
 
-#### 26.7.?.1 Overview [range.cache.last.overview] {-}
+#### 26.7.?.1 Overview [range.cache.latest.overview] {-}
 
-[#]{.pnum} `cache_last_view` caches the last element of its underlying sequence
+[#]{.pnum} `cache_latest_view` caches the last-accessed element of its underlying sequence
 so that the element does not have to be recomputed on repeated access.
 [This is useful if computation of the element to produce is expensive.]{.note}
 
-[#]{.pnum} The name `views::cache_last` denotes a range adaptor object ([range.adaptor.object]{.sref}).
-Let `E` be an expression. The expression `views​::cache_last(E)` is expression-equivalent to
-`cache_last_view(E)`. [Intentional CTAD to avoid double wrapping if `E` is
-already a `cache_last_view`.]{.draftnote}
+[#]{.pnum} The name `views::cache_latest` denotes a range adaptor object ([range.adaptor.object]{.sref}).
+Let `E` be an expression. The expression `views​::cache_latest(E)` is expression-equivalent to
+`cache_latest_view(E)`. [Intentional CTAD to avoid double wrapping if `E` is
+already a `cache_latest_view`.]{.draftnote}
 
-#### 26.7.?.2 Class template `cache_last_view` [range.cache.last.view] {-}
+#### 26.7.?.2 Class template `cache_latest_view` [range.cache.latest.view] {-}
 
 ```cpp
 template<input_range V>
   requires view<V>
-class cache_last_view : public view_interface<cache_last_view<V>>{
+class cache_latest_view : public view_interface<cache_latest_view<V>>{
   V $base_$ = V();                                                       // exposition only
   using $cache_t$ = conditional_t<is_reference_v<range_reference_t<V>>,  // exposition only
                                 add_pointer_t<range_reference_t<V>>,
@@ -229,8 +230,8 @@ class cache_last_view : public view_interface<cache_last_view<V>>{
   class $sentinel$;                                                      // exposition only
 
 public:
-  cache_last_view() requires default_initializable<V> = default;
-  constexpr explicit cache_last_view(V base);
+  cache_latest_view() requires default_initializable<V> = default;
+  constexpr explicit cache_latest_view(V base);
 
   constexpr V base() const & requires copy_constructible<V> { return $base_$; }
   constexpr V base() && { return std::move($base_$); }
@@ -243,14 +244,14 @@ public:
 };
 
 template<class R>
-  cache_last_view(R&&) -> cache_last_view<views::all_t<R>>;
+  cache_latest_view(R&&) -> cache_latest_view<views::all_t<R>>;
 
 ```
 
 ::: itemdecl
 
 ```cpp
-constexpr explicit cache_last_view(V base);
+constexpr explicit cache_latest_view(V base);
 ```
 
 [#]{.pnum} _Effects_: Initializes `$base_$` with  `std::move(base)`.
@@ -295,17 +296,17 @@ return ranges::size($base_$);
 
 :::
 
-#### 26.7.?.3 Class `cache_last_view::$iterator$` [range.cache.last.iterator] {-}
+#### 26.7.?.3 Class `cache_latest_view::$iterator$` [range.cache.latest.iterator] {-}
 
 ```cpp
 namespace std::ranges {
   template<input_range V>
     requires view<V>
-  class cache_last_view<V>::$iterator$ {
-    cache_last_view* $parent_$;                                 // exposition only
-    iterator_t<V> $current_$;                                   // exposition only
+  class cache_latest_view<V>::$iterator$ {
+    cache_latest_view* $parent_$;                                 // exposition only
+    iterator_t<V> $current_$;                                     // exposition only
 
-    constexpr explicit $iterator$(cache_last_view& parent);     // exposition only
+    constexpr explicit $iterator$(cache_latest_view& parent);     // exposition only
 
   public:
     using difference_type = range_difference_t<V>;
@@ -336,7 +337,7 @@ namespace std::ranges {
 ::: itemdecl
 
 ```cpp
-constexpr explicit $iterator$(cache_last_view& parent);
+constexpr explicit $iterator$(cache_latest_view& parent);
 ```
 
 [#]{.pnum} _Effects_: Initializes `$current_$` with `ranges::begin(parent.$base_$)`
@@ -415,16 +416,16 @@ friend constexpr void iter_swap(const $iterator$& x, const $iterator$& y)
 
 :::
 
-#### 26.7.?.3 Class `cache_last_view::$sentinel$` [range.cache.last.sentinel] {-}
+#### 26.7.?.3 Class `cache_latest_view::$sentinel$` [range.cache.latest.sentinel] {-}
 
 ```cpp
 namespace std::ranges {
   template<input_range V>
     requires view<V>
-  class cache_last_view<V>::$sentinel$ {
+  class cache_latest_view<V>::$sentinel$ {
     sentinel_t<V> $end_$ = sentinel_t<V>();               // exposition only
 
-    constexpr explicit $sentinel$(cache_last_view& parent);   // exposition only
+    constexpr explicit $sentinel$(cache_latest_view& parent);   // exposition only
 
   public:
     $sentinel$() = default;
@@ -439,7 +440,7 @@ namespace std::ranges {
 ::: itemdecl
 
 ```cpp
-constexpr explicit $sentinel$(cache_last_view& parent);
+constexpr explicit $sentinel$(cache_latest_view& parent);
 ```
 
 [#]{.pnum} _Effects_: Initializes `$end_$` with `ranges::end(parent.$base_$)`.
@@ -465,7 +466,7 @@ synopsis, with the value selected by the editor to reflect the date of adoption
 of this paper:
 
 ```cpp
-#define __cpp_lib_ranges_cache_last 20XXXXL // also in <ranges>
+#define __cpp_lib_ranges_cache_latest 20XXXXL // also in <ranges>
 ```
 
 ---
