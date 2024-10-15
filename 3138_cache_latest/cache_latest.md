@@ -1,6 +1,6 @@
 ---
 title: "`views::cache_latest`"
-document: D3138R3
+document: P3138R3
 date: today
 audience:
   - LEWG
@@ -169,6 +169,18 @@ Moreover, `indirectly_readable` requires `*i` to be equality-preserving. So
 the cache should not be invalidated by either operation. (The underlying element
 might be modified, but the reference itself, obtained from dereferencing the
 iterator, cannot.)
+
+## Naming
+
+range-v3 calls this `cache1`, which is not a particularly informative name (what does the 
+"1" stand for)? The ranges plan papers osciliated between `cache_last` and `cache_latest`
+for no clear reason. SG9's naming poll was a tie between `cache<1>` and `cache_latest`. 
+The author does not consider the first viable (it is unclear what `cache<2>` would mean
+when the caching implies an input range which can only ever represent one position). 
+However, `last` might be confused for the last element in the range (i.e., `back()`) or
+the past-the-end position(as in `[first, last)`) while `latest` does not have this issue.
+
+R3 of this paper accordingly renamed the proposed view to `cache_latest`.
 
 # Wording
 
