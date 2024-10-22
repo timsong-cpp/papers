@@ -1,6 +1,6 @@
 ---
 title: "`views::cache_latest`"
-document: P3138R3
+document: D3138R4
 date: today
 audience:
   - LEWG
@@ -17,6 +17,7 @@ the last dereference of the underlying iterator.
 
 # Revision history
 
+- R4: Added `operator-` for `sized_sentinel_for` cases.
 - R3: Rename to `cache_latest` per SG9 feedback.
 - R2: Removed the quasi-drive-by fix to [res.on.data.races]{.sref} per St. Louis SG1 feedback;
   it will be addressed as an LWG issue. Added feature-test macro.
@@ -445,6 +446,11 @@ namespace std::ranges {
     constexpr sentinel_t<V> base() const;
 
     friend constexpr bool operator==(const $iterator$& x, const $sentinel$& y);
+    
+    friend constexpr range_difference_t<V> operator-(const $iterator$& x, const $sentinel$& y)
+      requires sized_sentinel_for<sentinel_t<V>, iterator_t<V>>;
+    friend constexpr range_difference_t<V> operator-(const $sentinel$& x, const $iterator$& y)
+      requires sized_sentinel_for<sentinel_t<V>, iterator_t<V>>;
   };
 }
 ```
@@ -467,7 +473,23 @@ constexpr sentinel_t<V> base() const;
 friend constexpr bool operator==(const $iterator$& x, const $sentinel$& y);
 ```
 
-[#]{.pnum} _Returns:_ `x.$current_$ == y.$end_$;`
+[#]{.pnum} _Returns:_ `x.$current_$ == y.$end_$`.
+
+
+```cpp
+friend constexpr range_difference_t<V> operator-(const $iterator$& x, const $sentinel$& y)
+  requires sized_sentinel_for<sentinel_t<V>, iterator_t<V>>;
+```
+
+[#]{.pnum} _Returns:_ `x.$current_$ - y.$end_$`.
+
+
+```cpp
+friend constexpr range_difference_t<V> operator-(const $sentinel$& x, const $iterator$& y)
+  requires sized_sentinel_for<sentinel_t<V>, iterator_t<V>>;
+```
+
+[#]{.pnum} _Returns:_ `x.$end_$ - y.$current_$`.
 
 :::
 
