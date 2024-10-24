@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2024-10-22" />
+  <meta name="dcterms.date" content="2024-10-23" />
   <title>views::cache_latest</title>
   <style>
       code{white-space: pre-wrap;}
@@ -595,11 +595,11 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <table style="border:none;float:right">
   <tr>
     <td>Document #:</td>
-    <td>D3138R4</td>
+    <td>P3138R4</td>
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2024-10-22</td>
+    <td>2024-10-23</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -702,7 +702,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <h2 data-number="4.5" id="iter_move-and-iter_swap"><span class="header-section-number">4.5</span> <code class="sourceCode cpp">iter_move</code> and <code class="sourceCode cpp">iter_swap</code><a href="#iter_move-and-iter_swap" class="self-link"></a></h2>
 <p><code class="sourceCode cpp">indirectly_readable</code> and <code class="sourceCode cpp">indirectly_swappable</code> requires <code class="sourceCode cpp">iter_move</code> and <code class="sourceCode cpp">iter_swap</code> to respectively not modify <code class="sourceCode cpp">i</code> (in the <span>18.2 <a href="https://wg21.link/concepts.equality">[concepts.equality]</a></span> sense). Moreover, <code class="sourceCode cpp">indirectly_readable</code> requires <code class="sourceCode cpp"><span class="op">*</span>i</code> to be equality-preserving. So the cache should not be invalidated by either operation. (The underlying element might be modified, but the reference itself, obtained from dereferencing the iterator, cannot.)</p>
 <h2 data-number="4.6" id="naming"><span class="header-section-number">4.6</span> Naming<a href="#naming" class="self-link"></a></h2>
-<p>range-v3 calls this <code class="sourceCode cpp">cache1</code>, which is not a particularly informative name (what does the “1” stand for)? The ranges plan papers osciliated between <code class="sourceCode cpp">cache_last</code> and <code class="sourceCode cpp">cache_latest</code> for no clear reason. SG9’s naming poll was a tie between <code class="sourceCode cpp">cache<span class="op">&lt;</span><span class="dv">1</span><span class="op">&gt;</span></code> and <code class="sourceCode cpp">cache_latest</code>. The author does not consider the first viable (it is unclear what <code class="sourceCode cpp">cache<span class="op">&lt;</span><span class="dv">2</span><span class="op">&gt;</span></code> would mean when the caching implies an input range which can only ever represent one position). However, <code class="sourceCode cpp">last</code> might be confused for the last element in the range (i.e., <code class="sourceCode cpp">back<span class="op">()</span></code>) or the past-the-end position(as in <code class="sourceCode cpp"><span class="op">[</span>first, last<span class="op">)</span></code>) while <code class="sourceCode cpp">latest</code> does not have this issue.</p>
+<p>range-v3 calls this <code class="sourceCode cpp">cache1</code>, which is not a particularly informative name (what does the “1” stand for)? The ranges plan papers oscillated between <code class="sourceCode cpp">cache_last</code> and <code class="sourceCode cpp">cache_latest</code> for no clear reason. SG9’s naming poll was a tie between <code class="sourceCode cpp">cache<span class="op">&lt;</span><span class="dv">1</span><span class="op">&gt;</span></code> and <code class="sourceCode cpp">cache_latest</code>. The author does not consider the first viable (it is unclear what <code class="sourceCode cpp">cache<span class="op">&lt;</span><span class="dv">2</span><span class="op">&gt;</span></code> would mean when the caching implies an input range which can only ever represent one position). However, <code class="sourceCode cpp">last</code> might be confused for the last element in the range (i.e., <code class="sourceCode cpp">back<span class="op">()</span></code>) or the past-the-end position(as in <code class="sourceCode cpp"><span class="op">[</span>first, last<span class="op">)</span></code>) while <code class="sourceCode cpp">latest</code> does not have this issue.</p>
 <p>R3 of this paper accordingly renamed the proposed view to <code class="sourceCode cpp">cache_latest</code>.</p>
 <h1 data-number="5" style="border-bottom:1px solid #cccccc" id="wording"><span class="header-section-number">5</span> Wording<a href="#wording" class="self-link"></a></h1>
 <p>This wording is relative to <span class="citation" data-cites="N4971">[<a href="#ref-N4971" role="doc-biblioref">N4971</a>]</span>.</p>

@@ -1,6 +1,6 @@
 ---
 title: "`views::cache_latest`"
-document: D3138R4
+document: P3138R4
 date: today
 audience:
   - LEWG
@@ -174,7 +174,7 @@ iterator, cannot.)
 ## Naming
 
 range-v3 calls this `cache1`, which is not a particularly informative name (what does the 
-"1" stand for)? The ranges plan papers osciliated between `cache_last` and `cache_latest`
+"1" stand for)? The ranges plan papers oscillated between `cache_last` and `cache_latest`
 for no clear reason. SG9's naming poll was a tie between `cache<1>` and `cache_latest`. 
 The author does not consider the first viable (it is unclear what `cache<2>` would mean
 when the caching implies an input range which can only ever represent one position). 
