@@ -1,5 +1,0 @@
-css: /home/tsong/papers/md/pandoc.css
-filters: [/home/tsong/papers/md/pandoc.py]
-metadata:
-  highlighting:
-    inline-code: cpp
