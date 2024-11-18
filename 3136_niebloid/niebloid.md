@@ -1,9 +1,9 @@
 ---
 title: Retiring niebloids
-document: P3136R0
+document: P3136R1
 date: today
 audience:
-  - SG9
+  - LWG
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
@@ -14,6 +14,10 @@ toc: false
 
 This paper proposes that we respecify the algorithms in `std::ranges`
 that are currently so-called niebloids to be actual function objects.
+
+# Revision history
+
+- R1: Incorporated LWG review feedback.
 
 # Background
 
@@ -141,14 +145,14 @@ to model a particular concept.
 
 ### 16.3.3.? Algorithm function objects [niebloid] {-}
 
-[#]{.pnum} For clarity of exposition, this document depicts certain customization
-point objects ([customization.point.object]{.sref}) as sets of one or more overloaded
-function templates. These customization point objects are termed _algorithm function objects_.
-The name of these function templates designates the corresponding algorithm function
-object.
+[#]{.pnum} An _algorithm function object_ is a 
+customization point object ([customization.point.object]{.sref}) 
+that is specified as one or more overloaded function templates. 
+The name of these function templates designates the corresponding 
+algorithm function object.
 
 [#]{.pnum} For an algorithm function object `o`, let _`S`_ be the corresponding
-set of function templates shown in this document. Then for any sequence of arguments
+set of function templates. Then for any sequence of arguments
 `args...`, `o(args...)` is expression-equivalent to `s(args...)`, where the
 result of name lookup for `s` is the overload set _`S`_.
 
@@ -248,7 +252,7 @@ its first two parameters to have the same type.
 ::: add
 
 [2]{.pnum} The entities defined in the `std​::​ranges` namespace in this Clause
-that are depicted as function templates are algorithm function objects (16.3.3.? [niebloid]).
+and specified as function templates are algorithm function objects (16.3.3.? [niebloid]).
 
 :::
 
