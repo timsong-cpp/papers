@@ -1,9 +1,9 @@
 ---
 title: "`views::cache_latest`"
-document: P3138R4
+document: P3138R5
 date: today
 audience:
-  - LEWG
+  - LWG
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
@@ -17,6 +17,7 @@ the last dereference of the underlying iterator.
 
 # Revision history
 
+- R5: Incorporated LWG review feedback.
 - R4: Added `operator-` for `sized_sentinel_for` cases.
 - R3: Rename to `cache_latest` per SG9 feedback.
 - R2: Removed the quasi-drive-by fix to [res.on.data.races]{.sref} per St. Louis SG1 feedback;
@@ -374,8 +375,8 @@ constexpr $iterator$& operator++();
 
 ::: bq
 ```cpp
-   ++$current_$;
    $parent_$->$cache_$.reset();
+   ++$current_$;
    return *this;
 ```
 :::
@@ -384,7 +385,7 @@ constexpr $iterator$& operator++();
 constexpr void operator++(int);
 ```
 
-[#]{.pnum} _Effects_: Equivalent to: `++*this;`
+[#]{.pnum} _Effects_: Equivalent to: `++*this`.
 
 ```cpp
 constexpr range_reference_t<V>& operator*() const;
@@ -425,7 +426,7 @@ friend constexpr void iter_swap(const $iterator$& x, const $iterator$& y)
   requires indirectly_swappable<iterator_t<V>>;
 ```
 
-[#]{.pnum} _Effects_: Equivalent to: `ranges::iter_swap(x.$current_$, y.$current_$);`
+[#]{.pnum} _Effects_: Equivalent to: `ranges::iter_swap(x.$current_$, y.$current_$)`.
 
 :::
 
