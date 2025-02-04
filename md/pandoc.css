@@ -136,6 +136,15 @@ code.diff span.st { color: #000000; background-color: var(--diff-del); }
 
 blockquote { background-color: #f6f8fa; }
 
+div.quote {
+  text-align: right;
+  font-style: italic;
+}
+
+span.red {
+  color: #FF0000
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --diff-ins: #225522;
@@ -213,4 +222,6 @@ blockquote { background-color: #f6f8fa; }
     color: #8f3131 !important
   }
   div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
+
+  :target { background-color: #225522; }
 }
