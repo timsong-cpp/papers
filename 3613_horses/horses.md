@@ -178,7 +178,7 @@ So we'd need a whole new set of concepts and opt-ins for this to work well. And 
 
 [^5]: As of 2025-02-03. By comparison, range-v3 has 4176 stars.
 
-# A postscript: on chairs and [sea lions](https://en.wikipedia.org/wiki/Sealioning)
+# A postscript
 
 ::: quote
 
