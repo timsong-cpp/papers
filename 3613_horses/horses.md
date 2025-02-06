@@ -200,4 +200,4 @@ an insult to the ready-to-bake products available in supermarkets everywhere.
 It is, of course, the chair's prerogative to choose what paper is discussed. But I will certainly take that into account in deciding which room
 I would rather spend my time in.
 
-[^6] Including at least 10 reflector threads since 2022, all originating from the same individual.
+[^6]: Including more than ten reflector threads since 2022, all originating from the same individual.

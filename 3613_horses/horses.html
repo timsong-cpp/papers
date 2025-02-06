@@ -702,11 +702,10 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <p>Time is a flat circle. Everything we have ever done or will do, we are going to do over and over and over again – forever.</p>
 <p>— Rust Cohle, in True Detective</p>
 </div>
-<p>It is hard to believe that we are still relitigating design decisions embodied in the most fundamental concept of the entire ranges library <em>five years after</em> we shipped it in an international standard. This design space was exhaustively explored by the original authors of the ranges library before we standardized it, and again after that in the various forums of WG21.[^6] There is no new information coming in that would justify such an exercise.</p>
+<p>It is hard to believe that we are still relitigating design decisions embodied in the most fundamental concept of the entire ranges library <em>five years after</em> we shipped it in an international standard. This design space was exhaustively explored by the original authors of the ranges library before we standardized it, and again after that in the various forums of WG21.<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a> There is no new information coming in that would justify such an exercise.</p>
 <p>Yet here we are.</p>
 <p>On the basis of a paper whose exploration of the consequences of its proposed changes is so inadequate that calling it unbaked would be an insult to the ready-to-bake products available in supermarkets everywhere.</p>
 <p>It is, of course, the chair’s prerogative to choose what paper is discussed. But I will certainly take that into account in deciding which room I would rather spend my time in.</p>
-<p>[^6] Including at least 10 reflector threads since 2022, all originating from the same individual.</p>
 <h1 data-number="8" style="border-bottom:1px solid #cccccc" id="bibliography"><span class="header-section-number">8</span> References<a href="#bibliography" class="self-link"></a></h1>
 <div id="refs" class="references hanging-indent" role="doc-bibliography">
 <div id="ref-P2017R1">
@@ -764,6 +763,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <li id="fn5" role="doc-endnote"><p>Ironically, this is an attempt to make views behave more like containers. <span class="citation" data-cites="P3329R0">[<a href="#ref-P3329R0" role="doc-biblioref">P3329R0</a>]</span> repeatedly complains that views are not like containers in various aspects, yet where the library actually tries to make them more similar where it can, it attracted even more vehement complaints. No good deed goes unpunished, I suppose.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn6" role="doc-endnote"><p>It’s not that simple, either, because you don’t want to pay the caching cost when adapting a range that <em>does</em> have constant-time <code class="sourceCode cpp">begin</code>. So we’d need a whole new set of concepts and opt-ins for this to work well. And there isn’t even the faintest hint of this in the paper.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn7" role="doc-endnote"><p>As of 2025-02-03. By comparison, range-v3 has 4176 stars.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn8" role="doc-endnote"><p>Including more than ten reflector threads since 2022, all originating from the same individual.<a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 </div>
