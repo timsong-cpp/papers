@@ -1,9 +1,9 @@
 ---
 title: "`views::to_input`"
-document: P3137R2
+document: D3137R3
 date: today
 audience:
-  - LEWG
+  - LWG
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
@@ -17,6 +17,7 @@ range to an input-only, non-common range.
 
 # Revision history
 
+- R3: Wording fixes.
 - R2: Added a feature-test macro.
 - R1: Added `operator-` for `sized_sentinel_for` cases per SG9 feedback. Added
   additional discussion on the feasibility of splitting this adaptor.
@@ -110,11 +111,11 @@ determine if an operation can be used. So we do not try to do so here.
 
 # Wording
 
-This wording is relative to [@N4971].
+This wording is relative to [@N5001] and assumes the application of [@LWG4189].
 
 ## Addition to `<ranges>`
 
-Add the following to [ranges.syn]{.sref}, header `<ranges>` synopsis:
+Add the following declarations to [ranges.syn]{.sref}, header `<ranges>` synopsis:
 
 ```cpp
 // [...]
@@ -155,7 +156,7 @@ strength.]{.note}
 Let `E` be an expression and let `T` be `decltype((E))`.
 The expression `views​::to_input(E)` is expression-equivalent to:
 
-- [#.#]{.pnum} `views​::​all(E)` if `T` models `input_range`, does not model `common_range`, and does not model `forward_range`;
+- [#.#]{.pnum} `views​::​all(E)` if `T` models `input_range`, does not satisfy `common_range`, and does not satisfy `forward_range`;
 - [#.#]{.pnum} Otherwise, `to_input_view(E)`.
 
 #### 26.7.?.2 Class template `to_input_view` [range.to.input.view] {-}
@@ -393,7 +394,7 @@ synopsis, with the value selected by the editor to reflect the date of adoption
 of this paper:
 
 ```cpp
-#define __cpp_lib_ranges_to_input 20XXXXL // also in <ranges>
+#define __cpp_lib_ranges_to_input 20XXXXL // freestanding, also in <ranges>
 ```
 
 ---
