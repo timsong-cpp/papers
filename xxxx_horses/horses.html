@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2025-02-03" />
+  <meta name="dcterms.date" content="2025-02-05" />
   <title>On the beating of horses, and other matters</title>
   <style>
       code{white-space: pre-wrap;}
@@ -603,11 +603,11 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <table style="border:none;float:right">
   <tr>
     <td>Document #:</td>
-    <td>PXXXXRX</td>
+    <td>D3613R0</td>
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2025-02-03</td>
+    <td>2025-02-05</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -697,12 +697,12 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <li><code class="sourceCode cpp">join_view<span class="op">::</span>iterator<span class="op">::</span><span class="kw">operator</span><span class="op">--</span></code>, which needs to know whether it’s at the beginning of the current range.</li>
 </ul>
 <p>And what’s the deployment experience of this change to the most fundamental concept of the ranges library? The paper doesn’t say. Surely not just the github repo with a small handful of the simplest views and a paltry 63 stars<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a>, despite the author’s attempts to promote it at multiple conferences over several years?</p>
-<h1 data-number="7" style="border-bottom:1px solid #cccccc" id="a-postscript"><span class="header-section-number">7</span> A postscript<a href="#a-postscript" class="self-link"></a></h1>
+<h1 data-number="7" style="border-bottom:1px solid #cccccc" id="a-postscript-on-chairs-and-sea-lions"><span class="header-section-number">7</span> A postscript: on chairs and <a href="https://en.wikipedia.org/wiki/Sealioning">sea lions</a><a href="#a-postscript-on-chairs-and-sea-lions" class="self-link"></a></h1>
 <div class="quote">
 <p>Time is a flat circle. Everything we have ever done or will do, we are going to do over and over and over again – forever.</p>
 <p>— Rust Cohle, in True Detective</p>
 </div>
-<p>It is hard to believe that we are still relitigating design decisions embodied in the most fundamental concept of the entire ranges library <em>five years after</em> we shipped it in an international standard. This design space was exhaustively explored by the original authors of the ranges library before we standardized it, and again after that. There is no new information coming in that would justify such an exercise.</p>
+<p>It is hard to believe that we are still relitigating design decisions embodied in the most fundamental concept of the entire ranges library <em>five years after</em> we shipped it in an international standard. This design space was exhaustively explored by the original authors of the ranges library before we standardized it, and again after that in the various forums of WG21. There is no new information coming in that would justify such an exercise.</p>
 <p>Yet here we are.</p>
 <p>On the basis of a paper whose exploration of the consequences of its proposed changes is so inadequate that calling it unbaked would be an insult to the ready-to-bake products available in supermarkets everywhere.</p>
 <p>It is, of course, the chair’s prerogative to choose what paper is discussed. But I will certainly take that into account in deciding which room I would rather spend my time in.</p>
@@ -762,7 +762,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <li id="fn4" role="doc-endnote"><p>If it is allowed to be called multiple times, that is. <code class="sourceCode cpp">begin</code> can only be called once on non-forward ranges.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn5" role="doc-endnote"><p>Ironically, this is an attempt to make views behave more like containers. <span class="citation" data-cites="P3329R0">[<a href="#ref-P3329R0" role="doc-biblioref">P3329R0</a>]</span> repeatedly complains that views are not like containers in various aspects, yet where the library actually tries to make them more similar where it can, it attracted even more vehement complaints. No good deed goes unpunished, I suppose.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn6" role="doc-endnote"><p>It’s not that simple, either, because you don’t want to pay the caching cost when adapting a range that <em>does</em> have constant-time <code class="sourceCode cpp">begin</code>. So we’d need a whole new set of concepts and opt-ins for this to work well. And there isn’t even the faintest hint of this in the paper.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn7" role="doc-endnote"><p>As of 2025-02-03. In comparison, range-v3 has 4176 stars.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7" role="doc-endnote"><p>As of 2025-02-03. By comparison, range-v3 has 4176 stars.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 </div>

@@ -1,6 +1,6 @@
 ---
 title: On the beating of horses, and other matters
-document: PXXXXRX
+document: D3613R0
 date: today
 audience:
   - SG9
@@ -176,9 +176,9 @@ conferences over several years?
 [^4]: It's not that simple, either, because you don't want to pay the caching cost when adapting a range that _does_ have constant-time `begin`.
 So we'd need a whole new set of concepts and opt-ins for this to work well. And there isn't even the faintest hint of this in the paper.
 
-[^5]: As of 2025-02-03. In comparison, range-v3 has 4176 stars.
+[^5]: As of 2025-02-03. By comparison, range-v3 has 4176 stars.
 
-# A postscript
+# A postscript: on chairs and [sea lions](https://en.wikipedia.org/wiki/Sealioning)
 
 ::: quote
 
@@ -190,7 +190,7 @@ Time is a flat circle. Everything we have ever done or will do, we are going to 
 
 It is hard to believe that we are still relitigating design decisions embodied in the most fundamental concept of the entire ranges library _five years after_
 we shipped it in an international standard. This design space was exhaustively explored by the original authors of the ranges library before we
-standardized it, and again after that. There is no new information coming in that would justify such an exercise.
+standardized it, and again after that in the various forums of WG21. There is no new information coming in that would justify such an exercise.
 
 Yet here we are.
 
