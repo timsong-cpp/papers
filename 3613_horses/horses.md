@@ -102,7 +102,7 @@ A number of allegedly problematic examples in [@P3329R0] involve various forms o
 Once we realize that range adaptors are lazy algorithms, the problem with such examples becomes obvious: they are equivalent to mutating a container while iterating over it.
 That's generally a bad idea when the algorithm is eager. It's not made less bad just because the algorithm is lazy.
 
-Formally, such mutations is forbidden by the requirement that `ranges::begin` must be equality-preserving, non-modifying[^1], and stable
+Formally, such mutations are forbidden by the requirement that `ranges::begin` must be equality-preserving, non-modifying[^1], and stable
 when applied to forward (or stronger) ranges -- as long as the `filter_view` exists, messing with the underlying container is a violation
 of the semantic requirements on `range`, caching or not. But why let that stop the paper?
 
@@ -190,7 +190,7 @@ Time is a flat circle. Everything we have ever done or will do, we are going to 
 
 It is hard to believe that we are still relitigating design decisions embodied in the most fundamental concept of the entire ranges library _five years after_
 we shipped it in an international standard. This design space was exhaustively explored by the original authors of the ranges library before we
-standardized it, and again after that in the various forums of WG21. There is no new information coming in that would justify such an exercise.
+standardized it, and again after that in the various forums of WG21.[^6] There is no new information coming in that would justify such an exercise.
 
 Yet here we are.
 
@@ -199,3 +199,5 @@ an insult to the ready-to-bake products available in supermarkets everywhere.
 
 It is, of course, the chair's prerogative to choose what paper is discussed. But I will certainly take that into account in deciding which room
 I would rather spend my time in.
+
+[^6] Including at least 10 reflector threads since 2022, all originating from the same individual.

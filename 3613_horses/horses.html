@@ -672,7 +672,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 </div>
 <p>A number of allegedly problematic examples in <span class="citation" data-cites="P3329R0">[<a href="#ref-P3329R0" role="doc-biblioref">P3329R0</a>]</span> involve various forms of mutating the underlying container while a <code class="sourceCode cpp">filter_view</code> refers to it and attempting to use the view afterwards.</p>
 <p>Once we realize that range adaptors are lazy algorithms, the problem with such examples becomes obvious: they are equivalent to mutating a container while iterating over it. That’s generally a bad idea when the algorithm is eager. It’s not made less bad just because the algorithm is lazy.</p>
-<p>Formally, such mutations is forbidden by the requirement that <code class="sourceCode cpp">ranges<span class="op">::</span>begin</code> must be equality-preserving, non-modifying<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, and stable when applied to forward (or stronger) ranges – as long as the <code class="sourceCode cpp">filter_view</code> exists, messing with the underlying container is a violation of the semantic requirements on <code class="sourceCode cpp">range</code>, caching or not. But why let that stop the paper?</p>
+<p>Formally, such mutations are forbidden by the requirement that <code class="sourceCode cpp">ranges<span class="op">::</span>begin</code> must be equality-preserving, non-modifying<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, and stable when applied to forward (or stronger) ranges – as long as the <code class="sourceCode cpp">filter_view</code> exists, messing with the underlying container is a violation of the semantic requirements on <code class="sourceCode cpp">range</code>, caching or not. But why let that stop the paper?</p>
 <h1 data-number="4" style="border-bottom:1px solid #cccccc" id="const-iteration-and-deep-const"><span class="header-section-number">4</span> <code class="sourceCode cpp"><span class="kw">const</span></code>-iteration and deep <code class="sourceCode cpp"><span class="kw">const</span></code><a href="#const-iteration-and-deep-const" class="self-link"></a></h1>
 <div class="quote">
 <p>View adaptors are lazy algorithms, and some algorithms have mutable state.</p>
@@ -702,10 +702,11 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <p>Time is a flat circle. Everything we have ever done or will do, we are going to do over and over and over again – forever.</p>
 <p>— Rust Cohle, in True Detective</p>
 </div>
-<p>It is hard to believe that we are still relitigating design decisions embodied in the most fundamental concept of the entire ranges library <em>five years after</em> we shipped it in an international standard. This design space was exhaustively explored by the original authors of the ranges library before we standardized it, and again after that in the various forums of WG21. There is no new information coming in that would justify such an exercise.</p>
+<p>It is hard to believe that we are still relitigating design decisions embodied in the most fundamental concept of the entire ranges library <em>five years after</em> we shipped it in an international standard. This design space was exhaustively explored by the original authors of the ranges library before we standardized it, and again after that in the various forums of WG21.[^6] There is no new information coming in that would justify such an exercise.</p>
 <p>Yet here we are.</p>
 <p>On the basis of a paper whose exploration of the consequences of its proposed changes is so inadequate that calling it unbaked would be an insult to the ready-to-bake products available in supermarkets everywhere.</p>
 <p>It is, of course, the chair’s prerogative to choose what paper is discussed. But I will certainly take that into account in deciding which room I would rather spend my time in.</p>
+<p>[^6] Including at least 10 reflector threads since 2022, all originating from the same individual.</p>
 <h1 data-number="8" style="border-bottom:1px solid #cccccc" id="bibliography"><span class="header-section-number">8</span> References<a href="#bibliography" class="self-link"></a></h1>
 <div id="refs" class="references hanging-indent" role="doc-bibliography">
 <div id="ref-P2017R1">
