@@ -33,10 +33,10 @@ see, e.g., [@P2602R2][@P2609R3][@P2997R1].
 
 What we should not do, though, is descending upon that same crossing (which now looks [like this](https://maps.app.goo.gl/y9MmRTia1unEb6YX9)), more than a century later, in search of that horse so that we can give it another good beating.
 
-Yet it appears [@P3329R0] wants to do just that. This paper is an attempt[^0] to explain that the horse has already been thoroughly beaten and
+Yet it appears [@P3329R0] wants to do just that. This paper is an attempt[^1] to explain that the horse has already been thoroughly beaten and
 we should [drop our sticks and back slowly away from the imaginary horse carcass](https://en.wikipedia.org/wiki/Wikipedia:Drop_the_stick_and_back_slowly_away_from_the_horse_carcass).
 
-[^0]: Far from the first one.
+[^1]: Far from the first one.
 
 # `filter` and mutating elements
 
@@ -102,13 +102,16 @@ A number of allegedly problematic examples in [@P3329R0] involve various forms o
 Once we realize that range adaptors are lazy algorithms, the problem with such examples becomes obvious: they are equivalent to mutating a container while iterating over it.
 That's generally a bad idea when the algorithm is eager. It's not made less bad just because the algorithm is lazy.
 
-Formally, such mutations are forbidden by the requirement that `ranges::begin` must be equality-preserving, non-modifying[^1], and stable
+Formally, such mutations are forbidden by the requirement that `ranges::begin` must be equality-preserving, non-modifying[^2], and stable
 when applied to forward (or stronger) ranges -- as long as the `filter_view` exists, messing with the underlying container is a violation
-of the semantic requirements on `range`, caching or not. But why let that stop the paper?
+of the semantic requirements on `range`, caching or not. And it's not like these requirements are invented for no reason -- they are critical
+to the ability to reason about generic code.[^3] But why let that stop the paper?
 
-[^1]: Incidentally, [@P3329R0] also totally misunderstands what "non-modifying" means in this context (and even does so in [red text]{.red} as if it's a gotcha of some sort).
+[^2]: Incidentally, [@P3329R0] also totally misunderstands what "non-modifying" means in this context (and even does so in [red text]{.red} as if it's a gotcha of some sort).
 It means the call expression does not "modify" its inputs, as that term is defined in [concepts.equality]{.sref}.
 But there's no rule that you have to understand what is being changed before proposing changes.
+[^3]: What does it even _mean_ to, for example, "find the first occurrence of the needle in the haystack" if the needle (or the haystack) can spontaneously mutate whenever
+the algorithm looks at it?
 
 # `const`-iteration and deep `const`
 
@@ -142,19 +145,19 @@ library returns the end of its source range: often it's not necessary to reach t
 
 # Complexity requirement of `begin`
 
-The greatest mischief of [@P3329R0], however, is not its proposal to "heal"[^2] `filter_view`, but its cavalierly proposed modification to the semantic requirements on `range`.
+The greatest mischief of [@P3329R0], however, is not its proposal to "heal"[^4] `filter_view`, but its cavalierly proposed modification to the semantic requirements on `range`.
 Some might call it...audacious.
 
-[^2]: More like maim. Perhaps an [Auchenai Soulpriest](https://hearthstone.wiki.gg/wiki/Auchenai_Soulpriest) is in play?
+[^4]: More like maim. Perhaps an [Auchenai Soulpriest](https://hearthstone.wiki.gg/wiki/Auchenai_Soulpriest) is in play?
 
 The `range` concept requires `begin` and `end` to be amortized constant time. Here, "amortized" means that every call after the first is constant.
-In cases where `begin` or `end` cannot be computed in constant time (like `filter`'s `begin`), then, this requires caching the position.[^2.5]
+In cases where `begin` or `end` cannot be computed in constant time (like `filter`'s `begin`), then, this requires caching the position.[^5]
 The reason behind this design decision -- which had been [debated at length](https://github.com/ericniebler/range-v3/issues/254) [over the span of several years](https://github.com/ericniebler/range-v3/issues/385)
 prior to standardization -- is that it is not uncommon for range adaptors, and generic code in general, to call `begin` and `end` repeatedly, on the assumption
-that such calls are cheap. Having such calls perform a linear-time search each time can potentially turn a linear time algorithm into a quadratic one.[^3]
+that such calls are cheap. Having such calls perform a linear-time search each time can potentially turn a linear time algorithm into a quadratic one.[^6]
 
-[^2.5]: If it is allowed to be called multiple times, that is. `begin` can only be called once on non-forward ranges.
-[^3]: Ironically, this is an attempt to make views behave more like containers. [@P3329R0] repeatedly complains that views are not like containers in various aspects,
+[^5]: If it is allowed to be called multiple times, that is. `begin` can only be called once on non-forward ranges.
+[^6]: Ironically, this is an attempt to make views behave more like containers. [@P3329R0] repeatedly complains that views are not like containers in various aspects,
 yet where the library actually tries to make them more similar where it can, it attracted even more vehement complaints. No good deed goes unpunished, I suppose.
 
 Unfortunately, this design decision attracted the attention of [@P3329R0] like the red cape in a bullfight, and its proposed change -- allowing linear-time
@@ -162,7 +165,7 @@ for `begin` -- is fittingly not unlike a bull in a china shop.
 
 The paper doesn't even attempt to discuss the extent of breakage caused by this change. What breaks? Well, everything. The entire programming model changes.
 User code that had assumed that `begin` can be called multiple times cheaply can now silently incur a significant cost -- and has to do its own caching
-(which is actually tricky to do correctly) to get back the performance it lost.[^4] But we don't even need to go that far -- there are plenty of examples in the
+(which is actually tricky to do correctly) to get back the performance it lost.[^7] But we don't even need to go that far -- there are plenty of examples in the
 standard library. I'm not going to attempt to do a comprehensive survey (that's the paper author's responsibility), but consider, for instance:
 
 - `ranges::size`, which can compute `end() - begin()` in some cases.
@@ -170,13 +173,13 @@ standard library. I'm not going to attempt to do a comprehensive survey (that's 
 - `join_view::iterator::operator--`, which needs to know whether it's at the beginning of the current range.
 
 And what's the deployment experience of this change to the most fundamental concept of the ranges library? The paper doesn't say. Surely not
-just the github repo with a small handful of the simplest views and a paltry 63 stars[^5], despite the author's attempts to promote it at multiple
+just the github repo with a small handful of the simplest views and a paltry 63 stars[^8], despite the author's attempts to promote it at multiple
 conferences over several years?
 
-[^4]: It's not that simple, either, because you don't want to pay the caching cost when adapting a range that _does_ have constant-time `begin`.
+[^7]: It's not that simple, either, because you don't want to pay the caching cost when adapting a range that _does_ have constant-time `begin`.
 So we'd need a whole new set of concepts and opt-ins for this to work well. And there isn't even the faintest hint of this in the paper.
 
-[^5]: As of 2025-02-03. By comparison, range-v3 has 4176 stars.
+[^8]: As of 2025-02-03. By comparison, range-v3 has 4176 stars.
 
 # A postscript
 
@@ -190,7 +193,7 @@ Time is a flat circle. Everything we have ever done or will do, we are going to 
 
 It is hard to believe that we are still relitigating design decisions embodied in the most fundamental concept of the entire ranges library _five years after_
 we shipped it in an international standard. This design space was exhaustively explored by the original authors of the ranges library before we
-standardized it, and again after that in the various forums of WG21.[^6] There is no new information coming in that would justify such an exercise.
+standardized it, and again after that in the various forums of WG21.[^9] There is no new information coming in that would justify such an exercise.
 
 Yet here we are.
 
@@ -200,4 +203,4 @@ an insult to the ready-to-bake products available in supermarkets everywhere.
 It is, of course, the chair's prerogative to choose what paper is discussed. But I will certainly take that into account in deciding which room
 I would rather spend my time in.
 
-[^6]: Including more than ten reflector threads since 2022, all started by the same individual.
+[^9]: Including more than ten reflector threads since 2022, all started by the same individual.
