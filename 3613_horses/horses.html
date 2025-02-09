@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2025-02-06" />
+  <meta name="dcterms.date" content="2025-02-09" />
   <title>On the beating of horses, and other matters</title>
   <style>
       code{white-space: pre-wrap;}
@@ -610,7 +610,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2025-02-06</td>
+    <td>2025-02-09</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -699,7 +699,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <li><code class="sourceCode cpp">view_interface<span class="op">::</span><span class="kw">operator</span><span class="op">[]</span></code>, which does <code class="sourceCode cpp">begin<span class="op">()[</span>n<span class="op">]</span></code>.</li>
 <li><code class="sourceCode cpp">join_view<span class="op">::</span>iterator<span class="op">::</span><span class="kw">operator</span><span class="op">--</span></code>, which needs to know whether it’s at the beginning of the current range.</li>
 </ul>
-<p>And what’s the deployment experience of this change to the most fundamental concept of the ranges library? The paper doesn’t say. Surely not just the github repo with a small handful of the simplest views and a paltry 63 stars<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a>, despite the author’s attempts to promote it at multiple conferences over several years?</p>
+<p>And what’s the deployment experience of this change to the most fundamental concept of the ranges library? The paper doesn’t say. Surely not just the github repo with a small handful of the simplest views and a paltry 64 stars<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a>, despite the author’s attempts to promote it at multiple conferences over several years?</p>
 <h1 data-number="7" style="border-bottom:1px solid #cccccc" id="a-postscript"><span class="header-section-number">7</span> A postscript<a href="#a-postscript" class="self-link"></a></h1>
 <div class="quote">
 <p>Time is a flat circle. Everything we have ever done or will do, we are going to do over and over and over again – forever.</p>
@@ -765,8 +765,8 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <li id="fn4" role="doc-endnote"><p>More like maim. Perhaps an <a href="https://hearthstone.wiki.gg/wiki/Auchenai_Soulpriest">Auchenai Soulpriest</a> is in play?<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn5" role="doc-endnote"><p>If it is allowed to be called multiple times, that is. <code class="sourceCode cpp">begin</code> can only be called once on non-forward ranges.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn6" role="doc-endnote"><p>Ironically, this is an attempt to make views behave more like containers. <span class="citation" data-cites="P3329R0">[<a href="#ref-P3329R0" role="doc-biblioref">P3329R0</a>]</span> repeatedly complains that views are not like containers in various aspects, yet where the library actually tries to make them more similar where it can, it attracted even more vehement complaints. No good deed goes unpunished, I suppose.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn7" role="doc-endnote"><p>It’s not that simple, either, because you don’t want to pay the caching cost when adapting a range that <em>does</em> have constant-time <code class="sourceCode cpp">begin</code>. So we’d need a whole new set of concepts and opt-ins for this to work well. And there isn’t even the faintest hint of this in the paper.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn8" role="doc-endnote"><p>As of 2025-02-03. By comparison, range-v3 has 4176 stars.<a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7" role="doc-endnote"><p>It’s not that simple, either, because you don’t want to pay the caching cost when adapting a range that <em>does</em> have constant-time <code class="sourceCode cpp">begin</code>. So we’d need a whole new set of concepts and opt-ins for this to work well. As usual, there isn’t even the faintest hint of any of this in the paper.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn8" role="doc-endnote"><p>As of 2025-02-09. By comparison, range-v3 has 4185 stars.<a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn9" role="doc-endnote"><p>Including more than ten reflector threads since 2022, all started by the same individual.<a href="#fnref9" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>

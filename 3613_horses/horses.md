@@ -173,13 +173,13 @@ standard library. I'm not going to attempt to do a comprehensive survey (that's 
 - `join_view::iterator::operator--`, which needs to know whether it's at the beginning of the current range.
 
 And what's the deployment experience of this change to the most fundamental concept of the ranges library? The paper doesn't say. Surely not
-just the github repo with a small handful of the simplest views and a paltry 63 stars[^8], despite the author's attempts to promote it at multiple
+just the github repo with a small handful of the simplest views and a paltry 64 stars[^8], despite the author's attempts to promote it at multiple
 conferences over several years?
 
 [^7]: It's not that simple, either, because you don't want to pay the caching cost when adapting a range that _does_ have constant-time `begin`.
-So we'd need a whole new set of concepts and opt-ins for this to work well. And there isn't even the faintest hint of this in the paper.
+So we'd need a whole new set of concepts and opt-ins for this to work well. As usual, there isn't even the faintest hint of any of this in the paper.
 
-[^8]: As of 2025-02-03. By comparison, range-v3 has 4176 stars.
+[^8]: As of 2025-02-09. By comparison, range-v3 has 4185 stars.
 
 # A postscript
 
