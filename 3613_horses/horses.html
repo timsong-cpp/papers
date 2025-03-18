@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="mpark/wg21" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2025-02-09" />
+  <meta name="dcterms.date" content="2025-02-15" />
   <title>On the beating of horses, and other matters</title>
   <style>
       code{white-space: pre-wrap;}
@@ -606,11 +606,11 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <table style="border:none;float:right">
   <tr>
     <td>Document #:</td>
-    <td>D3613R0</td>
+    <td>P3613R0</td>
   </tr>
   <tr>
     <td>Date:</td>
-    <td>2025-02-09</td>
+    <td>2025-02-15</td>
   </tr>
   <tr>
     <td style="vertical-align:top">Project:</td>
@@ -667,7 +667,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <li>We can allow mutations in general, but disallow it – on pain of undefined behavior – if that would change the result of the predicate and cause us to fail to provide the multipass guarantee despite advertising so.</li>
 </ul>
 <p>The standard picked the last option. It makes <code class="sourceCode cpp">filter</code> as powerful as it can possibly be, within the fundamental constraints imposed by the definition of forward iterators. Implementations can opt to add debug checks that catch a good fraction of misuses, too – though it won’t be all of them.</p>
-<p>Now that we have <code class="sourceCode cpp">views<span class="op">::</span>as_const</code> and will soon have <code class="sourceCode cpp">views<span class="op">::</span>to_input</code>, it’s trivial to build the first two options from the third, if so desired. It is hard to build the last option from the remainder.</p>
+<p>Now that we have <code class="sourceCode cpp">views<span class="op">::</span>as_const</code> and will soon have <code class="sourceCode cpp">views<span class="op">::</span>to_input</code>, it’s trivial to build the first two options from the third, if so desired. It is hard – if not impossible – to build the last option from the remainder.</p>
 <h1 data-number="3" style="border-bottom:1px solid #cccccc" id="mutating-the-underlying-range"><span class="header-section-number">3</span> Mutating the underlying range<a href="#mutating-the-underlying-range" class="self-link"></a></h1>
 <div class="quote">
 <p>View adaptors are lazy algorithms.</p>
@@ -684,7 +684,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <p>As has been repeatedly explained, there is a wide variety of views that <em>must</em> maintain mutable state somewhere. <code class="sourceCode cpp">generator</code>. <code class="sourceCode cpp">istream_view</code>. <code class="sourceCode cpp">join</code> when joining a range of prvalues or an input range. <code class="sourceCode cpp">chunk</code> when chunking an input range. The list goes on.</p>
 <p>Unless we are prepared to remove them all – and reject all future adaptors like them – an arbitrary range will never be uniformly const-iterable.</p>
 <p>Nor will it be uniformly deep-<code class="sourceCode cpp"><span class="kw">const</span></code>. That ship sailed with <code class="sourceCode cpp">boost<span class="op">::</span>iterator_range</code>, a long time ago. And for copyable views in particular, deep-<code class="sourceCode cpp"><span class="kw">const</span></code> is illusory anyway.</p>
-<p>See also <span class="citation" data-cites="P3431R0">[<a href="#ref-P3431R0" role="doc-biblioref">P3431R0</a>]</span>.</p>
+<p>Cf. <span class="citation" data-cites="P3431R0">[<a href="#ref-P3431R0" role="doc-biblioref">P3431R0</a>]</span>.</p>
 <h1 data-number="5" style="border-bottom:1px solid #cccccc" id="why-doesnt-filter-cache-end"><span class="header-section-number">5</span> Why doesn’t <code class="sourceCode cpp">filter</code> “cache <code class="sourceCode cpp">end</code>”?<a href="#why-doesnt-filter-cache-end" class="self-link"></a></h1>
 <p>Well, it has no need to. Its <code class="sourceCode cpp">end</code> is a wrapper around the underlying range’s <code class="sourceCode cpp">end</code>. In a lot of cases you can’t do better anyway: if the range isn’t bidirectional, or isn’t common, you can’t go back from the end, so short of walking through the whole range there’s not much that can be done.</p>
 <p>But <span class="citation" data-cites="P3329R0">[<a href="#ref-P3329R0" role="doc-biblioref">P3329R0</a>]</span>’s “cache <code class="sourceCode cpp">end</code>” is something else: it suggests caching the position in the original range that is immediately past the last element. Why not do that, it asks triumphantly, if you care about performance?</p>
@@ -708,7 +708,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <p>It is hard to believe that we are still relitigating design decisions embodied in the most fundamental concept of the entire ranges library <em>five years after</em> we shipped it in an international standard. This design space was exhaustively explored by the original authors of the ranges library before we standardized it, and again after that in the various forums of WG21.<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a> There is no new information coming in that would justify such an exercise.</p>
 <p>Yet here we are.</p>
 <p>On the basis of a paper whose exploration of the consequences of its proposed changes is so inadequate that calling it unbaked would be an insult to the ready-to-bake products available in supermarkets everywhere.</p>
-<p>It is, of course, the chair’s prerogative to choose what paper is discussed. But I will certainly take that into account in deciding which room I would rather spend my time in.</p>
+<p>It is, of course, the chair’s prerogative to choose which paper is discussed. And perhaps a re-re-exploration will miraculously find a unicorn where the horse was. If so, I would be pleasantly surprised. Until the unicorn materializes, however, I plan to spend my time in subgroups where it can be put to more valuable use.</p>
 <h1 data-number="8" style="border-bottom:1px solid #cccccc" id="bibliography"><span class="header-section-number">8</span> References<a href="#bibliography" class="self-link"></a></h1>
 <div id="refs" class="references hanging-indent" role="doc-bibliography">
 <div id="ref-P2017R1">
@@ -766,7 +766,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <li id="fn5" role="doc-endnote"><p>If it is allowed to be called multiple times, that is. <code class="sourceCode cpp">begin</code> can only be called once on non-forward ranges.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn6" role="doc-endnote"><p>Ironically, this is an attempt to make views behave more like containers. <span class="citation" data-cites="P3329R0">[<a href="#ref-P3329R0" role="doc-biblioref">P3329R0</a>]</span> repeatedly complains that views are not like containers in various aspects, yet where the library actually tries to make them more similar where it can, it attracted even more vehement complaints. No good deed goes unpunished, I suppose.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn7" role="doc-endnote"><p>It’s not that simple, either, because you don’t want to pay the caching cost when adapting a range that <em>does</em> have constant-time <code class="sourceCode cpp">begin</code>. So we’d need a whole new set of concepts and opt-ins for this to work well. As usual, there isn’t even the faintest hint of any of this in the paper.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn8" role="doc-endnote"><p>As of 2025-02-09. By comparison, range-v3 has 4185 stars.<a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn8" role="doc-endnote"><p>As of 2025-02-09. By comparison, range-v3 has 4185 stars on that date.<a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn9" role="doc-endnote"><p>Including more than ten reflector threads since 2022, all started by the same individual.<a href="#fnref9" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>

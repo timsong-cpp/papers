@@ -1,7 +1,7 @@
 ---
 title: On the beating of horses, and other matters
-document: D3613R0
-date: today
+document: P3613R0
+date: 2025-02-15
 audience:
   - SG9
 author:
@@ -85,7 +85,7 @@ The standard picked the last option. It makes `filter` as powerful as it can pos
 Implementations can opt to add debug checks that catch a good fraction of misuses, too -- though it won't be all of them.
 
 Now that we have `views::as_const` and will soon have `views::to_input`, it's trivial to build the first two options from the third, if so desired.
-It is hard to build the last option from the remainder.
+It is hard -- if not impossible -- to build the last option from the remainder.
 
 # Mutating the underlying range
 
@@ -130,7 +130,7 @@ Unless we are prepared to remove them all -- and reject all future adaptors like
 
 Nor will it be uniformly deep-`const`. That ship sailed with `boost::iterator_range`, a long time ago. And for copyable views in particular, deep-`const` is illusory anyway.
 
-See also [@P3431R0].
+Cf. [@P3431R0].
 
 # Why doesn't `filter` "cache `end`"?
 
@@ -179,7 +179,7 @@ conferences over several years?
 [^7]: It's not that simple, either, because you don't want to pay the caching cost when adapting a range that _does_ have constant-time `begin`.
 So we'd need a whole new set of concepts and opt-ins for this to work well. As usual, there isn't even the faintest hint of any of this in the paper.
 
-[^8]: As of 2025-02-09. By comparison, range-v3 has 4185 stars.
+[^8]: As of 2025-02-09. By comparison, range-v3 has 4185 stars on that date.
 
 # A postscript
 
@@ -200,7 +200,8 @@ Yet here we are.
 On the basis of a paper whose exploration of the consequences of its proposed changes is so inadequate that calling it unbaked would be
 an insult to the ready-to-bake products available in supermarkets everywhere.
 
-It is, of course, the chair's prerogative to choose what paper is discussed. But I will certainly take that into account in deciding which room
-I would rather spend my time in.
+It is, of course, the chair's prerogative to choose which paper is discussed. And perhaps a re-re-exploration will miraculously find a
+unicorn where the horse was. If so, I would be pleasantly surprised. Until the unicorn materializes, however, I plan to spend my time
+in subgroups where it can be put to more valuable use.
 
 [^9]: Including more than ten reflector threads since 2022, all started by the same individual.
