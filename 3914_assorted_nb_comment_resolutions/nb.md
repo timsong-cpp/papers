@@ -1,6 +1,6 @@
 ---
 title: Assorted NB comment resolutions for Kona 2025
-document: D3914R0
+document: P3914R0
 date: 2025-11-04
 audience:
   - LWG
@@ -28,7 +28,7 @@ This wording is relative to [@N5014] except where noted.
 
 ## [US 160-260](https://github.com/cplusplus/nbballot/issues/835)
 
-[During offline discussion, Ruslan pointed out other issues with the specification of `unique` and `unique_copy`. The wording below addresses them as well.]{.draftnote}
+[During offline discussion, Ruslan Arutyunyan pointed out other issues with the specification of `unique` and `unique_copy` and suggested an elegant wording strategy to address them. The wording below incorporates his suggestions.]{.draftnote}
 
 Edit [alg.unique]{.sref} as indicated:
 
