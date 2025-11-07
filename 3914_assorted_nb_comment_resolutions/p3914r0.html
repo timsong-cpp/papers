@@ -1054,7 +1054,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 </ul>
 then an exception of type <code class="sourceCode default">meta::exception</code> is thrown. <span class="note"><span>[ <em>Note 1:</em> </span>For the first case, <em>S</em> is not instantiated.<span> — <em>end note</em> ]</span></span></li>
 <li><span class="marginalizedparent"><a class="marginalized" href="#pnum_72" id="pnum_72">(?.2)</a></span> Otherwise, if the instantiation of <em>S</em> would result in undefined behavior due to dependence on an incomplete type (<span>21.3.2 <a href="https://eel.is/c++draft/meta.rqmts">[meta.rqmts]</a></span>), then the call is not a constant subexpression.</li>
-<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_73" id="pnum_73">(?.3)</a></span> Otherwise, if the template arguments of <em>S</em> do not meet the preconditions of <em>C</em>, then it is unspecified whether the call is a constant subexpression or produces the result that would be produced if <em>C</em> had no preconditions.</li>
+<li><span class="marginalizedparent"><a class="marginalized" href="#pnum_73" id="pnum_73">(?.3)</a></span> Otherwise, if the template arguments of <em>S</em> do not meet the preconditions of <em>C</em>, then it is unspecified whether the call is a constant subexpression. If it is, the call produces the result that would be produced if <em>C</em> had no preconditions.</li>
 </ul>
 
 </div>

@@ -519,7 +519,7 @@ like any template instantiation triggered by a call to a reflection function.
 
   then an exception of type `meta::exception` is thrown. [For the first case, _S_ is not instantiated.]{.note}
 - [?.#]{.pnum} Otherwise, if the instantiation of _S_ would result in undefined behavior due to dependence on an incomplete type ([meta.rqmts]{.sref}), then the call is not a constant subexpression.
-- [?.#]{.pnum} Otherwise, if the template arguments of _S_ do not meet the preconditions of _C_, then it is unspecified whether the call is a constant subexpression or produces the result that would be produced if _C_ had no preconditions.
+- [?.#]{.pnum} Otherwise, if the template arguments of _S_ do not meet the preconditions of _C_, then it is unspecified whether the call is a constant subexpression. If it is, the call produces the result that would be produced if _C_ had no preconditions.
  
 :::
 
