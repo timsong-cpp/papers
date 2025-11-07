@@ -69,10 +69,10 @@ template<$execution-policy$ Ep, $sized-random-access-range$ R, class Proj = iden
   borrowed_subrange_t<R> ranges::unique(Ep&& exec, R&& r, C comp = {}, Proj proj = {});
 ```
 
-[#]{.pnum} Let `pred` be `equal_to{}` for the overloads with no parameter `pred`, 
+[#]{.pnum} Let `pred` be `equal_to{}` for the overloads with no parameter `pred`,
 and let _E_[(`i`)]{.diffins} be
 
-- [#.?]{.pnum} [`false` if `i` is equal to `first`; otherwise]{.diffins} 
+- [#.?]{.pnum} [`false` if `i` is equal to `first`; otherwise]{.diffins}
 - [#.1]{.pnum} `bool(pred(*(i - 1), *i))` for the overloads in namespace `std`;
 - [#.#]{.pnum} `bool(invoke(comp, invoke(proj, *(i - 1)), invoke(proj, *i)))` for the overloads in namespace `ranges`.
 
@@ -147,7 +147,7 @@ template<$execution-policy$ Ep, $sized-random-access-range$ R, $sized-random-acc
 
 [#]{.pnum} Let `pred` be `equal_to{}` for the overloads in namespace `std` with no parameter `pred`, and let _E_(`i`) be
 
-- [#.?]{.pnum} [`false` if `i` is equal to `first`; otherwise]{.diffins} 
+- [#.?]{.pnum} [`false` if `i` is equal to `first`; otherwise]{.diffins}
 - [#.1]{.pnum} `bool(pred(*i, *(i - 1)))` for the overloads in namespace `std`;
 - [#.#]{.pnum} `bool(invoke(comp, invoke(proj, *i), invoke(proj, *(i - 1))))` for the overloads in namespace `ranges`.
 
@@ -155,17 +155,17 @@ template<$execution-policy$ Ep, $sized-random-access-range$ R, $sized-random-acc
 
 - [#.#]{.pnum} _M_ be the number of iterators `i` in the range `[first @[+ 1]{.diffdel}@, last)` for which _E_(`i`) is `false`;
 - [#.#]{.pnum} `result_last` be `result` + _M_ [+ `1`]{.diffdel} for the overloads with no parameter `result_last` or `result_r`;
-- [#.#]{.pnum} _N_ be min(_M_ [+ 1]{.diffdel}, `result_last` - `result`) 
+- [#.#]{.pnum} _N_ be min(_M_ [+ 1]{.diffdel}, `result_last` - `result`)
 
 [#]{.pnum} _Mandates:_ `*first` is writable ([iterator.requirements.general]{.sref}) to `result`.
- 
+
 [#]{.pnum} _Preconditions:_
 
 - [#.#]{.pnum} The ranges `[first, last)` and `[result, result + $N$)` do not overlap.
 - [#.#]{.pnum} For the overloads in namespace `std`:
   - [#.#.#]{.pnum} The comparison function is an equivalence relation.
   - [#.#.#]{.pnum} For the overloads with no `ExecutionPolicy`, let `T` be the value type of `InputIterator`. If `InputIterator` models `forward_iterator` ([iterator.concept.forward]{.sref}), then there are no additional requirements for `T`. Otherwise, if `OutputIterator` meets the _Cpp17ForwardIterator_ requirements and its value type is the same as `T`, then `T` meets the _Cpp17CopyAssignable_ ([tab:cpp17.copyassignable]{.sref}) requirements. Otherwise, `T` meets both the _Cpp17CopyConstructible_ ([tab:cpp17.copyconstructible]{.sref}) and _Cpp17CopyAssignable_ requirements.
-  
+
 [For the parallel algorithm overloads in namespace `std`, there can be a performance cost if the value type of `ForwardIterator1` does not meet both the _Cpp17CopyConstructible_ and _Cpp17CopyAssignable_ requirements. For the parallel algorithm overloads in namespace `ranges`, there can be a performance cost if `iter_value_t<I>` does not model `copyable`.]{.note}
 
 [#]{.pnum} _Effects:_ Copies only the first [_N_]{.diffins} [element from N consecutive groups of equivalent]{.diffdel} elements referred to by the iterator `i` in the range `[first @[+ 1]{.diffdel}@, last)` for which _E_(`i`) [holds]{.diffdel} [is `false`]{.diffins} into the range `[result, result + $N$)`.
@@ -186,7 +186,7 @@ template<$execution-policy$ Ep, $sized-random-access-range$ R, $sized-random-acc
 ::: wordinglist
 
 - Add the following to the end of [exec.snd.general]{.sref}:
-  
+
 ::: add
 
 [?]{.pnum} Various function templates in subclause [exec.snd]{.sref} can throw an exception of type `$unspecified-exception$`. Each such exception object is of an unspecified type such that a _handler_ of type `exception` matches ([except.handle]{.sref}) the exception object but a _handler_ of type `dependent_sender_error` does not.
@@ -297,7 +297,7 @@ where `$is-valid-let-sender$` is `true` if and only if all of the following are 
 - [#.#]{.pnum} `invocable<LetFn, decay_t<Ts>&...>`
 - [#.#]{.pnum} `sender<invoke_result_t<LetFn, decay_t<Ts>&...>>`
 - [#.#]{.pnum} `sizeof...(Env) == 0 || sender_in<invoke_result_t<LetFn, decay_t<Ts>&...>, $env-t$...>`
-  
+
 where `$env-t$` is the pack `decltype($let-cpo$.transform_env(declval<Sndr>(), declval<Env>()))`.
 
 :::
@@ -419,6 +419,9 @@ shared_ptr<parallel_scheduler_backend> query_parallel_scheduler_backend();
 
 ## [US 265-398](https://github.com/cplusplus/nbballot/issues/973) and [US 266-399](https://github.com/cplusplus/nbballot/issues/974)
 
+[This wording is relative to the current draft, which already includes a [change](https://github.com/cplusplus/draft/commit/42793d0ce36d4fe09a4c7ebdceeadef2e343fee4) intended to
+address [US 266-399](https://github.com/cplusplus/nbballot/issues/974).]{.ednote}
+
 Edit [exec.sysctxrepl.psb]{.sref} as indicated:
 
 ::: itemdecl
@@ -520,7 +523,7 @@ like any template instantiation triggered by a call to a reflection function.
   then an exception of type `meta::exception` is thrown. [For the first case, _S_ is not instantiated.]{.note}
 - [?.#]{.pnum} Otherwise, if the instantiation of _S_ would result in undefined behavior due to dependence on an incomplete type ([meta.rqmts]{.sref}), then the call is not a constant subexpression.
 - [?.#]{.pnum} Otherwise, if the template arguments of _S_ do not meet the preconditions of _C_, then it is unspecified whether the call is a constant subexpression. If it is, the call produces the result that would be produced if _C_ had no preconditions.
- 
+
 :::
 
 - Edit [meta.reflection.traits]{.sref} as indicated:
@@ -530,7 +533,7 @@ like any template instantiation triggered by a call to a reflection function.
 
 ### Signature and Return Type
 
-::: ltcell 
+::: ltcell
 ```cpp
 bool meta::$UNARY$(info type);
 bool meta::$UNARY$_type(info type);
@@ -612,7 +615,7 @@ info meta::$VARIADIC$(R&& args);
 
 
 ::: ltcell
-A reflection representing the type denoted by 
+A reflection representing the type denoted by
 `std::$VARIADIC$@[\_t]{.diffdel}@<`$T...$`>`[`::type`]{.diffins} where $T...$ is the pack of types or type aliases whose elements are represented by the corresponding elements of `args`
 :::
 
