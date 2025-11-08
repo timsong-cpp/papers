@@ -1,6 +1,6 @@
 ---
 title: Additional NB comment resolutions for Kona 2025
-document: D3923R0
+document: P3923R0
 date: today
 audience:
   - LWG
