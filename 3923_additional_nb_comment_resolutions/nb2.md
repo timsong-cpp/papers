@@ -20,6 +20,10 @@ This paper provides wording to resolve the following national body comments on t
 - [US 147-240](https://github.com/cplusplus/nbballot/issues/811)
 - [US 164-203](https://github.com/cplusplus/nbballot/issues/838)
 - [US 126-189](https://github.com/cplusplus/nbballot/issues/758)
+- [US 227-346](https://github.com/cplusplus/nbballot/issues/921)
+- [US 229-347](https://github.com/cplusplus/nbballot/issues/922)
+- [US 221-339](https://github.com/cplusplus/nbballot/issues/914)
+- [US 225-341](https://github.com/cplusplus/nbballot/issues/916)
 
 # Wording
 
@@ -83,7 +87,7 @@ hive(const hive& x, const type_identity_t<Allocator>& alloc);
 
 [#]{.pnum} _Effects_: Constructs a hive object [equal to<-with the elements of]{.indel} `x`. If the second overload is called, uses `alloc`. Initializes `$current-limits$` with `x.$current-limits$`.
 
-[#]{.pnum} _Complexity_: Linear in` x.size()`.
+[#]{.pnum} _Complexity_: Linear in `x.size()`.
 
 ```cpp
 hive(hive&& x) noexcept;
@@ -210,7 +214,7 @@ void trim_capacity() noexcept;
 void trim_capacity(size_type n) noexcept;
 ```
 
-[12]{.pnum} _Effects_: For the first overload, all reserved blocks are deallocated, and `capacity()` is reduced accordingly. For the second overload, [if `n <= capacity()` is `true`, there are no effects; otherwise, ]{.diffins}`capacity()` is reduced to no less than `n`.
+[12]{.pnum} _Effects_: For the first overload, all reserved blocks are deallocated, and `capacity()` is reduced accordingly. For the second overload, [if `n >= capacity()` is `true`, there are no effects; otherwise,]{.diffins} `capacity()` is reduced to no less than `n`.
 
 [#]{.pnum} _Complexity_: Linear in the number of reserved blocks deallocated.
 
@@ -609,7 +613,7 @@ template<execution-policy Ep, sized-random-access-range R1, sized-random-access-
 [#]{.pnum} _Returns_:
 
 - [#.#]{.pnum} `result_last` for the overloads in namespace `std`.
-- [#.#]{.pnum} `{last1, last2, result +` _N_`}` for the overloads in namespace `ranges`, if _N_ is equal to _M_ + _K_.
+- [#.#]{.pnum} `{last1, last2, result +` _N_`}` for the overloads in namespace `ranges`, if _N_ is equal to _M_ [+ _K_]{.diffdel}.
 - [#.#]{.pnum} Otherwise, [`{j1, j2, result_last}`]{.diffdel} [`{first1 +` _A_`, first2 +` _B_`, result_last}`]{.diffins} for the overloads in namespace `ranges`, where [the iterators `j1` and `j2` point to positions past the last]{.diffdel}[_A_ and _B_ are the numbers of]{.diffins} copied or skipped elements in `[first1, last1)` and `[first2, last2)`, respectively.
 
 [#]{.pnum} _Complexity_: At most `2 * ((last1 - first1) + (last2 - first2)) - 1` comparisons and applications of each projection.
@@ -644,11 +648,430 @@ $r_K$.
 - [#.#]{.pnum} [...]
 - [#.#]{.pnum} [...]
 
-[#]{.pnum} _Effects_: [...]
+[#]{.pnum} _Effects_: Produces an injected declaration _D_ ([expr.const]{.sref}) that defines _C_ and has properties as follows:
+
+- [#.#]{.pnum} [...]
+- [#.#]{.pnum} [...]
+- [#.#]{.pnum} [...]
+- [#.#]{.pnum} If _C_ is a specialization of a templated class _T_, and _C_ is not a local class, then _D_ is an explicit specialization of _T_.
+- [#.#]{.pnum} [...]
+- [#.#]{.pnum} [...]
 
 [#]{.pnum} _Returns_: `class_type`.
 
 ::: add
-[?]{.pnum} _Remarks_: If _C_ is the specialization of a templated class, _C_ is not instantiated.
+[?]{.pnum} _Remarks_: If _C_ is a specialization of a templated class and it has not been instantiated, _C_ is treated as an explicit specialization.
 :::
+:::
+
+
+## [US 227-346](https://github.com/cplusplus/nbballot/issues/921) and [US 229-347](https://github.com/cplusplus/nbballot/issues/922)
+
+::: jwordinglist
+
+1. Edit [exec.spawn.future]{.sref} as indicated:
+
+[7]{.pnum} Let `$spawn-future-state$` be the exposition-only class template:
+
+```cpp
+namespace std::execution {
+  template<class Alloc, scope_token Token, sender Sender, class Env>
+  struct $spawn-future-state$                                                 // exposition only
+    : $spawn-future-state-base$<completion_signatures_of_t<$future-spawned-sender$<Sender, Env>>> {
+    using $sigs-t$ =                                                          // exposition only
+      completion_signatures_of_t<$future-spawned-sender$<Sender, Env>>;
+    using $receiver-t$ =                                                      // exposition only
+      $spawn-future-receiver$<$sigs-t$>;
+    using $op-t$ =                                                            // exposition only
+      connect_result_t<$future-spawned-sender$<Sender, Env>, $receiver-t$>;
+
+    $spawn-future-state$(Alloc alloc, Sender&& sndr, Token token, Env env)    // exposition only
+      : alloc(std::move(alloc)),
+        op(connect(
+          write_env($stop-when$(std::forward<Sender>(sndr), ssource.get_token()), std::move(env)),
+          $receiver-t$(this))),
+        token(std::move(token)),
+        associated(token.try_associate()) {
+          if (associated)
+            start(op);
+          else
+            set_stopped($receiver-t$(this));
+        }
+
+    void complete() noexcept override;                                      // exposition only
+    void consume(receiver auto& rcvr) noexcept;                             // exposition only
+    void abandon() noexcept;                                                // exposition only
+
+  private:
+    @[`using $alloc-t$ =                                                         // exposition only`]{.diffdel}@
+      @[`allocator_traits<Alloc>::template rebind_alloc<$spawn-future-state$>;`]{.diffdel}@
+
+    @[`Alloc`<-`$alloc-t$`]{.indel}@ alloc;                                                          // exposition only
+    $ssource-t$ $ssource$;                                                      // exposition only
+    $op-t$ $op$;                                                                // exposition only
+    Token $token$;                                                            // exposition only
+    bool $associated$;                                                        // exposition only
+
+    void $destroy$() noexcept;                                                // exposition only
+  };
+
+  @[`template<class Alloc, scope_token Token, sender Sender, class Env>`]{.diffins}@
+  @[`$spawn-future-state$(Alloc alloc, Sender&& sndr, Token token, Env env) -> $spawn-future-state$<Alloc, Token, Sender, Env>`;]{.diffins}@
+}
+```
+
+[...]
+
+::: itemdecl
+```cpp
+void $destroy$() noexcept;
+```
+
+[12]{.pnum} _Effects_: Equivalent to:
+
+::: bq
+```diff
+ auto token = std::move(this->$token$);
+ bool associated = this->$associated$;
+
+ {
+
+-  auto alloc = std::move(this->$alloc$);
+-
+-  allocator_traits<$alloc-t$>::destroy(alloc, this);
+-  allocator_traits<$alloc-t$>::deallocate(alloc, this, 1);
+
++  using traits = allocator_traits<Alloc>::template rebind_traits<$spawn-future-state$>;
++  typename traits::allocator_type alloc(std::move(this->$alloc$));
++  traits::destroy(alloc, this);
++  traits::deallocate(alloc, this, 1);
+ }
+
+ if (associated)
+   token.disassociate();
+```
+:::
+
+:::
+
+[...]
+
+[16]{.pnum} The expression `spawn_future(sndr, token, env)` has the following effects:
+
+- [#.#]{.pnum} Uses `alloc` to allocate and construct an object `s` of [a type that is a specialization of `@_spawn-future-state_@`]{.diffdel} [type `decltype($spawn-future-state$(alloc, token.wrap(sndr), token, senv))`]{.diffins} from `alloc`, `token.wrap(sndr)`, `token`, and `senv`. If an exception is thrown then any constructed objects are destroyed and any allocated memory is deallocated.
+- [#.#]{.pnum} Constructs an object `u` of a type that is a specialization of `unique_ptr` such that:
+  - [#.#.#]{.pnum} `u.get()` is equal to the address of `s`, and
+  - [#.#.#]{.pnum}` u.get_deleter()(u.release())` is equivalent to `u.release()->$abandon$()`.
+- [#.#]{.pnum} Returns `$make-sender$(spawn_future, std​::​move(u))`.
+
+2. Edit [exec.spawn]{.sref} as indicated:
+
+[5]{.pnum} Let `$spawn-state$` be the exposition-only class template:
+
+```cpp
+namespace std::execution {
+  template<class Alloc, scope_token Token, sender Sender>
+  struct $spawn-state$ : $spawn-state-base$ {                   // exposition only
+    using $op-t$ = connect_result_t<Sender, $spawn-receiver$>;  // exposition only
+
+    $spawn-state$(Alloc alloc, Sender&& sndr, Token token);   // exposition only
+    void complete() noexcept override;                      // exposition only
+    void run();                                             // exposition only
+
+  private:
+    @[`using $alloc-t$ =                                         // exposition only`]{.diffdel}@
+      @[`allocator_traits<Alloc>::template rebind_alloc<$spawn-state$>;`]{.diffdel}@
+
+    @[`Alloc`<-`$alloc-t$`]{.indel}@ $alloc$;                                          // exposition only
+    $op-t$ $op$;                                                // exposition only
+    Token $token$;                                            // exposition only
+
+    void $destroy$() noexcept;                                // exposition only
+  };
+}
+```
+
+[...]
+
+::: itemdecl
+```cpp
+void $destroy$() noexcept;
+```
+
+[9]{.pnum} _Effects_: Equivalent to:
+
+::: bq
+```diff
+-  auto alloc = std::move(this->$alloc$);
+-
+-  allocator_traits<$alloc-t$>::destroy(alloc, this);
+-  allocator_traits<$alloc-t$>::deallocate(alloc, this, 1);
+
++  using traits = allocator_traits<Alloc>::template rebind_traits<$spawn-state$>;
++  typename traits::allocator_type alloc(std::move(this->$alloc$));
++  traits::destroy(alloc, this);
++  traits::deallocate(alloc, this, 1);
+```
+:::
+:::
+
+[11]{.pnum} The expression `spawn(sndr, token, env)` is of type `void` and has the following effects:
+
+- [#.#]{.pnum} Uses `alloc` to allocate and construct an object `o` of type [that is a specialization of `$spawn-state$`]{.diffdel} [`decltype($spawn-state$(alloc, write_env(token.wrap(sndr), senv), token)`]{.diffins} from `alloc`, `write_env(token.wrap(sndr), senv)`, and `token` and then invokes `o.$run$()`. If an exception is thrown then any constructed objects are destroyed and any allocated memory is deallocated.
+
+:::
+
+## [US 221-339](https://github.com/cplusplus/nbballot/issues/914)
+
+[This wording is relative to the working draft after the application of the resolution of US 209-232.
+]{.ednote}
+
+Edit [exec.bulk]{.sref} as indicated:
+
+[5]{.pnum} The exposition-only class template `$impls-for$` ([exec.snd.expos]{.sref}) is specialized for `bulk_chunked_t` as follows:
+
+```cpp
+namespace std::execution {
+  template<>
+  struct $impls-for$<bulk_chunked_t> : $default-impls$ {
+    static constexpr auto $complete$ = $see below$;
+
+    template<class Sndr, class... Env>
+      static consteval void $check-types$();
+  };
+}
+```
+
+The member `$impls-for$<bulk_chunked_t>​::@_​complete_@` is initialized with a callable object equivalent to the following lambda:
+
+[...]
+
+::: add
+
+::: itemdecl
+
+```cpp
+template<class Sndr, class... Env>
+  static consteval void $check-types$();
+```
+
+[?]{.pnum} _Effects_: Equivalent to:
+
+::: bq
+```cpp
+auto cs = get_completion_signatures<$child-type$<Sndr>, $FWD-ENV-T$(Env)...>();
+auto fn = []<class... Ts>(set_value_t(*)(Ts...)) {
+  using data_type = $data-type$<Sndr>;
+  if constexpr (!invocable<remove_cvref_t<$child-type$<data_type>&,
+                           remove_cvref_t<$data-type$<data_type>>, Ts&...>)
+    throw $unspecified-exception$();
+};
+cs.$for-each$($overload-set$(fn, [](auto){}));
+```
+:::
+
+:::
+
+:::
+
+[6]{.pnum} The exposition-only class template `$impls-for$` ([exec.snd.expos]{.sref}) is specialized for `bulk_unchunked_t` as follows:
+
+```cpp
+namespace std::execution {
+  template<>
+  struct $impls-for$<bulk_unchunked_t> : $default-impls$ {
+    static constexpr auto complete = see below;
+
+    @[`template<class Sndr, class... Env>`]{.diffins}@
+      @[`static consteval void $check-types$();`]{.diffins}@
+  };
+}
+```
+
+The member `$impls-for$<bulk_unchunked_t>​::@_​complete_@` is initialized with a callable object equivalent to the following lambda:
+
+[...]
+
+::: itemdecl
+```cpp
+template<class Sndr, class... Env>
+  static consteval void $check-types$();
+```
+
+[#]{.pnum} _Effects:_ Equivalent to:
+
+::: bq
+```cpp
+auto cs = get_completion_signatures<$child-type$<Sndr>, $FWD-ENV-T$(Env)...>();
+auto fn = []<class... Ts>(set_value_t(*)(Ts...)) {
+  @[`using data_type = $data-type$<Sndr>;`]{.diffins}@
+  if constexpr (!invocable<@[`remove_cvref_t<$child-type$<data_type>>&,`]{.diffins}@
+                           remove_cvref_t<$data-type$<@[data_type<-Sndr]{.indel}@>>, Ts&...>)
+    throw $unspecified-exception$();
+};
+cs.$for-each$($overload-set$(fn, [](auto){}));
+```
+:::
+:::
+
+## [US 225-341](https://github.com/cplusplus/nbballot/issues/916)
+
+::: jwordinglist
+
+1. Edit [tuple.tuple.general]{.sref} as indicated:
+
+```cpp
+namespace std {
+  template<class... Types>
+  class tuple {
+  public:
+    // [tuple.cnstr], tuple construction
+    constexpr explicit($see below$) tuple();
+    constexpr explicit($see below$) tuple(const Types&...) @[`noexcept($see below$)`]{.diffins}@;         // only if sizeof...(Types) >= 1
+    template<class... UTypes>
+      constexpr explicit($see below$) tuple(UTypes&&...) @[`noexcept($see below$)`]{.diffins}@;           // only if sizeof...(Types) >= 1
+
+    tuple(const tuple&) = default;
+    tuple(tuple&&) = default;
+
+    template<class... UTypes>
+      constexpr explicit($see below$) tuple(tuple<UTypes...>&);
+    template<class... UTypes>
+      constexpr explicit($see below$) tuple(const tuple<UTypes...>&);
+    template<class... UTypes>
+      constexpr explicit($see below$) tuple(tuple<UTypes...>&&);
+    template<class... UTypes>
+      constexpr explicit($see below$) tuple(const tuple<UTypes...>&&);
+
+    template<class U1, class U2>
+      constexpr explicit($see below$) tuple(pair<U1, U2>&);         // only if sizeof...(Types) == 2
+    template<class U1, class U2>
+      constexpr explicit($see below$) tuple(const pair<U1, U2>&);   // only if sizeof...(Types) == 2
+    template<class U1, class U2>
+      constexpr explicit($see below$) tuple(pair<U1, U2>&&);        // only if sizeof...(Types) == 2
+    template<class U1, class U2>
+      constexpr explicit($see below$) tuple(const pair<U1, U2>&&);  // only if sizeof...(Types) == 2
+
+    template<tuple-like UTuple>
+      constexpr explicit($see below$) tuple(UTuple&&);
+
+    // allocator-extended constructors
+    template<class Alloc>
+      constexpr explicit($see below$)
+        tuple(allocator_arg_t, const Alloc& a);
+    template<class Alloc>
+      constexpr explicit($see below$)
+        tuple(allocator_arg_t, const Alloc& a, const Types&...);
+    template<class Alloc, class... UTypes>
+      constexpr explicit($see below$)
+        tuple(allocator_arg_t, const Alloc& a, UTypes&&...);
+    template<class Alloc>
+      constexpr tuple(allocator_arg_t, const Alloc& a, const tuple&);
+    template<class Alloc>
+      constexpr tuple(allocator_arg_t, const Alloc& a, tuple&&);
+    template<class Alloc, class... UTypes>
+      constexpr explicit($see below$)
+        tuple(allocator_arg_t, const Alloc& a, tuple<UTypes...>&);
+    template<class Alloc, class... UTypes>
+      constexpr explicit($see below$)
+        tuple(allocator_arg_t, const Alloc& a, const tuple<UTypes...>&);
+    template<class Alloc, class... UTypes>
+      constexpr explicit($see below$)
+        tuple(allocator_arg_t, const Alloc& a, tuple<UTypes...>&&);
+    template<class Alloc, class... UTypes>
+      constexpr explicit($see below$)
+        tuple(allocator_arg_t, const Alloc& a, const tuple<UTypes...>&&);
+    template<class Alloc, class U1, class U2>
+      constexpr explicit($see below$)
+        tuple(allocator_arg_t, const Alloc& a, pair<U1, U2>&);
+    template<class Alloc, class U1, class U2>
+      constexpr explicit($see below$)
+        tuple(allocator_arg_t, const Alloc& a, const pair<U1, U2>&);
+    template<class Alloc, class U1, class U2>
+      constexpr explicit($see below$)
+        tuple(allocator_arg_t, const Alloc& a, pair<U1, U2>&&);
+    template<class Alloc, class U1, class U2>
+      constexpr explicit($see below$)
+        tuple(allocator_arg_t, const Alloc& a, const pair<U1, U2>&&);
+
+    template<class Alloc, $tuple-like$ UTuple>
+      constexpr explicit($see below$) tuple(allocator_arg_t, const Alloc& a, UTuple&&);
+
+    // [tuple.assign], tuple assignment
+    constexpr tuple& operator=(const tuple&);
+    constexpr const tuple& operator=(const tuple&) const;
+    constexpr tuple& operator=(tuple&&) noexcept(see below);
+    constexpr const tuple& operator=(tuple&&) const;
+
+    template<class... UTypes>
+      constexpr tuple& operator=(const tuple<UTypes...>&);
+    template<class... UTypes>
+      constexpr const tuple& operator=(const tuple<UTypes...>&) const;
+    template<class... UTypes>
+      constexpr tuple& operator=(tuple<UTypes...>&&);
+    template<class... UTypes>
+      constexpr const tuple& operator=(tuple<UTypes...>&&) const;
+
+    template<class U1, class U2>
+      constexpr tuple& operator=(const pair<U1, U2>&);          // only if sizeof...(Types) == 2
+    template<class U1, class U2>
+      constexpr const tuple& operator=(const pair<U1, U2>&) const;
+                                                                // only if sizeof...(Types) == 2
+    template<class U1, class U2>
+      constexpr tuple& operator=(pair<U1, U2>&&);               // only if sizeof...(Types) == 2
+    template<class U1, class U2>
+      constexpr const tuple& operator=(pair<U1, U2>&&) const;   // only if sizeof...(Types) == 2
+
+    template<$tuple-like$ UTuple>
+      constexpr tuple& operator=(UTuple&&);
+    template<$tuple-like$ UTuple>
+      constexpr const tuple& operator=(UTuple&&) const;
+
+    // [tuple.swap], tuple swap
+    constexpr void swap(tuple&) noexcept($see below$);
+    constexpr void swap(const tuple&) const noexcept($see below$);
+  };
+
+  template<class... UTypes>
+    tuple(UTypes...) -> tuple<UTypes...>;
+  template<class T1, class T2>
+    tuple(pair<T1, T2>) -> tuple<T1, T2>;
+  template<class Alloc, class... UTypes>
+    tuple(allocator_arg_t, Alloc, UTypes...) -> tuple<UTypes...>;
+  template<class Alloc, class T1, class T2>
+    tuple(allocator_arg_t, Alloc, pair<T1, T2>) -> tuple<T1, T2>;
+  template<class Alloc, class... UTypes>
+    tuple(allocator_arg_t, Alloc, tuple<UTypes...>) -> tuple<UTypes...>;
+}
+```
+
+1. Edit [tuple.cnstr]{.sref} as indicated:
+
+::: itemdecl
+
+```cpp
+constexpr explicit($see below$) tuple(const Types&...) @[`noexcept((is_nothrow_copy_constructible_v<Types> && ...))`]{.diffins}@;
+```
+
+[9]{.pnum} _Constraints_: [...]
+
+[#]{.pnum} _Effects_: [...]
+
+[#]{.pnum} _Remarks_: [...]
+
+```cpp
+template<class... UTypes>
+  constexpr explicit($see below$) tuple(UTypes&&... u) @[`noexcept((is_nothrow_constructible_v<Types, UTypes> && ...))`]{.diffins}@;
+```
+
+[#]{.pnum} [...]
+
+[#]{.pnum} _Constraints_: [...]
+
+[#]{.pnum} _Effects_: [...]
+
+[#]{.pnum} _Remarks_: [...]
+
+:::
+
 :::

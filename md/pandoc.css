@@ -105,8 +105,8 @@ span.diffdel {
     background-color: var(--diff-strongdel);
 }
 
-div.rm { text-decoration: line-through; }
-div.rm code.sourceCode { text-decoration: line-through; }
+div.rm { text-decoration: line-through; color: #8f3131 !important }
+div.rm code.sourceCode { text-decoration: line-through; color: #8f3131 !important }
 div.addu, span.addu {
     color: #006e28;
     background-color: var(--diff-ins);
