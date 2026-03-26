@@ -606,7 +606,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <table style="border:none;float:right">
   <tr>
     <td>Document #:</td>
-    <td>P3914R0</td>
+    <td>P4154R0</td>
   </tr>
   <tr>
     <td>Date:</td>
@@ -626,6 +626,7 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
     <td style="vertical-align:top">Reply-to:</td>
     <td>
       Tim Song<br>&lt;<a href="mailto:t.canens.cpp@gmail.com" class="email">t.canens.cpp@gmail.com</a>&gt;<br>
+      Ruslan Arutyunyan<br>&lt;<a href="mailto:ruslan.arutyunyan@intel.com" class="email">ruslan.arutyunyan@intel.com</a>&gt;<br>
     </td>
   </tr>
 </table>
@@ -646,13 +647,17 @@ div.rm pre, div.add pre { background-color: rgba(255, 255, 255, .03); }
 <li><span class="citation" data-cites="P3940R0">[<a href="#ref-P3940R0" role="doc-biblioref">P3940R0</a>]</span>: Rename concept tags for C++26: <code class="sourceCode cpp">sender_t</code> to <code class="sourceCode cpp">sender_tag</code></li>
 <li><span class="citation" data-cites="P4031R1">[<a href="#ref-P4031R1" role="doc-biblioref">P4031R1</a>]</span>: Rename <code class="sourceCode cpp">system_context_replaceability</code> namespace</li>
 </ul>
-<p>which resolves the following national body comment on the C++26 CD:</p>
+<p>This resolves the following national body comment on the C++26 CD:</p>
 <ul>
-<li><a href="https://github.com/cplusplus/nbballot/issues/835">US 205-320</a></li>
+<li><a href="https://github.com/cplusplus/nbballot/issues/895">US 205-320</a></li>
+</ul>
+<p>and partially addresses the following national body comment on the C++26 CD:</p>
+<ul>
+<li><a href="https://github.com/cplusplus/nbballot/issues/970">RO 4-395</a></li>
 </ul>
 <p>Because there are multiple papers in flight targeting <span>33 <a href="https://eel.is/c++draft/exec">[exec]</a></span>, LWG requested replacement wording for renames to minimize merge conflicts.</p>
 <h1 data-number="2" style="border-bottom:1px solid #cccccc" id="wording"><span class="header-section-number">2</span> Wording<a href="#wording" class="self-link"></a></h1>
-<p>Instruction to the editor:</p>
+<p>Instructions to the editor:</p>
 <p>After applying <em>all other papers</em> moved during the Croydon meeting, please make the following replacements in <span>33 <a href="https://eel.is/c++draft/exec">[exec]</a></span>:</p>
 <ul>
 <li>Replace each instance of <code class="sourceCode cpp">sender_t</code> with <code class="sourceCode cpp">sender_tag</code>.</li>

@@ -1,12 +1,14 @@
 ---
 title: Renaming various execution things
-document: P3914R0
+document: P4154R0
 date: today
 audience:
   - LWG
 author:
   - name: Tim Song
     email: <t.canens.cpp@gmail.com>
+  - name: Ruslan Arutyunyan
+    email: <ruslan.arutyunyan@intel.com>
 ---
 
 # Introduction
@@ -16,16 +18,20 @@ This paper provides replacement wording for the following papers:
 - [@P3940R0]: Rename concept tags for C++26: `sender_t` to `sender_tag`
 - [@P4031R1]: Rename `system_context_replaceability` namespace
 
-which resolves the following national body comment on the C++26 CD:
+This resolves the following national body comment on the C++26 CD:
 
-- [US 205-320](https://github.com/cplusplus/nbballot/issues/835)
+- [US 205-320](https://github.com/cplusplus/nbballot/issues/895)
+
+and partially addresses the following national body comment on the C++26 CD:
+
+- [RO 4-395](https://github.com/cplusplus/nbballot/issues/970)
 
 Because there are multiple papers in flight targeting [exec]{.sref},
 LWG requested replacement wording for renames to minimize merge conflicts.
 
 # Wording
 
-Instruction to the editor:
+Instructions to the editor:
 
 After applying _all other papers_ moved during the Croydon meeting,
 please make the following replacements in [exec]{.sref}:
@@ -47,7 +53,7 @@ references:
       citation-label: P4031R1
       title: "Rename `system_context_replaceability` namespace"
       author:
-        - family: "	Ruslan Arutyunyan"
+        - family: "Ruslan Arutyunyan"
       issued:
         year: 2026
       URL: https://wg21.link/P4031R1
