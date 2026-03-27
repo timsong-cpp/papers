@@ -9,6 +9,8 @@ author:
     email: <t.canens.cpp@gmail.com>
   - name: Ruslan Arutyunyan
     email: <ruslan.arutyunyan@intel.com>
+  - name: Arthur O'Dwyer
+    email: <arthur.j.odwyer@gmail.com>
 ---
 
 # Introduction
@@ -44,7 +46,7 @@ please make the following replacements in [exec]{.sref}:
 - Replace each instance of `receiver_t` **outside** [exec.continues.on][^1] with `receiver_tag`.
 - In [exec.continues.on], replace `using receiver_concept = receiver_t;` with `using receiver_concept = receiver_tag;`.
 
-[^1]: In particular, this cross-reference is after [@P3826R5] has been applied.
+[^1]: In particular, this cross-reference is after [@P3826R5] has been applied (in the current working draft [@N5032], the relevant wording is located in [exec.schedule.from]{.sref}).
 
 
 ---
